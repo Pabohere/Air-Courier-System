@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ __('Sign in · Standard') }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ __('Sign in · Standard') }}</title><script src="{{ asset('js/theme.js') }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 </head>
@@ -24,6 +24,7 @@
 <small>{{ __('Single branch · International courier management') }}</small>
 </section>
 <section class="login-form">
+<x-theme-switch />
 <x-language-switch />
 <div class="eyebrow">
 {{ __('WELCOME BACK') }}

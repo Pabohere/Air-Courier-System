@@ -407,5 +407,8 @@
   "PaymentMethod": "PaymentMethod",
   "Rate": "Rate",
   "User": "User",
-  "Reconciliation": "Reconciliation"
+  "Reconciliation": "Reconciliation",
+  "Appearance": "Appearance",
+  "Light": "Light",
+  "Dark": "Dark"
 }

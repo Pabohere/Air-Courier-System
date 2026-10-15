@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} {{ __('· Manifest') }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} {{ __('· Manifest') }}</title><script src="{{ asset('js/theme.js') }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 </head>
 <body>
 <main class="print-page">
 <div class="print-toolbar">
+<x-theme-switch />
 <x-language-switch />
 <a href="{{ route('dispatches.show',$dispatch) }}" class="button secondary">{{ __('Back') }}</a><button class="button" data-print>{{ __('Print manifest') }}</button>
 </div>
