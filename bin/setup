@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+if command -v composer >/dev/null 2>&1; then composer install --no-interaction; elif [ -f .tools/composer ]; then ./bin/php .tools/composer install --no-interaction; else printf '%s\n' 'Composer 2 is required; see README.md.' >&2; exit 1; fi
+if [ ! -f .env ]; then cp .env.example .env; fi
+if ! grep -q '^APP_KEY=base64:' .env; then ./bin/php artisan key:generate --no-interaction; fi
+if [ ! -f database/database.sqlite ]; then touch database/database.sqlite; fi
+./bin/php artisan migrate --no-interaction
+./bin/php artisan db:seed --no-interaction
+printf '%s\n' 'Ready. Create an admin with ./bin/php artisan courier:admin you@example.com, or seed local sample data per README.md.' 'Start with ./bin/serve. Run checks with ./bin/test.'

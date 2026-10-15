@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+COURIER_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if command -v php >/dev/null 2>&1; then exec php "$@"; fi
+if [ -x "$COURIER_ROOT/.tools/php" ]; then exec "$COURIER_ROOT/.tools/php" "$@"; fi
+printf '%s\n' 'PHP 8.4+ is required. Install PHP and Composer; see README.md.' >&2
+exit 1
