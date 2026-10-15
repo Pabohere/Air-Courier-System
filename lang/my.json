@@ -499,5 +499,11 @@
   ":branch dashboard": ":branch ဒက်ရှ်ဘုတ်",
   "Branch dashboards": "ဆိုင်ခွဲ ဒက်ရှ်ဘုတ်များ",
   "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "ပို့ခနှင့် လက်ကျန်မှာ ဤဆိုင်ခွဲမှ အပ်နှံမှုများအတွက် ဖြစ်ပြီး၊ ငွေလက်ခံမှုမှာ ဤဆိုင်ခွဲ၌ လက်ခံရရှိသည့်ငွေ ဖြစ်ပါသည်။ ငွေကြေးတစ်မျိုးစီ ခွဲပြထားပါသည်။",
-  "Opened your assigned branch dashboard (:branch).": "သင့်အကောင့်၏ ဆိုင်ခွဲ (:branch) ဒက်ရှ်ဘုတ်သို့ ပြောင်းဖွင့်ပေးထားပါသည်။"
+  "Opened your assigned branch dashboard (:branch).": "သင့်အကောင့်၏ ဆိုင်ခွဲ (:branch) ဒက်ရှ်ဘုတ်သို့ ပြောင်းဖွင့်ပေးထားပါသည်။",
+  "Choose the branch you want to work in.": "မိမိဝင်ရောက်လုပ်ကိုင်မည့် ဆိုင်ခွဲကို ရွေးပါ။",
+  "Choose your branch": "ဆိုင်ခွဲရွေးချယ်ရန်",
+  "Sign in to :branch dashboard": ":branch ဒက်ရှ်ဘုတ်သို့ ဝင်ရောက်ရန်",
+  "Sign in to :branch →": ":branch သို့ ဝင်ရောက်ရန် →",
+  "Staff must use their assigned branch. Admin can choose either side.": "ဝန်ထမ်းများသည် မိမိဆိုင်ခွဲကို ရွေးရပါမည်။ Admin သည် နှစ်ဖက်လုံး ရွေးနိုင်ပါသည်။",
+  "Check your email, password and selected branch.": "အီးမေးလ်၊ စကားဝှက်နှင့် ရွေးထားသော ဆိုင်ခွဲကို စစ်ဆေးပါ။"
 }

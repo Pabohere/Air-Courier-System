@@ -499,5 +499,11 @@
   ":branch dashboard": ":branch dashboard",
   "Branch dashboards": "Branch dashboards",
   "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.",
-  "Opened your assigned branch dashboard (:branch).": "Opened your assigned branch dashboard (:branch)."
+  "Opened your assigned branch dashboard (:branch).": "Opened your assigned branch dashboard (:branch).",
+  "Choose the branch you want to work in.": "Choose the branch you want to work in.",
+  "Choose your branch": "Choose your branch",
+  "Sign in to :branch dashboard": "Sign in to :branch dashboard",
+  "Sign in to :branch →": "Sign in to :branch →",
+  "Staff must use their assigned branch. Admin can choose either side.": "Staff must use their assigned branch. Admin can choose either side.",
+  "Check your email, password and selected branch.": "Check your email, password and selected branch."
 }
