@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} · Manifest</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
-<link rel="icon" type="image/png" href="{{ asset('images/standard-logo.png') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 </head>
 <body>
 <main class="print-page">
@@ -11,7 +11,7 @@
 </div>
 <div class="print-head">
 <div class="print-company">
-<img class="print-logo" src="{{ asset('images/standard-logo.png') }}" alt="Standard courier logo" width="960" height="960">
+<img class="print-logo" src="{{ asset('images/standard-mark.png') }}" alt="Standard courier logo" width="1305" height="1206">
 <div>
 <h1>
 {{ $company->name }}

@@ -53,8 +53,8 @@ button {
   width:68px;
   height:68px;
   object-fit:contain;
-  background:white;
-  border-radius:10px;
+  background:transparent;
+  border-radius:0;
   flex-shrink:0;
 }
 .brand-copy { font-size:24px; letter-spacing:-.5px; }
@@ -938,3 +938,20 @@ nav a.active { box-shadow:inset 3px 0 0 var(--brand-sky); }
   .print-logo { width:26mm; height:26mm; }
   .print-head { border-color:#062467; }
 }
+
+/* Keep the extracted navy emblem legible without a white image tile. */
+.sidebar { background:#edf5ff; border-right:1px solid #d6e4f8; color:#062467; }
+.sidebar .brand { color:#062467; }
+.sidebar .brand-logo { background:transparent; border-radius:0; }
+.sidebar .brand small { color:#506d9d; }
+.sidebar .nav-caption { color:#647da5; }
+.sidebar nav a { color:#153d78; }
+.sidebar nav a:hover { background:#dcecff; }
+.sidebar nav a.active { background:#0a469f; color:white; border-color:#0a469f; }
+.sidebar-bottom { color:#45628e; border-color:#ceddf2; }
+.sidebar-bottom small { color:#647da5; }
+.login-story { background:linear-gradient(145deg,#edf7ff,#d9ebff); color:#062467; }
+.login-story .brand, .login-story h1 { color:#062467; }
+.login-story .brand-logo { background:transparent; border-radius:0; }
+.login-story .brand small, .login-story p, .login-story small { color:#496b9a; }
+.login-story .eyebrow { color:#0a469f; }
