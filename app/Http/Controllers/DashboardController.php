@@ -6,18 +6,24 @@ use App\Models\Branch;
 use App\Models\Shipment;
 use App\Services\BranchAccess;
 use App\Services\ReportService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(ReportService $reports, Request $request, ?string $side = null): View
+    public function __invoke(ReportService $reports, Request $request, ?string $side = null): View|RedirectResponse
     {
         [$requestedBranchId] = BranchAccess::financialScope($request);
         $branch = $side
             ? Branch::where('code', strtoupper($side))->firstOrFail()
             : ($requestedBranchId ? Branch::findOrFail($requestedBranchId) : Branch::where('code', 'YGN')->firstOrFail());
-        BranchAccess::authorize($request->user(), $branch->id);
+        $user = $request->user();
+        if ($side && ! $user->isAdmin() && $user->branch && $user->branch_id !== $branch->id) {
+            return redirect()->route('dashboard.branch', ['side' => strtolower($user->branch->code)])
+                ->with('success', __('Opened your assigned branch dashboard (:branch).', ['branch' => $user->branch->code]));
+        }
+        BranchAccess::authorize($user, $branch->id);
         $branchId = $branch->id;
         $currency = $request->input('currency') ?? ($branch->code === 'SG' ? 'SGD' : 'MMK');
         $today = BranchAccess::todayFor($branchId);

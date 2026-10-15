@@ -42,9 +42,35 @@ class BranchDashboardTest extends TestCase
             $this->actingAs(User::factory()->create(['branch_id' => $branch->id]));
             $this->get(route('dashboard'))->assertOk()->assertViewHas('branchId', $branch->id);
             $this->get(route('dashboard.branch', ['side' => strtolower($code)]))->assertOk();
-            $this->get(route('dashboard.branch', ['side' => strtolower($other->code)]))->assertForbidden();
+            $this->get(route('dashboard.branch', ['side' => strtolower($other->code)]))
+                ->assertRedirectToRoute('dashboard.branch', ['side' => strtolower($code)])
+                ->assertSessionHas('success');
+            $this->get(route('dashboard.branch', ['side' => strtolower($code)]))->assertOk()->assertViewHas('branchId', $branch->id);
             $this->get(route('dashboard.branch', ['side' => strtolower($code), 'branch_id' => $other->id]))->assertForbidden();
         }
+    }
+
+    public function test_login_from_another_branch_dashboard_recovers_to_the_assigned_branch(): void
+    {
+        foreach (['YGN', 'SG'] as $code) {
+            $branch = Branch::where('code', $code)->firstOrFail();
+            $otherSide = $code === 'YGN' ? 'sg' : 'ygn';
+            $staff = User::factory()->create(['branch_id' => $branch->id]);
+            $this->withSession(['url.intended' => route('dashboard.branch', ['side' => $otherSide])])
+                ->post(route('login.store'), ['email' => $staff->email, 'password' => 'password'])
+                ->assertRedirectToRoute('dashboard.branch', ['side' => $otherSide]);
+            $this->get(route('dashboard.branch', ['side' => $otherSide]))
+                ->assertRedirectToRoute('dashboard.branch', ['side' => strtolower($code)]);
+            $this->get(route('dashboard.branch', ['side' => strtolower($code)]))
+                ->assertOk()->assertViewHas('branchId', $branch->id);
+            $this->post(route('logout'))->assertRedirectToRoute('login');
+        }
+    }
+
+    public function test_unassigned_staff_cannot_gain_dashboard_access_through_redirects(): void
+    {
+        $this->actingAs(User::factory()->create(['branch_id' => null]))
+            ->get(route('dashboard.branch', ['side' => 'ygn']))->assertForbidden();
     }
 
     public function test_dashboard_separates_booking_charges_receipt_branch_and_currency(): void

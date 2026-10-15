@@ -498,5 +498,6 @@
   "Recipient": "လက်ခံသူ",
   ":branch dashboard": ":branch ဒက်ရှ်ဘုတ်",
   "Branch dashboards": "ဆိုင်ခွဲ ဒက်ရှ်ဘုတ်များ",
-  "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "ပို့ခနှင့် လက်ကျန်မှာ ဤဆိုင်ခွဲမှ အပ်နှံမှုများအတွက် ဖြစ်ပြီး၊ ငွေလက်ခံမှုမှာ ဤဆိုင်ခွဲ၌ လက်ခံရရှိသည့်ငွေ ဖြစ်ပါသည်။ ငွေကြေးတစ်မျိုးစီ ခွဲပြထားပါသည်။"
+  "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "ပို့ခနှင့် လက်ကျန်မှာ ဤဆိုင်ခွဲမှ အပ်နှံမှုများအတွက် ဖြစ်ပြီး၊ ငွေလက်ခံမှုမှာ ဤဆိုင်ခွဲ၌ လက်ခံရရှိသည့်ငွေ ဖြစ်ပါသည်။ ငွေကြေးတစ်မျိုးစီ ခွဲပြထားပါသည်။",
+  "Opened your assigned branch dashboard (:branch).": "သင့်အကောင့်၏ ဆိုင်ခွဲ (:branch) ဒက်ရှ်ဘုတ်သို့ ပြောင်းဖွင့်ပေးထားပါသည်။"
 }
