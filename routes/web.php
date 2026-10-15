@@ -23,6 +23,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(function () {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/dashboard/{side}', DashboardController::class)->whereIn('side', ['ygn', 'sg'])->name('dashboard.branch');
     Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
     Route::get('/flight-schedule', FlightScheduleController::class)->name('flights.index');
     Route::resource('customers', CustomerController::class)->except('destroy');

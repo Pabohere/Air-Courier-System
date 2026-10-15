@@ -495,5 +495,8 @@
   "YGN ↔ SG · Connected branch operations": "YGN ↔ SG · Connected branch operations",
   "Collected by customer": "Collected by customer",
   "Select YGN or SG for a staff account.": "Select YGN or SG for a staff account.",
-  "Recipient": "Recipient"
+  "Recipient": "Recipient",
+  ":branch dashboard": ":branch dashboard",
+  "Branch dashboards": "Branch dashboards",
+  "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time."
 }

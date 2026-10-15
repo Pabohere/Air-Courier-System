@@ -13,7 +13,14 @@
 {{ __('WORKSPACE') }}
 </div>
 <nav>
-@foreach(['dashboard'=>[__('Overview'),'◫'],'branches.index'=>[__('Branch operations'),'⇆'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤'],'flights.index'=>[__('Flight schedule'),'✈']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
+@if(auth()->user()->isAdmin())
+@foreach($branches as $dashboardBranch)
+<a href="{{ route('dashboard.branch', ['side' => strtolower($dashboardBranch->code)]) }}" class="{{ request()->routeIs('dashboard*') && ($branchId ?? null) === $dashboardBranch->id ? 'active' : '' }}"><span>◫</span>{{ __(':branch dashboard', ['branch' => $dashboardBranch->code]) }}</a>
+@endforeach
+@else
+<a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}"><span>◫</span>{{ __('Overview') }}</a>
+@endif
+@foreach(['branches.index'=>[__('Branch operations'),'⇆'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤'],'flights.index'=>[__('Flight schedule'),'✈']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
 <div class="nav-caption">
 {{ __('ADMINISTRATION') }}
 </div>

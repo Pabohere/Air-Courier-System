@@ -495,5 +495,8 @@
   "YGN ↔ SG · Connected branch operations": "YGN ↔ SG · ဆိုင်ခွဲချိတ်ဆက် လုပ်ငန်းစနစ်",
   "Collected by customer": "ဖောက်သည်မှ လာထုတ်ပြီး",
   "Select YGN or SG for a staff account.": "ဝန်ထမ်းအကောင့်အတွက် YGN သို့မဟုတ် SG ဆိုင်ခွဲကို ရွေးပါ။",
-  "Recipient": "လက်ခံသူ"
+  "Recipient": "လက်ခံသူ",
+  ":branch dashboard": ":branch ဒက်ရှ်ဘုတ်",
+  "Branch dashboards": "ဆိုင်ခွဲ ဒက်ရှ်ဘုတ်များ",
+  "Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.": "ပို့ခနှင့် လက်ကျန်မှာ ဤဆိုင်ခွဲမှ အပ်နှံမှုများအတွက် ဖြစ်ပြီး၊ ငွေလက်ခံမှုမှာ ဤဆိုင်ခွဲ၌ လက်ခံရရှိသည့်ငွေ ဖြစ်ပါသည်။ ငွေကြေးတစ်မျိုးစီ ခွဲပြထားပါသည်။"
 }
