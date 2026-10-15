@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · Air Courier</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · Standard</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/standard-logo.png') }}">
 </head>
 <body class="login-body">
 <div class="login-shell">
 <section class="login-story">
 <div>
 <div class="brand">
-<span class="brand-icon">↗</span><span>air courier<small>OPERATIONS DESK</small></span>
+<img class="brand-logo" src="{{ asset('images/standard-logo.png') }}" alt="Standard · Yangon–Singapore courier service" width="960" height="960">
+<span class="brand-copy">Standard<small>YANGON ↔ SINGAPORE</small></span>
 </div>
-<div class="eyebrow" style="color:#9cddc5">
+<div class="eyebrow">
 YOUR DAILY OPERATIONS, CONNECTED
 </div>
 <h1>

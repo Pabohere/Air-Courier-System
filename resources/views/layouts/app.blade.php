@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title','Overview') · {{ $company?->name ?? 'Air Courier' }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title','Overview') · {{ $company?->name ?? 'Standard' }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/standard-logo.png') }}">
 </head>
 <body>
 <aside class="sidebar">
-<a class="brand" href="{{ route('dashboard') }}"><span class="brand-icon">↗</span><span>air courier<small>OPERATIONS DESK</small></span></a>
+<a class="brand" href="{{ route('dashboard') }}"><img class="brand-logo" src="{{ asset('images/standard-logo.png') }}" alt="Standard · Yangon–Singapore courier service" width="960" height="960">
+<span class="brand-copy">Standard<small>YANGON ↔ SINGAPORE</small></span></a>
 <div class="nav-caption">
 WORKSPACE
 </div>

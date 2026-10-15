@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} · Manifest</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/standard-logo.png') }}">
 </head>
 <body>
 <main class="print-page">
@@ -9,11 +10,14 @@
 <a href="{{ route('dispatches.show',$dispatch) }}" class="button secondary">Back</a><button class="button" data-print>Print manifest</button>
 </div>
 <div class="print-head">
+<div class="print-company">
+<img class="print-logo" src="{{ asset('images/standard-logo.png') }}" alt="Standard courier logo" width="960" height="960">
 <div>
 <h1>
 {{ $company->name }}
 </h1>
 <p class="preserve subtle">{{ $company->address }}<br>{{ $company->phone }}</p>
+</div>
 </div>
 <div class="right">
 <div class="eyebrow">
