@@ -1,0 +1,2 @@
+<label class="full">{{ __('Parcel photos') }}<input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" data-parcel-photos data-max-photos="{{ $remaining ?? 5 }}" data-photo-error="{{ __('Select up to :count photos, maximum 1 MB each (JPG, PNG or WebP).', ['count' => $remaining ?? 5]) }}"><span class="help">{{ __('Select up to :count photos, maximum 1 MB each (JPG, PNG or WebP).', ['count' => $remaining ?? 5]) }}</span></label>
+<div class="parcel-photo-grid full" data-photo-preview aria-live="polite"></div>

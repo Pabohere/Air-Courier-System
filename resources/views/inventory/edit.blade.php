@@ -3,6 +3,7 @@
 @section('content')
 <div class="page-heading"><div><div class="eyebrow">{{ $shipment->currentBranch->code }} · {{ $shipment->tracking_number }}</div><h1>{{ __('Manage storage') }}</h1></div><a class="button secondary" href="{{ route('inventory.index', ['branch_id' => $shipment->current_branch_id]) }}">{{ __('Back to storage') }}</a></div>
 <section class="card"><div class="card-head"><h2>{{ __('Parcel details') }}</h2><a href="{{ route('shipments.show', $shipment) }}">{{ __('Tracking') }} →</a></div><div class="card-body"><p>{{ $shipment->sender['name'] }} → {{ $shipment->recipient_name }}</p><p>{{ $shipment->quantity }} {{ __('pcs') }} · {{ $shipment->actual_weight }} kg · {{ __($shipment->status) }}</p></div></section>
+@include('shipments.photos')
 @if($shipment->inventory_archived_at)
 <section class="card"><div class="card-head"><h2>{{ __('Deleted entries') }}</h2></div><div class="card-body"><p>{{ $shipment->inventory_archive_reason }}</p><p class="help">{{ __('Deleted entries can be restored. Totals include deleted entries while parcels remain physically in storage. Use handover, collection or return to record physical stock leaving.') }}</p><form method="post" action="{{ route('inventory.restore', $shipment) }}">@csrf<button class="button">{{ __('Restore entry') }}</button></form></div></section>
 @else

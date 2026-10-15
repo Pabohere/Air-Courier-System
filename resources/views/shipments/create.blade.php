@@ -3,7 +3,7 @@
 @section('content')
 <div class="page-heading"><div><div class="eyebrow">{{ __('YGN ↔ SG BRANCH TRANSFER') }}</div><h1>{{ __('Book a shipment') }}</h1><p class="subtle">{{ __('Weigh the parcel, choose its branch route, and enter the agreed charge.') }}</p></div><a class="button secondary" href="{{ route('branches.index') }}">{{ __('Branch operations') }} →</a></div>
 @if($customers->isEmpty())<div class="notice error">{{ __('Add a customer before booking.') }} <a href="{{ route('customers.create') }}">{{ __('Add customer →') }}</a></div>@endif
-<form method="post" action="{{ route('shipments.store') }}">
+<form method="post" enctype="multipart/form-data" action="{{ route('shipments.store') }}">
 @csrf<input type="hidden" name="booking_key" value="{{ old('booking_key', \Illuminate\Support\Str::uuid()) }}">
 <div class="split"><div>
 <section class="card"><div class="card-head"><h2>{{ __('Branch route') }}</h2><span class="badge">YGN ↔ SG</span></div><div class="card-body field-grid">
@@ -28,6 +28,7 @@
 <label>{{ __('Shipment date') }}<input type="date" name="shipment_date" value="{{ old('shipment_date', \App\Services\BranchAccess::todayFor()) }}" max="{{ \App\Services\BranchAccess::todayFor() }}" required></label>
 <label>{{ __('Quantity / pieces') }}<input type="number" name="quantity" value="{{ old('quantity', 1) }}" min="1" max="10000" required></label>
 <label>{{ __('Actual weight (kg)') }}<input type="number" name="actual_weight" value="{{ old('actual_weight') }}" min="0.001" max="99999.999" step="0.001" required></label>
+@include('shipments.photo-input')
 <label class="full">{{ __('Parcel description') }}<textarea name="description" required>{{ old('description') }}</textarea></label>
 </div></section></div><div><section class="card"><div class="card-head"><h2>{{ __('03 · Shipment charges') }}</h2></div><div class="card-body">
 <p class="subtle">{{ __('Enter the agreed shipment charge manually. MMK and SGD are kept separately; no automatic currency conversion.') }}</p>

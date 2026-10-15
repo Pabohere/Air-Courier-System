@@ -9,6 +9,7 @@ use App\Models\PaymentMethod;
 use App\Models\Shipment;
 use App\Services\BranchAccess;
 use App\Services\CourierService;
+use App\Services\ShipmentPhotoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -30,11 +31,12 @@ class ShipmentController extends Controller
         return view('shipments.create', ['customers' => Customer::orderBy('name')->get(), 'destinations' => Destination::with('rate')->where('active', true)->whereHas('rate')->orderBy('country')->get(), 'settings' => CompanySetting::firstOrFail()]);
     }
 
-    public function store(Request $request, CourierService $service): RedirectResponse
+    public function store(Request $request, ShipmentPhotoService $photos): RedirectResponse
     {
         $routed = $request->has('origin_branch_id') || $request->has('destination_branch_id') || $request->user()->branch_id !== null;
         $data = $request->validate(($routed ? ['origin_branch_id' => 'required|integer|exists:branches,id', 'destination_branch_id' => 'required|integer|different:origin_branch_id|exists:branches,id', 'currency' => 'required|in:MMK,SGD', 'price' => ['required', 'regex:/^\d{1,9}(\.\d{1,2})?$/D']] : []) + ['storage_location' => 'nullable|string|max:100', 'booking_key' => 'required|uuid', 'customer_id' => 'required|integer|exists:customers,id', 'destination_id' => ($routed ? 'nullable' : 'required').'|integer|exists:destinations,id', 'recipient_name' => 'required|string|max:150', 'recipient_phone' => 'required|string|max:50', 'recipient_address' => 'required|string|max:2000', 'shipment_date' => 'required|date_format:Y-m-d|before_or_equal:'.BranchAccess::todayFor($routed ? $request->integer('origin_branch_id') : null), 'description' => 'required|string|max:2000', 'quantity' => 'required|integer|min:1|max:10000', 'actual_weight' => ['required', 'regex:/^\d{1,5}(\.\d{1,3})?$/D']]);
-        $shipment = $service->book($data, $request->user());
+        $request->validate(ShipmentPhotoService::rules());
+        $shipment = $photos->book($data, $request->file('photos', []), $request->user());
 
         return redirect()->route('shipments.show', $shipment)->with('success', __('Shipment booked. Price is saved and locked.'));
     }

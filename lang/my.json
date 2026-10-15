@@ -572,5 +572,13 @@
   "Deleted entries can be restored. Totals include deleted entries while parcels remain physically in storage. Use handover, collection or return to record physical stock leaving.": "ဖျက်ထားသောစာရင်းကို ပြန်ယူနိုင်ပါသည်။ ပါဆယ်ဆိုင်မှာရှိနေသေးလျှင် စုစုပေါင်းလက်ကျန်မှာ ဆက်တွက်ထားပါသည်။ ပစ္စည်းတကယ်ထွက်လျှင် သယ်ယူသူထံလွှဲခြင်း၊ လာထုတ်ခြင်း သို့မဟုတ် ပေးပို့သူထံပြန်ပေးခြင်းကို မှတ်တမ်းတင်ပါ။",
   "Storage entry moved to deleted entries. Physical stock and shipment records are preserved.": "ဖျက်ထားသောစာရင်းထဲ ရွှေ့ပြီးပါပြီ။ ပါဆယ်လက်ကျန်နှင့် ပို့ဆောင်မှုမှတ်တမ်းများ ဆက်လက်ရှိနေပါသည်။",
   "Storage entry restored.": "သိုလှောင်စာရင်း ပြန်ယူပြီးပါပြီ။",
-  "Save changes": "ပြင်ဆင်ချက် သိမ်းရန်"
+  "Save changes": "ပြင်ဆင်ချက် သိမ်းရန်",
+  "Parcel photos": "ပါဆယ်ဓာတ်ပုံများ",
+  "Select up to :count photos, maximum 1 MB each (JPG, PNG or WebP).": "ဓာတ်ပုံ :count ပုံအထိ ရွေးနိုင်ပါသည်။ တစ်ပုံလျှင် အများဆုံး 1 MB (JPG၊ PNG သို့မဟုတ် WebP)။",
+  "Parcel photo :number": "ပါဆယ်ဓာတ်ပုံ :number",
+  "No parcel photos uploaded yet.": "ပါဆယ်ဓာတ်ပုံ မတင်ရသေးပါ။",
+  "Upload photos": "ဓာတ်ပုံတင်ရန်",
+  "Maximum 5 photos saved for this parcel.": "ဤပါဆယ်အတွက် ဓာတ်ပုံ အများဆုံး ၅ ပုံ သိမ်းထားပြီးပါပြီ။",
+  "Parcel photos saved.": "ပါဆယ်ဓာတ်ပုံများ သိမ်းပြီးပါပြီ။",
+  "A parcel can have at most 5 photos. Existing photos count toward this limit.": "ပါဆယ်တစ်ခုလျှင် ဓာတ်ပုံ အများဆုံး ၅ ပုံသာ တင်နိုင်ပါသည်။ ရှိပြီးသားပုံများလည်း ထည့်တွက်ပါသည်။"
 }

@@ -64,3 +64,29 @@ if (originBranch && destinationBranch) {
     originBranch.addEventListener('change', alignBranches);
     alignBranches();
 }
+
+
+document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
+    const preview = input.closest('form').querySelector('[data-photo-preview]');
+    let urls = [];
+    input.addEventListener('change', () => {
+        urls.forEach((url) => URL.revokeObjectURL(url));
+        urls = [];
+        preview.replaceChildren();
+        const files = Array.from(input.files);
+        const invalid = files.length > Number(input.dataset.maxPhotos) || files.some((file) => file.size > 1024 * 1024 || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type));
+        input.setCustomValidity(invalid ? input.dataset.photoError : '');
+        if (invalid) {
+            input.reportValidity();
+            return;
+        }
+        files.forEach((file) => {
+            const img = document.createElement('img');
+            const url = URL.createObjectURL(file);
+            urls.push(url);
+            img.src = url;
+            img.alt = file.name;
+            preview.append(img);
+        });
+    });
+});
