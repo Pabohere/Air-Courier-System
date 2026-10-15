@@ -501,3 +501,36 @@ html[data-theme="dark"] .login-form .language-switch button[aria-pressed="true"]
     .print-page h1, .print-page h2, .print-page h3, .print-page td, .print-page .summary-list .total { color: black; }
     .print-page th { background: #f3f3f3; color: #333; }
 }
+
+/* Official timetable reference. The source images retain a white paper surface. */
+.flight-route { display:grid; grid-template-columns:auto minmax(50px,1fr) auto 1.25fr; align-items:center; gap:26px; padding:28px 30px; }
+.flight-route-airport { display:flex; flex-direction:column; gap:2px; min-width:92px; }
+.flight-route-airport .eyebrow { margin:0; font-size:9px; }
+.flight-route-airport strong { font:650 42px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; letter-spacing:-1px; color:#bcd0e9; }
+.flight-route-airport>span:last-child { color:var(--muted); font-size:12px; }
+.flight-route-singapore strong { color:#e3a4cd; }
+.flight-route-line { height:1px; background:linear-gradient(90deg,#1d5dab,#b51b70); position:relative; }
+.flight-route-line span { position:absolute; top:-17px; left:calc(50% - 13px); color:#c8c4df; font-size:26px; transform:rotate(-12deg); }
+.flight-reference { display:flex; flex-direction:column; gap:7px; padding-left:26px; border-left:1px solid var(--line); }
+.flight-reference .eyebrow { margin:0; }
+.flight-reference strong { font-size:13px; }
+.schedule-alert { color:#f4d9a3; background:#d18e1012; border:1px solid #d18e104d; border-left:3px solid #d18e10; border-radius:14px; padding:17px 22px; margin:0 0 28px; }
+.schedule-alert strong { font-size:13px; }
+.schedule-alert p { font-size:12px; margin:6px 0 0; max-width:1000px; }
+.flight-section-heading { display:flex; align-items:center; justify-content:space-between; gap:15px; margin:0 0 18px; }
+.flight-section-heading p { margin:5px 0 0; max-width:660px; }
+.schedule-sheet .card-head h2 { margin:0; }
+.schedule-image-wrap { padding:18px; background:#fff; color:#25405e; }
+.schedule-image-wrap>a { display:block; }
+.schedule-image-wrap img { display:block; width:100%; height:auto; }
+.schedule-image-error { padding:30px 15px; text-align:center; }
+.flight-attribution { margin-top:10px; line-height:1.8; }
+html[data-theme="light"] .flight-route-airport strong { color:var(--yangon-blue); }
+html[data-theme="light"] .flight-route-singapore strong { color:var(--changi-plum); }
+html[data-theme="light"] .flight-route-line span { color:var(--changi-plum); }
+html[data-theme="light"] .schedule-alert { color:#72500b; background:#fff7e8cc; border-color:#d18e104d; }
+@media(max-width:1150px) { .flight-route { grid-template-columns:auto minmax(40px,1fr) auto; gap:20px; } .flight-reference { grid-column:1/-1; padding:16px 0 0; border-left:0; border-top:1px solid var(--line); } }
+@media(max-width:780px) { .flight-route { padding:22px; gap:15px; } .flight-route-airport strong { font-size:34px; } .flight-route-airport { min-width:75px; } .flight-section-heading { flex-wrap:wrap; } .schedule-image-wrap { padding:5px; } }
+
+.flight-page-heading { flex-wrap:wrap; }
+.flight-page-heading>div { flex:1; min-width:min(300px,100%); }

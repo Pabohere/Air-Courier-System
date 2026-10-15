@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\FlightScheduleController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
@@ -21,6 +22,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(function () {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/flight-schedule', FlightScheduleController::class)->name('flights.index');
     Route::resource('customers', CustomerController::class)->except('destroy');
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('/shipments/{shipment}/status', [ShipmentController::class, 'status'])->name('shipments.status');

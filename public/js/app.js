@@ -43,3 +43,13 @@ if (quoteForm) {
 document.querySelectorAll('[data-print]').forEach((button) => {
     button.addEventListener('click', () => window.print());
 });
+
+// Keep the official source links available if the remote timetable is unavailable.
+document.querySelectorAll('[data-schedule-image]').forEach((image) => {
+    const showError = () => {
+        image.closest('a').classList.add('hide');
+        image.closest('.schedule-image-wrap').querySelector('.schedule-image-error').classList.remove('hide');
+    };
+    image.addEventListener('error', showError);
+    if (image.complete && image.naturalWidth === 0) showError();
+});
