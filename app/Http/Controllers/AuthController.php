@@ -29,9 +29,10 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         if ($branch) {
+            $request->session()->put('dashboard_branch_code', $branch->code);
             $request->session()->forget('url.intended');
 
-            return redirect()->route('dashboard.branch', ['side' => strtolower($branch->code)]);
+            return redirect()->route('dashboard');
         }
 
         return redirect()->intended(route('dashboard'));

@@ -13,19 +13,13 @@
 </div>
 <a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branchId]) }}">{{ __('＋ New shipment') }}</a>
 </div>
-<nav class="dashboard-sides" aria-label="{{ __('Branch dashboards') }}">
-@foreach($branches as $sideBranch)
-@if(auth()->user()->isAdmin() || auth()->user()->branch_id === $sideBranch->id)
-<a class="dashboard-side {{ $branchId === $sideBranch->id ? 'selected' : '' }}" data-side="{{ strtolower($sideBranch->code) }}" href="{{ route('dashboard.branch', ['side' => strtolower($sideBranch->code)]) }}" @if($branchId === $sideBranch->id) aria-current="page" @endif><strong>{{ $sideBranch->code }}</strong><span>{{ __($sideBranch->name) }}</span><small>{{ __(':branch dashboard', ['branch' => $sideBranch->code]) }} →</small></a>
-@endif
-@endforeach
-</nav>
+<div class="dashboard-identity" data-side="{{ strtolower($branch->code) }}"><strong>{{ $branch->code }}</strong><div>{{ __($branch->name) }}<small>{{ $branch->code === 'YGN' ? 'YGN → SG' : 'SG → YGN' }}</small></div></div>
 <div class="metrics branch-operational-metrics">
 @foreach(['Outgoing parcels' => $outgoing, 'Incoming flights / parcels' => $incoming, 'Ready for Collection' => $readyForCollection] as $label => $count)
 <a class="metric" href="{{ route('branches.index', ['branch_id' => $branchId]) }}"><div class="metric-label">{{ __($label) }}</div><div class="metric-value">{{ $count }}</div></a>
 @endforeach
 </div>
-<form class="filters" method="get" action="{{ route('dashboard.branch', ['side' => strtolower($branch->code)]) }}">
+<form class="filters" method="get" action="{{ request()->routeIs('dashboard.branch') ? route('dashboard.branch', ['side' => strtolower($branch->code)]) : route('dashboard') }}">
 <label>{{ __('Currency') }}<select name="currency">@foreach(['MMK', 'SGD', 'USD'] as $code)<option value="{{ $code }}" @selected($currency === $code)>{{ $code }}</option>@endforeach</select></label><button class="button secondary">{{ __('Apply filters') }}</button>
 <p class="help">{{ __('Charges and balances belong to this branch’s bookings. Receipts belong to this branch’s payment desk. One currency at a time.') }}</p>
 </form>

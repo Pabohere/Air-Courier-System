@@ -13,13 +13,7 @@
 {{ __('WORKSPACE') }}
 </div>
 <nav>
-@if(auth()->user()->isAdmin())
-@foreach($branches as $dashboardBranch)
-<a href="{{ route('dashboard.branch', ['side' => strtolower($dashboardBranch->code)]) }}" class="{{ request()->routeIs('dashboard*') && ($branchId ?? null) === $dashboardBranch->id ? 'active' : '' }}"><span>◫</span>{{ __(':branch dashboard', ['branch' => $dashboardBranch->code]) }}</a>
-@endforeach
-@else
 <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}"><span>◫</span>{{ __('Overview') }}</a>
-@endif
 @foreach(['branches.index'=>[__('Branch operations'),'⇆'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤'],'flights.index'=>[__('Flight schedule'),'✈']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
 <div class="nav-caption">
 {{ __('ADMINISTRATION') }}
@@ -27,7 +21,7 @@
 <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index')?'active':'' }}"><span>⚙</span>{{ __('System settings') }}</a><a href="{{ route('settings.audit') }}"><span>◷</span>{{ __('Audit history') }}</a>@endcan
 </nav>
 <div class="sidebar-bottom">
-<span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->branch?->code ?? __('All branches') }}</small>
+<span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->branch?->code ?? session('dashboard_branch_code', __('All branches')) }}</small>
 </div>
 </aside>
 <div class="workspace">
@@ -40,7 +34,7 @@
 <x-language-switch />
 <span class="avatar">{{ mb_substr(auth()->user()->name,0,1) }}</span>
 <div>
-{{ auth()->user()->name }}<small>{{ __(ucfirst(auth()->user()->role)) }} · {{ auth()->user()->branch?->code ?? __('All branches') }}</small>
+{{ auth()->user()->name }}<small>{{ __(ucfirst(auth()->user()->role)) }} · {{ auth()->user()->branch?->code ?? session('dashboard_branch_code', __('All branches')) }}</small>
 </div>
 <form method="post" action="{{ route('logout') }}">
 @csrf<button class="text-button" aria-label="{{ __('Log out') }}">{{ __('Log out') }}</button>

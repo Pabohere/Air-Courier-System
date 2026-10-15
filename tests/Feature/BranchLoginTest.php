@@ -36,7 +36,7 @@ class BranchLoginTest extends TestCase
             $staff = User::factory()->create(['branch_id' => $branch->id]);
             $this->withSession(['url.intended' => route('dashboard.branch', ['side' => $side === 'ygn' ? 'sg' : 'ygn'])])
                 ->post(route('login.store'), ['email' => $staff->email, 'password' => 'password', 'side' => $side])
-                ->assertRedirectToRoute('dashboard.branch', ['side' => $side])->assertSessionMissing('url.intended');
+                ->assertRedirectToRoute('dashboard')->assertSessionHas('dashboard_branch_code', strtoupper($side))->assertSessionMissing('url.intended');
             $this->assertAuthenticatedAs($staff);
             $this->post(route('logout'));
         }
@@ -57,8 +57,9 @@ class BranchLoginTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
         foreach (['ygn', 'sg'] as $side) {
-            $this->post(route('login.store'), ['email' => $admin->email, 'password' => 'password', 'side' => $side])->assertRedirectToRoute('dashboard.branch', ['side' => $side]);
+            $this->post(route('login.store'), ['email' => $admin->email, 'password' => 'password', 'side' => $side])->assertRedirectToRoute('dashboard')->assertSessionHas('dashboard_branch_code', strtoupper($side));
             $this->assertAuthenticatedAs($admin);
+            $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === strtoupper($side));
             $this->post(route('logout'));
         }
     }
@@ -82,6 +83,30 @@ class BranchLoginTest extends TestCase
             ->get(route('login', ['side' => 'ygn']))->assertOk()
             ->assertViewHas('loginBranch', fn ($branch) => $branch->code === 'YGN')
             ->assertSee('name="side" value="ygn"', false);
+    }
+
+    public function test_two_admin_workspaces_keep_independent_branch_context_on_the_same_dashboard_link(): void
+    {
+        $yangonAdmin = User::factory()->admin()->create();
+        $singaporeAdmin = User::factory()->admin()->create();
+        foreach ([[$yangonAdmin, 'YGN'], [$singaporeAdmin, 'SG'], [$yangonAdmin, 'YGN']] as [$admin, $code]) {
+            $this->actingAs($admin)->withSession(['dashboard_branch_code' => $code])
+                ->get(route('dashboard'))->assertOk()
+                ->assertViewHas('branch', fn ($branch) => $branch->code === $code)
+                ->assertSee('data-side="'.strtolower($code).'"', false)
+                ->assertDontSee('class="dashboard-side', false)
+                ->assertDontSee('href="'.route('dashboard.branch', ['side' => 'ygn']).'"', false)
+                ->assertDontSee('href="'.route('dashboard.branch', ['side' => 'sg']).'"', false);
+        }
+    }
+
+    public function test_admin_explicit_branch_tabs_do_not_change_the_login_selected_workspace(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $this->actingAs($admin)->withSession(['dashboard_branch_code' => 'SG']);
+        $this->get(route('dashboard.branch', ['side' => 'ygn']))->assertOk()->assertSessionHas('dashboard_branch_code', 'SG');
+        $this->get(route('dashboard.branch', ['side' => 'sg']))->assertOk();
+        $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === 'SG');
     }
 
     public function test_unknown_branch_is_rejected_before_authentication(): void

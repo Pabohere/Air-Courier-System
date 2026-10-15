@@ -17,7 +17,7 @@ class DashboardController extends Controller
         [$requestedBranchId] = BranchAccess::financialScope($request);
         $branch = $side
             ? Branch::where('code', strtoupper($side))->firstOrFail()
-            : ($requestedBranchId ? Branch::findOrFail($requestedBranchId) : Branch::where('code', 'YGN')->firstOrFail());
+            : ($requestedBranchId ? Branch::findOrFail($requestedBranchId) : Branch::where('code', $request->session()->get('dashboard_branch_code', 'YGN'))->firstOrFail());
         $user = $request->user();
         if ($side && ! $user->isAdmin() && $user->branch && $user->branch_id !== $branch->id) {
             return redirect()->route('dashboard.branch', ['side' => strtolower($user->branch->code)])
