@@ -2,6 +2,7 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $shipment->tracking_number }} {{ __('· Receipt') }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 </head>
 <body>
