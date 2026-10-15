@@ -1,6 +1,6 @@
 # Air Courier System
 
-Single-branch international courier POS built with Laravel 13, PHP 8.4+, Blade and a relational database. Local CSS/JavaScript and server-rendered pages need no frontend build or third-party CDN.
+YGN ↔ SG two-branch international courier POS built with Laravel 13, PHP 8.4+, Blade and a relational database. Local CSS/JavaScript and server-rendered pages need no frontend build or third-party CDN.
 
 ## Setup
 
@@ -17,7 +17,7 @@ php artisan courier:admin you@example.com --name="Branch Admin"
 php artisan serve --host=127.0.0.1 --port=8010
 ```
 
-Open http://127.0.0.1:8010. The admin command prompts for a password without placing it in shell history. Configure company information, currency, weight unit and destination rates before booking. Add customers and staff through the app. The normal seeder creates no user accounts.
+Open http://127.0.0.1:8010. The admin command prompts for a password without placing it in shell history. Configure company information and assign staff to YGN or SG before booking. New branch bookings use kg, a manually entered charge, and a choice of MMK or SGD. Legacy destination rates remain available for historic rated workflows. Add customers and staff through the app. The normal seeder creates no user accounts.
 
 On the prepared VS Code machine, a private development PHP runtime and Composer are in the ignored `.tools` directory. No system PATH change is necessary:
 
@@ -28,6 +28,26 @@ On the prepared VS Code machine, a private development PHP runtime and Composer 
 ```
 
 VS Code → Terminal → Run Task includes **Courier: serve** and **Courier: tests**. Other machines should install PHP/Composer normally; `.tools` and `vendor` are local dependencies. The server binds to localhost only.
+
+## Connected YGN and SG workflow
+
+Use one centrally hosted Laravel application and database for both locations. Both branches open the same HTTPS URL and sign in with their own branch-assigned accounts. Running independent local SQLite databases does not connect the branches; this repository's localhost server is for local review.
+
+After pulling the upgrade, run `./bin/php artisan migrate` (or `php artisan migrate`). The additive migration creates YGN and SG, assigns existing staff to YGN, and preserves existing parcels and financial entries as legacy records with no inferred route. Administrators can change staff branch assignments in System settings and inspect either branch in Branch operations.
+
+New booking: origin branch → opposite destination branch, total kg, sender/recipient, manual MMK or SGD charge. The currency and charge are locked for that parcel. Payments use that same currency; there is no automatic exchange conversion or mixed-currency settlement.
+
+Received → Processing → Ready for Dispatch → dispatch with flight number and departure date/time → physical handover → In Transit (optional) → Arrived at Branch → Ready for Collection → Collected. Dispatches cannot mix directions. Enter departure time in the origin branch's timezone (Asia/Yangon or Asia/Singapore); it is stored consistently and shown with its timezone. Destination staff record arrival and collection. Collection requires a settled balance and collector name; staff, time, and optional confirmation reference remain in the audit trail.
+
+Bookkeeping filters one currency at a time. Charges and current balances belong to the origin branch, while payments belong to the branch that actually received them. Refund corrections retain the original receiving branch. Reconciliation is per receiving branch, currency, date and method; there is no branch remittance or exchange-rate accounting.
+
+For fictional two-branch samples, only on a local/testing database:
+
+```sh
+./bin/php artisan db:seed --class=BranchDemoSeeder
+```
+
+This idempotent seeder adds sample transfers in both directions and branch demo staff: `ygn@courier.test` and `sg@courier.test`, password `CourierDemo2026!`. It does not replace existing accounts or records. These are local test accounts only.
 
 ## Fictional sample data
 
@@ -117,4 +137,4 @@ Check the exit status, encrypt/protect backups and copy them off-device. The app
 
 ## Scope and release
 
-No external courier/airline APIs, payment gateway, SMS/messaging, public booking portal, mobile app, multi-branch features, payroll or profit accounting. Develop and test on demo; promote a reviewed and backed-up release to prod after branch acceptance testing.
+No external courier/airline APIs, payment gateway, SMS/messaging, public booking portal, mobile app, branches beyond the YGN/SG pair, payroll or profit accounting. Develop and test on demo; promote a reviewed and backed-up release to prod after branch acceptance testing.

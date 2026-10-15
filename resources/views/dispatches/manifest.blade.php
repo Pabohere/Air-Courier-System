@@ -29,6 +29,8 @@
 <strong class="mono">{{ $dispatch->reference }}</strong><p class="subtle">{{ $dispatch->handed_over_at?__('HANDED OVER'):__('DRAFT · NOT YET HANDED OVER') }}</p>
 </div>
 </div>
+<div class="section-gap"><x-branch-route :record="$dispatch" /></div>
+@if($dispatch->flight_departure_at)<p class="subtle">{{ __('Flight departure') }}: {{ $dispatch->flight_departure_at->timezone($dispatch->originBranch->timezone)->format('d M Y H:i') }} ({{ $dispatch->originBranch->timezone }})</p>@endif
 <dl class="summary-list">
 <div>
 <dt>

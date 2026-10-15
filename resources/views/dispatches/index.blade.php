@@ -32,6 +32,7 @@
 <label>
 {{ __('Flight details') }}<input name="flight" value="{{ old('flight') }}" maxlength="100">
 </label>
+<label class="full">{{ __('Flight departure (origin branch local time)') }}<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}"><span class="help">{{ __('YGN: Asia/Yangon · SG: Asia/Singapore. Flight number and time are required for branch transfers.') }}</span></label>
 <label class="full">
 {{ __('External AWB number') }}<input name="awb" value="{{ old('awb') }}" maxlength="100">
 </label>
@@ -47,7 +48,7 @@
 <div class="checklist">
 @forelse($ready as $shipment)
 <label>
-<input type="checkbox" name="shipments[]" value="{{ $shipment->id }}" @checked(in_array($shipment->id,old('shipments',[])))><span class="mono">{{ $shipment->tracking_number }}</span><span>{{ $shipment->destination_country }} · {{ $shipment->actual_weight }} {{ $shipment->weight_unit }}</span>
+<input type="checkbox" name="shipments[]" value="{{ $shipment->id }}" @checked(in_array($shipment->id,old('shipments',[])))><span class="mono">{{ $shipment->tracking_number }}</span><span><x-branch-route :record="$shipment" /> · {{ $shipment->destination_country }} · {{ $shipment->actual_weight }} {{ $shipment->weight_unit }}</span>
 </label>
 @empty
 <div class="empty">
@@ -99,7 +100,7 @@
 <a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a><small>{{ $dispatch->awb?:__('No external AWB') }}</small>
 </td>
 <td>
-{{ $dispatch->partner }}
+{{ $dispatch->partner }}<small><x-branch-route :record="$dispatch" /></small>
 </td>
 <td>
 {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}<small>{{ $dispatch->flight }}</small>

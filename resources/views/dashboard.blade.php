@@ -9,10 +9,11 @@
 <h1>
 {{ __('Your branch, in view.') }}
 </h1>
-<p class="subtle">{{ today()->locale(app()->getLocale())->translatedFormat('l, d F Y') }} {{ __('· A clear picture of today\'s activity.') }}</p>
+<p class="subtle">{{ \Carbon\Carbon::parse(\App\Services\BranchAccess::todayFor($branchId))->locale(app()->getLocale())->translatedFormat('l, d F Y') }} {{ __('· A clear picture of today\'s activity.') }}</p>
 </div>
 <a class="button" href="{{ route('shipments.create') }}">{{ __('＋ New shipment') }}</a>
 </div>
+<form class="filters" method="get"><x-financial-scope :branch-id="$branchId" :currency="$currency" /><button class="button secondary">{{ __('Apply filters') }}</button></form>
 <div class="metrics">
 <div class="metric">
 <div class="metric-label">

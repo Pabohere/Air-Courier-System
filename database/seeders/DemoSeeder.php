@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Destination;
 use App\Models\PaymentMethod;
@@ -27,7 +28,7 @@ class DemoSeeder extends Seeder
         }
         DB::transaction(function () {
             $admin = User::create(['name' => 'Branch Admin', 'email' => 'admin@courier.test', 'password' => 'CourierDemo2026!', 'role' => 'admin', 'active' => true]);
-            $staff = User::create(['name' => 'Operations Staff', 'email' => 'staff@courier.test', 'password' => 'CourierDemo2026!', 'role' => 'staff', 'active' => true]);
+            $staff = User::create(['branch_id' => Branch::where('code', 'YGN')->value('id'), 'name' => 'Operations Staff', 'email' => 'staff@courier.test', 'password' => 'CourierDemo2026!', 'role' => 'staff', 'active' => true]);
             $countries = ['Singapore' => ['5.00', '12.00', '15.00'], 'Thailand' => ['3.00', '8.00', '10.00'], 'Japan' => ['8.00', '18.00', '25.00'], 'United Kingdom' => ['10.00', '24.00', '30.00']];
             foreach ($countries as $country => $r) {
                 $d = Destination::firstOrCreate(['country' => $country], ['active' => true]);

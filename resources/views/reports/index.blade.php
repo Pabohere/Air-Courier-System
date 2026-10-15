@@ -1,4 +1,5 @@
 @extends('layouts.app') @section('title',__('Bookkeeping')) @section('content')
+@php($scope = ['branch_id' => $branchId, 'currency' => $currency])
 <div class="page-heading">
 <div>
 <div class="eyebrow">
@@ -7,13 +8,14 @@
 <h1>
 {{ __('Bookkeeping & reports') }}
 </h1>
-<p class="subtle">{{ __('Shipment charges, receipts and balances. No profit estimate.') }}</p>
+<p class="subtle">{{ __('Shipment charges, receipts and balances. No profit estimate.') }} {{ __('One currency at a time. Charges and balances belong to the origin branch; receipts belong to the payment branch.') }}</p>
 </div>
 <div class="actions">
-<a class="button secondary" href="{{ route('reports.index',['from'=>today()->startOfMonth()->toDateString(),'to'=>today()->endOfMonth()->toDateString()]) }}">{{ __('This month') }}</a><a class="button secondary" href="{{ route('reports.index') }}">{{ __('Today') }}</a>
+<a class="button secondary" href="{{ route('reports.index',['from'=>today()->startOfMonth()->toDateString(),'to'=>today()->endOfMonth()->toDateString()]+$scope) }}">{{ __('This month') }}</a><a class="button secondary" href="{{ route('reports.index',$scope) }}">{{ __('Today') }}</a>
 </div>
 </div>
 <form method="get" class="filters">
+<x-financial-scope :branch-id="$branchId" :currency="$currency" />
 <label>
 {{ __('From') }}<input type="date" name="from" value="{{ $from }}" required>
 </label>
@@ -74,7 +76,7 @@
 {{ __('Receipts by payment method') }}
 </h2>
 <div class="actions">
-<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'payments']) }}">{{ __('Payments CSV ↓') }}</a><a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'shipments']) }}">{{ __('Bookings CSV ↓') }}</a>
+<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'payments']+$scope) }}">{{ __('Payments CSV ↓') }}</a><a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'shipments']+$scope) }}">{{ __('Bookings CSV ↓') }}</a>
 </div>
 </div>
 <div class="table-wrap">
@@ -163,7 +165,7 @@
 {{ __(ucfirst($payment->type)) }}<small>{{ __($payment->method->name) }}</small>
 </td>
 <td>
-{{ $payment->reference?:'—' }}<small>{{ $payment->staff->name }}</small>
+{{ $payment->reference?:'—' }} · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ $payment->staff->name }}</small>
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($payment->signedCents()) }} {{ $payment->currency }}
@@ -190,10 +192,11 @@
 <div class="card-body">
 <p class="subtle">{{ __('Enter actual net receipts (received less refunded) for a single day and method. A negative amount is allowed for refund-only days.') }}</p>
 <form method="post" action="{{ route('reports.reconcile') }}">
+<input type="hidden" name="currency" value="{{ $currency }}"><input type="hidden" name="branch_id" value="{{ $branchId }}">
 @csrf
 <div class="field-grid">
 <label>
-{{ __('Date') }}<input type="date" name="date" value="{{ old('date',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
+{{ __('Date') }}<input type="date" name="date" value="{{ old('date',\App\Services\BranchAccess::todayFor()) }}" max="{{ \App\Services\BranchAccess::todayFor() }}" required>
 </label>
 <label>
 {{ __('Payment method') }}
@@ -227,7 +230,7 @@
 @forelse($reconciliations as $item)@php($row=$item['record'])
 <details>
 <summary>
-{{ $row->date->locale(app()->getLocale())->translatedFormat('d M') }} · {{ $row->method->name }} <span class="badge">{{ $item['current']['version']!=$row->ledger_version?__('Review: new ledger entries'):(\App\Services\Money::decimal($item['current']['expected'])!==$row->expected?__('Review: changed ledger'):($row->expected===$row->actual?__('Matched'):__('Variance'))) }}</span>
+{{ $branches->firstWhere('id', $row->branch_id)?->code ?? __('Legacy') }} · {{ $row->currency }} · {{ $row->date->locale(app()->getLocale())->translatedFormat('d M') }} · {{ $row->method->name }} <span class="badge">{{ $item['current']['version']!=$row->ledger_version?__('Review: new ledger entries'):(\App\Services\Money::decimal($item['current']['expected'])!==$row->expected?__('Review: changed ledger'):($row->expected===$row->actual?__('Matched'):__('Variance'))) }}</span>
 </summary>
 <dl class="summary-list">
 <div>
@@ -280,7 +283,7 @@
 </h2>
 <p class="subtle">{{ __('Current balances across all booking dates; not a historical balance report.') }}</p>
 </div>
-<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'outstanding']) }}">{{ __('Outstanding CSV ↓') }}</a>
+<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'outstanding']+$scope) }}">{{ __('Outstanding CSV ↓') }}</a>
 </div>
 @include('shipments.table',['shipments'=>$report['outstanding']])
 </div>

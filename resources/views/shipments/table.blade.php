@@ -31,7 +31,7 @@
 <strong>{{ $shipment->sender['name'] }}</strong><small>{{ $shipment->recipient_name }} {{ __('· recipient') }}</small>
 </td>
 <td>
-{{ $shipment->destination_country }}<small>{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}</small>
+{{ $shipment->destination_country }}<small><x-branch-route :record="$shipment" /></small><small>{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}</small>
 </td>
 <td>
 <span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>

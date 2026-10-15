@@ -53,3 +53,14 @@ document.querySelectorAll('[data-schedule-image]').forEach((image) => {
     image.addEventListener('error', showError);
     if (image.complete && image.naturalWidth === 0) showError();
 });
+
+const originBranch = document.querySelector('[data-origin-branch]');
+const destinationBranch = document.querySelector('[data-destination-branch]');
+if (originBranch && destinationBranch) {
+    const alignBranches = () => {
+        Array.from(destinationBranch.options).forEach((option) => { option.disabled = option.value === originBranch.value; });
+        if (destinationBranch.value === originBranch.value) destinationBranch.value = Array.from(destinationBranch.options).find((option) => !option.disabled)?.value ?? '';
+    };
+    originBranch.addEventListener('change', alignBranches);
+    alignBranches();
+}

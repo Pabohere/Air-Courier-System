@@ -21,7 +21,7 @@
 </h1>
 <p>{{ __('A focused workspace for your team, from the first booking to the final delivery.') }}</p>
 </div>
-<small>{{ __('Single branch · International courier management') }}</small>
+<small>{{ __('YGN ↔ SG · Connected branch operations') }}</small>
 </section>
 <section class="login-form">
 <x-theme-switch />

@@ -534,3 +534,17 @@ html[data-theme="light"] .schedule-alert { color:#72500b; background:#fff7e8cc; 
 
 .flight-page-heading { flex-wrap:wrap; }
 .flight-page-heading>div { flex:1; min-width:min(300px,100%); }
+
+.branch-route-tag { display:inline-flex; align-items:center; gap:10px; font-weight:650; font-size:12px; white-space:nowrap; }
+.branch-route-tag>span:first-child { color:#adc7e8; padding:4px 9px; background:#1d5dab26; border-radius:7px; }
+.branch-route-tag>span:last-child { color:#e7b9e2; padding:4px 9px; background:#6d226a33; border-radius:7px; }
+.branch-flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:10px 0 24px; color:var(--muted); font-size:11px; }
+.branch-flow span { background:var(--glass); border:1px solid var(--line); padding:7px 12px; border-radius:9px; }
+.badge[data-status="Arrived at Branch"] { color:#e7b9e2; background:#6d226a40; }
+.badge[data-status="Ready for Collection"] { color:#98e0d6; background:#0b7d7c30; }
+.badge[data-status="Collected"] { color:#b8e4a9; background:#1d681333; }
+html[data-theme="light"] .branch-route-tag>span:first-child,.print-page .branch-route-tag>span:first-child { color:#1d5dab; background:#1d5dab12; }
+html[data-theme="light"] .branch-route-tag>span:last-child,.print-page .branch-route-tag>span:last-child { color:#6d226a; background:#6d226a12; }
+html[data-theme="light"] .badge[data-status="Arrived at Branch"] { color:#6d226a; background:#6d226a14; }
+html[data-theme="light"] .badge[data-status="Ready for Collection"] { color:#08635f; background:#0b7d7c17; }
+html[data-theme="light"] .badge[data-status="Collected"] { color:#1d6813; background:#1d681314; }

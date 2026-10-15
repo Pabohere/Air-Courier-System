@@ -10,7 +10,7 @@ class Reconciliation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'payment_method_id', 'currency', 'expected', 'actual', 'ledger_version', 'notes', 'staff_id'];
+    protected $fillable = ['branch_id', 'date', 'payment_method_id', 'currency', 'expected', 'actual', 'ledger_version', 'notes', 'staff_id'];
 
     protected function casts(): array
     {

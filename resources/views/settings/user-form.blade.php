@@ -7,6 +7,7 @@
 <label>
 {{ __('Email') }}<input name="email" type="email" value="{{ $staff->email }}" required>
 </label>
+<label>{{ __('Branch') }}<select name="branch_id"><option value="">{{ __('All branches (admin only)') }}</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected(($staff->branch_id ?? (!$staff->exists ? $branches->first()->id : null)) == $branch->id)>{{ $branch->code }} · {{ __($branch->name) }}</option>@endforeach</select></label>
 <label>
 {{ __('Role') }}
 <select name="role">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\Branch;
 use App\Models\CompanySetting;
 use App\Models\Destination;
 use App\Models\PaymentMethod;
@@ -73,15 +74,19 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
 
     public function user(Request $request, CourierService $service): RedirectResponse
     {
-        $data = $request->validate(['user_id' => 'nullable|integer|exists:users,id', 'name' => 'required|string|max:150', 'email' => ['required', 'email', 'max:200', Rule::unique('users', 'email')->ignore($request->input('user_id'))], 'role' => 'required|in:admin,staff', 'active' => 'required|boolean', 'password' => [filled($request->input('user_id')) ? 'nullable' : 'required', 'confirmed', Password::min(12)->letters()->numbers()]]);
+        $data = $request->validate(['user_id' => 'nullable|integer|exists:users,id', 'name' => 'required|string|max:150', 'email' => ['required', 'email', 'max:200', Rule::unique('users', 'email')->ignore($request->input('user_id'))], 'branch_id' => 'nullable|integer|exists:branches,id', 'role' => 'required|in:admin,staff', 'active' => 'required|boolean', 'password' => [filled($request->input('user_id')) ? 'nullable' : 'required', 'confirmed', Password::min(12)->letters()->numbers()]]);
+        if (array_key_exists('branch_id', $data) && $data['role'] === 'staff' && ! $data['branch_id']) {
+            throw ValidationException::withMessages(['branch_id' => __('Select YGN or SG for a staff account.')]);
+        }
         DB::transaction(function () use ($data, $request, $service) {
             $admins = User::where('role', 'admin')->where('active', true)->lockForUpdate()->get();
             $user = isset($data['user_id']) ? User::query()->lockForUpdate()->findOrFail($data['user_id']) : new User;
             if ($user->exists && $user->active && $user->isAdmin() && ($data['role'] !== 'admin' || ! $data['active']) && $admins->count() <= 1) {
                 throw ValidationException::withMessages(['role' => __('At least one active administrator is required.')]);
             }
-            $before = $user->exists ? $user->only(['name', 'email', 'role', 'active']) : null;
-            $values = collect($data)->only(['name', 'email', 'role', 'active'])->all();
+            $before = $user->exists ? $user->only(['name', 'email', 'role', 'active', 'branch_id']) : null;
+            $values = collect($data)->only(['name', 'email', 'role', 'active', 'branch_id'])->all();
+            $values['branch_id'] = $data['branch_id'] ?? ($data['role'] === 'staff' ? ($user->branch_id ?? Branch::where('code', 'YGN')->value('id')) : null);
             if (filled($data['password'] ?? null)) {
                 $values['password'] = $data['password'];
             }
@@ -89,7 +94,7 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
             if ($user->wasChanged('password') || ! $user->active) {
                 DB::table('sessions')->where('user_id', $user->id)->delete();
             }
-            $service->audit($request->user(), 'settings.user', $user, $before, $user->only(['name', 'email', 'role', 'active']) + ['password_changed' => filled($data['password'] ?? null)]);
+            $service->audit($request->user(), 'settings.user', $user, $before, $user->only(['name', 'email', 'role', 'active', 'branch_id']) + ['password_changed' => filled($data['password'] ?? null)]);
         }, 3);
 
         return back()->with('success', __('User account saved.'));

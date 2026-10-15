@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Branch;
 use App\Models\CompanySetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -15,6 +16,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('admin', fn (User $user) => $user->active && $user->isAdmin());
-        View::composer(['layouts.app', 'auth.login', 'shipments.receipt', 'dispatches.manifest'], fn ($view) => $view->with('company', CompanySetting::first()));
+        View::composer(['layouts.app', 'auth.login', 'shipments.receipt', 'dispatches.manifest', 'shipments.*', 'dispatches.*', 'settings.*', 'reports.*', 'dashboard', 'branches.*'], fn ($view) => $view->with('company', CompanySetting::first())->with('branches', Branch::orderBy('id')->get()));
     }
 }

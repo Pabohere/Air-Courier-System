@@ -29,6 +29,7 @@
 <strong>{{ $shipment->shipment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</strong><p class="subtle">{{ __($shipment->status) }}</p>
 </div>
 </div>
+<x-branch-route :record="$shipment" />
 <div class="label-number">
 {{ $shipment->tracking_number }}
 </div>

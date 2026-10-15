@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Money;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,11 +13,28 @@ class Shipment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tracking_number', 'booking_key', 'customer_id', 'destination_id', 'dispatch_id', 'sender', 'recipient_name', 'recipient_phone', 'recipient_address', 'destination_country', 'shipment_date', 'description', 'quantity', 'actual_weight', 'weight_unit', 'currency', 'rate_snapshot', 'price', 'status', 'created_by', 'updated_by'];
+    protected $fillable = ['current_branch_id', 'arrived_at', 'collected_at', 'collector_name', 'collection_reference', 'origin_branch_id', 'destination_branch_id', 'tracking_number', 'booking_key', 'customer_id', 'destination_id', 'dispatch_id', 'sender', 'recipient_name', 'recipient_phone', 'recipient_address', 'destination_country', 'shipment_date', 'description', 'quantity', 'actual_weight', 'weight_unit', 'currency', 'rate_snapshot', 'price', 'status', 'created_by', 'updated_by'];
 
     protected function casts(): array
     {
-        return ['sender' => 'array', 'rate_snapshot' => 'array', 'shipment_date' => 'date', 'price' => 'decimal:2', 'actual_weight' => 'decimal:3'];
+        return ['arrived_at' => 'datetime', 'collected_at' => 'datetime', 'sender' => 'array', 'rate_snapshot' => 'array', 'shipment_date' => 'date', 'price' => 'decimal:2', 'actual_weight' => 'decimal:3'];
+    }
+
+    public function originBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'origin_branch_id');
+    }
+
+    public function destinationBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'destination_branch_id');
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): void
+    {
+        if (! $user->isAdmin()) {
+            $query->where(fn ($q) => $q->whereNull('origin_branch_id')->orWhere('origin_branch_id', $user->branch_id ?? 0)->orWhere('destination_branch_id', $user->branch_id ?? 0));
+        }
     }
 
     public function customer(): BelongsTo

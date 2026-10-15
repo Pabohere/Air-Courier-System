@@ -54,7 +54,7 @@ weight_unit===$unit)>{{ $unit }}
 <div class="card-head">
 <div>
 <h2>
-{{ __('Destinations & rates') }}
+{{ __('Legacy destination rates') }}
 </h2>
 <p class="subtle">{{ __('Formula: max(minimum, base + weight × rate) + additional charge. Existing booking prices stay fixed.') }}</p>
 </div>

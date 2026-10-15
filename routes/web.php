@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
@@ -22,6 +23,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(function () {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
     Route::get('/flight-schedule', FlightScheduleController::class)->name('flights.index');
     Route::resource('customers', CustomerController::class)->except('destroy');
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);

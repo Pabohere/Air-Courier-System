@@ -10,15 +10,17 @@
 <p class="subtle">{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</p>
 </div>
 <div class="actions">
-<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">{{ __('Print manifest ↗') }}</a>@unless($dispatch->handed_over_at)
+<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">{{ __('Print manifest ↗') }}</a>@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $dispatch->origin_branch_id))
 <form method="post" action="{{ route('dispatches.handover',$dispatch) }}" data-confirm="{{ __('Confirm physical handover? All assigned shipments will be marked Dispatched.') }}">
 @csrf<button class="button">{{ __('Record handover →') }}</button>
 </form>
-@endunless
+@endif
 </div>
 </div>
 <div class="card">
 <div class="card-body">
+<div class="section-gap"><x-branch-route :record="$dispatch" /></div>
+@if($dispatch->flight_departure_at)<p class="subtle">{{ __('Flight departure') }}: {{ $dispatch->flight_departure_at->timezone($dispatch->originBranch->timezone)->format('d M Y H:i') }} ({{ $dispatch->originBranch->timezone }})</p>@endif
 <dl class="summary-list">
 <div>
 <dt>
@@ -98,11 +100,11 @@
 <span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>
 </td>
 <td>
-@unless($dispatch->handed_over_at)
+@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $dispatch->origin_branch_id))
 <form method="post" action="{{ route('dispatches.unassign',[$dispatch,$shipment]) }}">
 @csrf @method('DELETE')<button class="button small secondary">{{ __('Remove from draft') }}</button>
 </form>
-@endunless
+@endif
 </td>
 </tr>
 @empty
