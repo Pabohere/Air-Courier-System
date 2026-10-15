@@ -35,7 +35,7 @@ class CustomerController extends Controller
             return $customer;
         });
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Customer saved.');
+        return redirect()->route('customers.show', $customer)->with('success', __('Customer saved.'));
     }
 
     public function show(Customer $customer): View
@@ -58,7 +58,7 @@ class CustomerController extends Controller
             $service->audit($request->user(), 'customer.updated', $customer, $before);
         });
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Customer updated. Existing shipment sender details are preserved.');
+        return redirect()->route('customers.show', $customer)->with('success', __('Customer updated. Existing shipment sender details are preserved.'));
     }
 
     private function validated(Request $request): array

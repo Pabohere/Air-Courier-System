@@ -1,22 +1,22 @@
-@extends('layouts.app') @section('title','Shipment details') @section('content')
+@extends('layouts.app') @section('title',__('Shipment details')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-SHIPMENT DETAILS
+{{ __('SHIPMENT DETAILS') }}
 </div>
 <h1 class="mono" style="font-size:24px">
 {{ $shipment->tracking_number }}
 </h1>
-<p class="subtle">Booked by {{ $shipment->creator->name }} · {{ $shipment->created_at->format('d M Y, H:i') }}</p>
+<p class="subtle">{{ __('Booked by') }} {{ $shipment->creator->name }} · {{ $shipment->created_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }}</p>
 </div>
 <div class="actions">
-<span class="badge" data-status="{{ $shipment->status }}">{{ $shipment->status }}</span><a class="button secondary" href="{{ route('shipments.receipt',$shipment) }}" target="_blank" rel="noopener">Print receipt / label ↗</a>
+<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span><a class="button secondary" href="{{ route('shipments.receipt',$shipment) }}" target="_blank" rel="noopener">{{ __('Print receipt / label ↗') }}</a>
 </div>
 </div>
 <div class="metrics">
 <div class="metric">
 <div class="metric-label">
-Shipment charge
+{{ __('Shipment charge') }}
 </div>
 <div class="metric-value">
 {{ $shipment->price }}<small>{{ $shipment->currency }}</small>
@@ -24,7 +24,7 @@ Shipment charge
 </div>
 <div class="metric accent">
 <div class="metric-label">
-Paid, less refunds
+{{ __('Paid, less refunds') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::decimal($shipment->paidCents()) }}<small>{{ $shipment->currency }}</small>
@@ -32,7 +32,7 @@ Paid, less refunds
 </div>
 <div class="metric">
 <div class="metric-label">
-Outstanding
+{{ __('Outstanding') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::decimal($shipment->balanceCents()) }}<small>{{ $shipment->currency }}</small>
@@ -40,19 +40,19 @@ Outstanding
 </div>
 <div class="metric">
 <div class="metric-label">
-Total weight / pieces
+{{ __('Total weight / pieces') }}
 </div>
 <div class="metric-value">
 {{ $shipment->actual_weight }}<small>{{ $shipment->weight_unit }}</small>
 </div>
 <div class="metric-foot">
-{{ $shipment->quantity }} pieces
+{{ $shipment->quantity }} {{ __('pieces') }}
 </div>
 </div>
 </div>
 @if($shipment->status==='Cancelled'&&$shipment->paidCents()>0)
 <div class="notice error">
-Cancelled shipment has retained payments. An administrator should review whether a refund is required.
+{{ __('Cancelled shipment has retained payments. An administrator should review whether a refund is required.') }}
 </div>
 @endif
 <div class="split">
@@ -60,20 +60,20 @@ Cancelled shipment has retained payments. An administrator should review whether
 <div class="card">
 <div class="card-head">
 <h2>
-Booking information
+{{ __('Booking information') }}
 </h2>
 </div>
 <div class="card-body">
 <div class="two-columns">
 <div>
 <h3>
-From · sender
+{{ __('From · sender') }}
 </h3>
 <strong>{{ $shipment->sender['name'] }}</strong><p class="preserve subtle">{{ $shipment->sender['phone'] }}<br>{{ $shipment->sender['address'] }}</p>
 </div>
 <div>
 <h3>
-To · recipient
+{{ __('To · recipient') }}
 </h3>
 <strong>{{ $shipment->recipient_name }}</strong><p class="preserve subtle">{{ $shipment->recipient_phone }}<br>{{ $shipment->recipient_address }}<br>{{ $shipment->destination_country }}</p>
 </div>
@@ -81,15 +81,15 @@ To · recipient
 <dl class="summary-list">
 <div>
 <dt>
-Shipment date
+{{ __('Shipment date') }}
 </dt>
 <dd>
-{{ $shipment->shipment_date->format('d M Y') }}
+{{ $shipment->shipment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}
 </dd>
 </div>
 <div>
 <dt>
-Description
+{{ __('Description') }}
 </dt>
 <dd class="preserve">
 {{ $shipment->description }}
@@ -98,7 +98,7 @@ Description
 @if($shipment->dispatch)
 <div>
 <dt>
-Dispatch
+{{ __('Dispatch') }}
 </dt>
 <dd>
 <a href="{{ route('dispatches.show',$shipment->dispatch) }}">{{ $shipment->dispatch->reference }}</a>
@@ -108,13 +108,13 @@ Dispatch
 </dl>
 <details>
 <summary>
-Saved rate breakdown
+{{ __('Saved rate breakdown') }}
 </summary>
 <dl class="summary-list">
 @foreach($shipment->rate_snapshot as $key=>$value)
 <div>
 <dt>
-{{ ucfirst(str_replace('_',' ',$key)) }}
+{{ __(ucfirst(str_replace('_',' ',$key))) }}
 </dt>
 <dd>
 {{ $value }} {{ $shipment->currency }}
@@ -128,25 +128,25 @@ Saved rate breakdown
 <div class="card">
 <div class="card-head">
 <h2>
-Payment history
+{{ __('Payment history') }}
 </h2>
-<span class="subtle">Append-only ledger</span>
+<span class="subtle">{{ __('Append-only ledger') }}</span>
 </div>
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>
-Entry / date
+{{ __('Entry / date') }}
 </th>
 <th>
-Method / reference
+{{ __('Method / reference') }}
 </th>
 <th>
-Staff
+{{ __('Staff') }}
 </th>
 <th class="right">
-Amount
+{{ __('Amount') }}
 </th>
 </tr>
 </thead>
@@ -154,13 +154,13 @@ Amount
 @forelse($shipment->payments as $payment)
 <tr>
 <td>
-#{{ $payment->id }} · {{ ucfirst($payment->type) }}<small>{{ $payment->payment_date->format('d M Y') }}</small>@if($payment->original_payment_id)<small>Refund of #{{ $payment->original_payment_id }}</small>@endif
+#{{ $payment->id }} · {{ __(ucfirst($payment->type)) }}<small>{{ $payment->payment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</small>@if($payment->original_payment_id)<small>{{ __('Refund of #') }}{{ $payment->original_payment_id }}</small>@endif
 </td>
 <td>
-{{ $payment->method->name }}<small>{{ $payment->reference }}</small>@if($payment->reason)<small class="wrap">{{ $payment->reason }}</small>@endif
+{{ __($payment->method->name) }}<small>{{ $payment->reference }}</small>@if($payment->reason)<small class="wrap">{{ $payment->reason }}</small>@endif
 </td>
 <td>
-{{ $payment->staff->name }}<small>{{ $payment->created_at->format('d M, H:i') }}</small>
+{{ $payment->staff->name }}<small>{{ $payment->created_at->locale(app()->getLocale())->translatedFormat('d M, H:i') }}</small>
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($payment->signedCents()) }}
@@ -169,7 +169,7 @@ Amount
 @empty
 <tr>
 <td colspan="4" class="empty">
-No payments recorded.
+{{ __('No payments recorded.') }}
 </td>
 </tr>
 @endforelse
@@ -181,39 +181,39 @@ No payments recorded.
 <div class="card">
 <div class="card-head">
 <h2>
-Refund / financial correction
+{{ __('Refund / financial correction') }}
 </h2>
 </div>
 <div class="card-body">
-<p class="subtle">Refund the original entry, then record a replacement payment if needed. Both entries remain in the ledger.</p>
-<form method="post" action="{{ route('payments.refund',$shipment) }}" data-confirm="Record this refund? The original payment will remain in the ledger.">
+<p class="subtle">{{ __('Refund the original entry, then record a replacement payment if needed. Both entries remain in the ledger.') }}</p>
+<form method="post" action="{{ route('payments.refund',$shipment) }}" data-confirm="{{ __('Record this refund? The original payment will remain in the ledger.') }}">
 @csrf<input type="hidden" name="submission_key" value="{{ \Illuminate\Support\Str::uuid() }}">
 <div class="field-grid">
 <label>
-Original payment
+{{ __('Original payment') }}
 <select name="original_payment_id" required>
 @foreach($shipment->payments->where('type','payment') as $payment)
 <option value="{{ $payment->id }}">
-#{{ $payment->id }} · {{ $payment->amount }} · {{ $payment->method->name }}
+#{{ $payment->id }} · {{ $payment->amount }} · {{ __($payment->method->name) }}
 </option>
 @endforeach
 </select>
 </label>
 <label>
-Refund amount<input name="amount" type="number" min="0.01" step="0.01" required>
+{{ __('Refund amount') }}<input name="amount" type="number" min="0.01" step="0.01" required>
 </label>
 <label>
-Refund date<input type="date" name="payment_date" value="{{ today()->toDateString() }}" max="{{ today()->toDateString() }}" required>
+{{ __('Refund date') }}<input type="date" name="payment_date" value="{{ today()->toDateString() }}" max="{{ today()->toDateString() }}" required>
 </label>
 <label>
-Reference<input name="reference" maxlength="150">
+{{ __('Reference') }}<input name="reference" maxlength="150">
 </label>
 <label class="full">
-Authorization reason<textarea name="reason" required></textarea>
+{{ __('Authorization reason') }}<textarea name="reason" required></textarea>
 </label>
 </div>
 <div class="form-actions">
-<button class="button danger">Record refund</button>
+<button class="button danger">{{ __('Record refund') }}</button>
 </div>
 </form>
 </div>
@@ -226,7 +226,7 @@ Authorization reason<textarea name="reason" required></textarea>
 <div class="card">
 <div class="card-head">
 <h2>
-Record a payment
+{{ __('Record a payment') }}
 </h2>
 </div>
 <div class="card-body">
@@ -234,27 +234,27 @@ Record a payment
 @csrf<input type="hidden" name="submission_key" value="{{ old('submission_key',\Illuminate\Support\Str::uuid()) }}">
 <div class="field-grid">
 <label class="full">
-Amount ({{ $shipment->currency }})<input type="number" name="amount" min="0.01" max="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}" step="0.01" value="{{ old('amount',\App\Services\Money::decimal($shipment->balanceCents())) }}" required>
+{{ __('Amount (') }}{{ $shipment->currency }})<input type="number" name="amount" min="0.01" max="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}" step="0.01" value="{{ old('amount',\App\Services\Money::decimal($shipment->balanceCents())) }}" required>
 </label>
 <label class="full">
-Payment method
+{{ __('Payment method') }}
 <select name="payment_method_id" required>
 @foreach($methods as $method)
 <option value="{{ $method->id }}" @selected(old('payment_method_id')==$method->
-id)>{{ $method->name }}
+id)>{{ __($method->name) }}
 </option>
 @endforeach
 </select>
 </label>
 <label class="full">
-Payment date<input name="payment_date" type="date" value="{{ old('payment_date',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
+{{ __('Payment date') }}<input name="payment_date" type="date" value="{{ old('payment_date',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
 </label>
 <label class="full">
-Reference number<input name="reference" value="{{ old('reference') }}" maxlength="150">
+{{ __('Reference number') }}<input name="reference" value="{{ old('reference') }}" maxlength="150">
 </label>
 </div>
 <div class="form-actions">
-<button class="button">Save payment</button>
+<button class="button">{{ __('Save payment') }}</button>
 </div>
 </form>
 </div>
@@ -264,29 +264,29 @@ Reference number<input name="reference" value="{{ old('reference') }}" maxlength
 <div class="card">
 <div class="card-head">
 <h2>
-Update shipment status
+{{ __('Update shipment status') }}
 </h2>
 </div>
 <div class="card-body">
 <form method="post" action="{{ route('shipments.status',$shipment) }}">
 @csrf
 <label>
-Next status
+{{ __('Next status') }}
 <select name="status" required>
 @foreach($transitions as $status)
-<option>
-{{ $status }}
+<option value="{{ $status }}">
+{{ __($status) }}
 </option>
 @endforeach
 </select>
 </label>
 <label class="section-gap">
-Notes / reason<textarea name="notes" placeholder="Required for Cancelled or Exception"></textarea>
+{{ __('Notes / reason') }}<textarea name="notes" placeholder="{{ __('Required for Cancelled or Exception') }}"></textarea>
 </label>
 <div class="form-actions">
-<button class="button secondary">Update status</button>
+<button class="button secondary">{{ __('Update status') }}</button>
 </div>
-<p class="help">Dispatch handover is recorded at the dispatch desk.</p>
+<p class="help">{{ __('Dispatch handover is recorded at the dispatch desk.') }}</p>
 </form>
 </div>
 </div>
@@ -294,14 +294,14 @@ Notes / reason<textarea name="notes" placeholder="Required for Cancelled or Exce
 <div class="card">
 <div class="card-head">
 <h2>
-Status history
+{{ __('Status history') }}
 </h2>
 </div>
 <div class="card-body">
 <ul class="timeline">
 @foreach($shipment->events->reverse() as $event)
 <li>
-<strong>{{ $event->status }}</strong><p>{{ $event->notes }}</p><small>{{ \Carbon\Carbon::parse($event->created_at)->format('d M Y, H:i') }} · {{ $event->staff->name }}</small>
+<strong>{{ __($event->status) }}</strong><p>{{ __($event->notes ?? '') }}</p><small>{{ \Carbon\Carbon::parse($event->created_at)->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }} · {{ $event->staff->name }}</small>
 </li>
 @endforeach
 </ul>

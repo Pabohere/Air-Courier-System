@@ -4,12 +4,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Middleware\EnsureActiveUser;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/language', LanguageController::class)->name('language.update');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');

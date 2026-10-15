@@ -21,7 +21,7 @@ class DispatchController extends Controller
         $data = $request->validate(['partner' => 'required|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'awb' => 'nullable|string|max:100', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
         $dispatch = $service->createDispatch($data, $request->user());
 
-        return redirect()->route('dispatches.show', $dispatch)->with('success', 'Draft dispatch created.');
+        return redirect()->route('dispatches.show', $dispatch)->with('success', __('Draft dispatch created.'));
     }
 
     public function show(Dispatch $dispatch): View
@@ -35,14 +35,14 @@ class DispatchController extends Controller
     {
         $service->handover($dispatch, $request->user());
 
-        return back()->with('success', 'Handover recorded. All parcels marked Dispatched.');
+        return back()->with('success', __('Handover recorded. All parcels marked Dispatched.'));
     }
 
     public function unassign(Request $request, Dispatch $dispatch, Shipment $shipment, CourierService $service): RedirectResponse
     {
         $service->unassign($dispatch, $shipment, $request->user());
 
-        return back()->with('success', 'Shipment removed from draft dispatch.');
+        return back()->with('success', __('Shipment removed from draft dispatch.'));
     }
 
     public function manifest(Dispatch $dispatch): View

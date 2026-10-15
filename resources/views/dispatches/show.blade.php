@@ -1,18 +1,18 @@
-@extends('layouts.app') @section('title','Dispatch details') @section('content')
+@extends('layouts.app') @section('title',__('Dispatch details')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-DISPATCH RECORD
+{{ __('DISPATCH RECORD') }}
 </div>
 <h1>
 {{ $dispatch->reference }}
 </h1>
-<p class="subtle">{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->format('d M Y') }}</p>
+<p class="subtle">{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</p>
 </div>
 <div class="actions">
-<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">Print manifest ↗</a>@unless($dispatch->handed_over_at)
-<form method="post" action="{{ route('dispatches.handover',$dispatch) }}" data-confirm="Confirm physical handover? All assigned shipments will be marked Dispatched.">
-@csrf<button class="button">Record handover →</button>
+<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">{{ __('Print manifest ↗') }}</a>@unless($dispatch->handed_over_at)
+<form method="post" action="{{ route('dispatches.handover',$dispatch) }}" data-confirm="{{ __('Confirm physical handover? All assigned shipments will be marked Dispatched.') }}">
+@csrf<button class="button">{{ __('Record handover →') }}</button>
 </form>
 @endunless
 </div>
@@ -22,7 +22,7 @@ DISPATCH RECORD
 <dl class="summary-list">
 <div>
 <dt>
-Flight details
+{{ __('Flight details') }}
 </dt>
 <dd>
 {{ $dispatch->flight?:'—' }}
@@ -30,7 +30,7 @@ Flight details
 </div>
 <div>
 <dt>
-External AWB
+{{ __('External AWB') }}
 </dt>
 <dd>
 {{ $dispatch->awb?:'—' }}
@@ -38,7 +38,7 @@ External AWB
 </div>
 <div>
 <dt>
-Notes
+{{ __('Notes') }}
 </dt>
 <dd class="preserve">
 {{ $dispatch->notes?:'—' }}
@@ -46,10 +46,10 @@ Notes
 </div>
 <div>
 <dt>
-Handover
+{{ __('Handover') }}
 </dt>
 <dd>
-{{ $dispatch->handed_over_at?$dispatch->handed_over_at->format('d M Y, H:i').' · '.$dispatch->handoverStaff->name:'Awaiting physical handover' }}
+{{ $dispatch->handed_over_at?$dispatch->handed_over_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i').' · '.$dispatch->handoverStaff->name:__('Awaiting physical handover') }}
 </dd>
 </div>
 </dl>
@@ -58,25 +58,25 @@ Handover
 <div class="card">
 <div class="card-head">
 <h2>
-Assigned parcels
+{{ __('Assigned parcels') }}
 </h2>
-<span class="subtle">{{ $dispatch->shipments->count() }} shipments</span>
+<span class="subtle">{{ $dispatch->shipments->count() }} {{ __('shipments') }}</span>
 </div>
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>
-Tracking
+{{ __('Tracking') }}
 </th>
 <th>
-Destination
+{{ __('Destination') }}
 </th>
 <th>
-Weight / pieces
+{{ __('Weight / pieces') }}
 </th>
 <th>
-Status
+{{ __('Status') }}
 </th>
 <th>
 </th>
@@ -92,15 +92,15 @@ Status
 {{ $shipment->destination_country }}
 </td>
 <td>
-{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} pcs
+{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}
 </td>
 <td>
-<span class="badge" data-status="{{ $shipment->status }}">{{ $shipment->status }}</span>
+<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>
 </td>
 <td>
 @unless($dispatch->handed_over_at)
 <form method="post" action="{{ route('dispatches.unassign',[$dispatch,$shipment]) }}">
-@csrf @method('DELETE')<button class="button small secondary">Remove from draft</button>
+@csrf @method('DELETE')<button class="button small secondary">{{ __('Remove from draft') }}</button>
 </form>
 @endunless
 </td>
@@ -108,7 +108,7 @@ Status
 @empty
 <tr>
 <td colspan="5" class="empty">
-This draft has no assigned parcels.
+{{ __('This draft has no assigned parcels.') }}
 </td>
 </tr>
 @endforelse

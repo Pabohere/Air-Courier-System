@@ -34,7 +34,7 @@ class ShipmentController extends Controller
         $data = $request->validate(['booking_key' => 'required|uuid', 'customer_id' => 'required|integer|exists:customers,id', 'destination_id' => 'required|integer|exists:destinations,id', 'recipient_name' => 'required|string|max:150', 'recipient_phone' => 'required|string|max:50', 'recipient_address' => 'required|string|max:2000', 'shipment_date' => 'required|date_format:Y-m-d|before_or_equal:today', 'description' => 'required|string|max:2000', 'quantity' => 'required|integer|min:1|max:10000', 'actual_weight' => ['required', 'regex:/^\d{1,5}(\.\d{1,3})?$/D']]);
         $shipment = $service->book($data, $request->user());
 
-        return redirect()->route('shipments.show', $shipment)->with('success', 'Shipment booked. Price is saved and locked.');
+        return redirect()->route('shipments.show', $shipment)->with('success', __('Shipment booked. Price is saved and locked.'));
     }
 
     public function show(Shipment $shipment): View
@@ -49,7 +49,7 @@ class ShipmentController extends Controller
         $data = $request->validate(['status' => ['required', Rule::in(array_keys(CourierService::TRANSITIONS))], 'notes' => 'nullable|string|max:2000']);
         $service->transition($shipment, $data['status'], $data['notes'] ?? null, $request->user());
 
-        return back()->with('success', 'Status updated.');
+        return back()->with('success', __('Status updated.'));
     }
 
     public function receipt(Shipment $shipment): View

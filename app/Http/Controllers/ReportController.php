@@ -24,7 +24,7 @@ class ReportController extends Controller
         $from = $data['from'] ?? today()->toDateString();
         $to = $data['to'] ?? $from;
         if ($to < $from || Carbon::parse($from)->diffInDays($to) > 366) {
-            throw ValidationException::withMessages(['to' => 'Choose a date range of at most 366 days, ending on or after its start.']);
+            throw ValidationException::withMessages(['to' => __('Choose a date range of at most 366 days, ending on or after its start.')]);
         }
 
         return [$from, $to];
@@ -51,12 +51,12 @@ class ReportController extends Controller
                 fputcsv($file, array_map(fn ($v) => is_string($v) && preg_match('/^[\s]*[=+@\-]/u', $v) ? "'".$v : $v, $row), ',', '"', '');
             };
             if ($type === 'payments') {
-                $write(['Date', 'Tracking', 'Type', 'Method', 'Amount', 'Currency', 'Reference', 'Staff', 'Reason']);
+                $write(array_map('__', ['Date', 'Tracking', 'Type', 'Method', 'Amount', 'Currency', 'Reference', 'Staff', 'Reason']));
                 foreach ($report['payments'] as $p) {
                     $write([$p->payment_date->toDateString(), $p->shipment->tracking_number, $p->type, $p->method->name, Money::decimal($p->signedCents()), $p->currency, $p->reference, $p->staff->name, $p->reason]);
                 }
             } else {
-                $write(['Shipment date', 'Tracking', 'Customer', 'Destination', 'Status', 'Charge', 'Paid', 'Outstanding', 'Currency']);
+                $write(array_map('__', ['Shipment date', 'Tracking', 'Customer', 'Destination', 'Status', 'Charge', 'Paid', 'Outstanding', 'Currency']));
                 foreach ($report[$type === 'outstanding' ? 'outstanding' : 'shipments'] as $s) {
                     $write([$s->shipment_date->toDateString(), $s->tracking_number, $s->sender['name'], $s->destination_country, $s->status, $s->price, Money::decimal($s->paidCents()), Money::decimal($s->balanceCents()), $s->currency]);
                 }
@@ -73,12 +73,12 @@ class ReportController extends Controller
             $day = $reports->methodDay($data['date'], $method->id);
             $actual = Money::cents(ltrim($data['actual'], '-')) * (str_starts_with($data['actual'], '-') ? -1 : 1);
             if ($actual !== $day['expected'] && ! filled($data['notes'] ?? null)) {
-                throw ValidationException::withMessages(['notes' => 'Explain the reconciliation variance.']);
+                throw ValidationException::withMessages(['notes' => __('Explain the reconciliation variance.')]);
             }
             $row = Reconciliation::create(['date' => $data['date'], 'payment_method_id' => $method->id, 'currency' => CompanySetting::firstOrFail()->currency, 'expected' => Money::decimal($day['expected']), 'actual' => Money::decimal($actual), 'ledger_version' => $day['version'], 'notes' => $data['notes'] ?? null, 'staff_id' => $request->user()->id]);
             $service->audit($request->user(), 'payments.reconciled', $row);
         }, 3);
 
-        return back()->with('success', 'Reconciliation snapshot saved. New ledger entries will mark it for review.');
+        return back()->with('success', __('Reconciliation snapshot saved. New ledger entries will mark it for review.'));
     }
 }

@@ -2,21 +2,21 @@
 @csrf @if($method->exists)<input type="hidden" name="method_id" value="{{ $method->id }}">@endif
 <div class="field-grid">
 <label>
-Name<input name="name" value="{{ $method->name }}" maxlength="100" required>
+{{ __('Name') }}<input name="name" value="{{ $method->name }}" maxlength="100" required>
 </label>
 <label>
-Status
+{{ __('Status') }}
 <select name="active">
 <option value="1" @selected($method->
-active??true)>Active
+active??true)>{{ __('Active') }}
 </option>
 <option value="0" @selected($method->
-exists&&!$method->active)>Inactive
+exists&&!$method->active)>{{ __('Inactive') }}
 </option>
 </select>
 </label>
 </div>
 <div class="form-actions">
-<button class="button">Save method</button>
+<button class="button">{{ __('Save method') }}</button>
 </div>
 </form>

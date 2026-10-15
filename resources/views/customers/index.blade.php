@@ -1,21 +1,21 @@
-@extends('layouts.app') @section('title','Customers') @section('content')
+@extends('layouts.app') @section('title',__('Customers')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-YOUR CUSTOMER DIRECTORY
+{{ __('YOUR CUSTOMER DIRECTORY') }}
 </div>
 <h1>
-Customers
+{{ __('Customers') }}
 </h1>
-<p class="subtle">Contact details and shipment history in one place.</p>
+<p class="subtle">{{ __('Contact details and shipment history in one place.') }}</p>
 </div>
-<a class="button" href="{{ route('customers.create') }}">＋ Add customer</a>
+<a class="button" href="{{ route('customers.create') }}">{{ __('＋ Add customer') }}</a>
 </div>
 <form method="get" class="filters">
 <label class="search">
-Search customers<input name="q" value="{{ $q }}" placeholder="Name or phone number">
+{{ __('Search customers') }}<input name="q" value="{{ $q }}" placeholder="{{ __('Name or phone number') }}">
 </label>
-<button class="button secondary">Search</button>
+<button class="button secondary">{{ __('Search') }}</button>
 </form>
 <div class="card">
 <div class="table-wrap">
@@ -23,16 +23,16 @@ Search customers<input name="q" value="{{ $q }}" placeholder="Name or phone numb
 <thead>
 <tr>
 <th>
-Customer
+{{ __('Customer') }}
 </th>
 <th>
-Phone
+{{ __('Phone') }}
 </th>
 <th>
-Address
+{{ __('Address') }}
 </th>
 <th>
-Shipments
+{{ __('Shipments') }}
 </th>
 <th>
 </th>
@@ -54,13 +54,13 @@ Shipments
 {{ $customer->shipments_count }}
 </td>
 <td>
-<a href="{{ route('customers.edit',$customer) }}">Edit</a>
+<a href="{{ route('customers.edit',$customer) }}">{{ __('Edit') }}</a>
 </td>
 </tr>
 @empty
 <tr>
 <td colspan="5" class="empty">
-No customers found.
+{{ __('No customers found.') }}
 </td>
 </tr>
 @endforelse

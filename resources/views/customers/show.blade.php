@@ -1,30 +1,30 @@
-@extends('layouts.app') @section('title','Customer details') @section('content')
+@extends('layouts.app') @section('title',__('Customer details')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-CUSTOMER DETAILS
+{{ __('CUSTOMER DETAILS') }}
 </div>
 <h1>
 {{ $customer->name }}
 </h1>
 <p class="subtle">{{ $customer->phone }}</p>
 </div>
-<a class="button secondary" href="{{ route('customers.edit',$customer) }}">Edit customer</a>
+<a class="button secondary" href="{{ route('customers.edit',$customer) }}">{{ __('Edit customer') }}</a>
 </div>
 <div class="card">
 <div class="card-body">
 <div class="two-columns">
 <div>
 <h3>
-Address
+{{ __('Address') }}
 </h3>
 <p class="preserve subtle">{{ $customer->address }}</p>
 </div>
 <div>
 <h3>
-Notes
+{{ __('Notes') }}
 </h3>
-<p class="preserve subtle">{{ $customer->notes??'No notes.' }}</p>
+<p class="preserve subtle">{{ $customer->notes??__('No notes.') }}</p>
 </div>
 </div>
 </div>
@@ -32,9 +32,9 @@ Notes
 <div class="card">
 <div class="card-head">
 <h2>
-Shipment history
+{{ __('Shipment history') }}
 </h2>
-<a href="{{ route('shipments.create') }}">New booking →</a>
+<a href="{{ route('shipments.create') }}">{{ __('New booking →') }}</a>
 </div>
 @include('shipments.table')<x-pagination :paginator="$shipments" />
 </div>

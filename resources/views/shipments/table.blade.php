@@ -3,19 +3,19 @@
 <thead>
 <tr>
 <th>
-Tracking / booked
+{{ __('Tracking / booked') }}
 </th>
 <th>
-Customer
+{{ __('Customer') }}
 </th>
 <th>
-Destination
+{{ __('Destination') }}
 </th>
 <th>
-Status
+{{ __('Status') }}
 </th>
 <th class="right">
-Charge / balance
+{{ __('Charge / balance') }}
 </th>
 <th>
 </th>
@@ -25,28 +25,28 @@ Charge / balance
 @forelse($shipments as $shipment)
 <tr>
 <td>
-<a class="mono" href="{{ route('shipments.show',$shipment) }}">{{ $shipment->tracking_number }}</a><small>{{ $shipment->shipment_date->format('d M Y') }}</small>
+<a class="mono" href="{{ route('shipments.show',$shipment) }}">{{ $shipment->tracking_number }}</a><small>{{ $shipment->shipment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</small>
 </td>
 <td>
-<strong>{{ $shipment->sender['name'] }}</strong><small>{{ $shipment->recipient_name }} · recipient</small>
+<strong>{{ $shipment->sender['name'] }}</strong><small>{{ $shipment->recipient_name }} {{ __('· recipient') }}</small>
 </td>
 <td>
-{{ $shipment->destination_country }}<small>{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} pcs</small>
+{{ $shipment->destination_country }}<small>{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}</small>
 </td>
 <td>
-<span class="badge" data-status="{{ $shipment->status }}">{{ $shipment->status }}</span>
+<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>
 </td>
 <td class="right">
-<strong>{{ $shipment->price }} {{ $shipment->currency }}</strong><small>{{ \App\Services\Money::decimal($shipment->balanceCents()) }} outstanding</small>
+<strong>{{ $shipment->price }} {{ $shipment->currency }}</strong><small>{{ \App\Services\Money::decimal($shipment->balanceCents()) }} {{ __('outstanding') }}</small>
 </td>
 <td>
-<a href="{{ route('shipments.show',$shipment) }}" aria-label="View {{ $shipment->tracking_number }}">↗</a>
+<a href="{{ route('shipments.show',$shipment) }}" aria-label="{{ __('View') }} {{ $shipment->tracking_number }}">↗</a>
 </td>
 </tr>
 @empty
 <tr>
 <td colspan="6" class="empty">
-No shipments yet. Create a booking to get started.
+{{ __('No shipments yet. Create a booking to get started.') }}
 </td>
 </tr>
 @endforelse

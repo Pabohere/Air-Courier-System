@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} · Manifest</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $dispatch->reference }} {{ __('· Manifest') }}</title><link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 </head>
 <body>
 <main class="print-page">
 <div class="print-toolbar">
-<a href="{{ route('dispatches.show',$dispatch) }}" class="button secondary">Back</a><button class="button" data-print>Print manifest</button>
+<x-language-switch />
+<a href="{{ route('dispatches.show',$dispatch) }}" class="button secondary">{{ __('Back') }}</a><button class="button" data-print>{{ __('Print manifest') }}</button>
 </div>
 <div class="print-head">
 <div class="print-company">
-<img class="print-logo" src="{{ asset('images/standard-mark.png') }}" alt="Standard courier logo" width="1305" height="1206">
+<img class="print-logo" src="{{ asset('images/standard-mark.png') }}" alt="{{ __('Standard courier logo') }}" width="1305" height="1206">
 <div>
 <h1>
 {{ $company->name }}
@@ -21,23 +22,23 @@
 </div>
 <div class="right">
 <div class="eyebrow">
-DISPATCH MANIFEST
+{{ __('DISPATCH MANIFEST') }}
 </div>
-<strong class="mono">{{ $dispatch->reference }}</strong><p class="subtle">{{ $dispatch->handed_over_at?'HANDED OVER':'DRAFT · NOT YET HANDED OVER' }}</p>
+<strong class="mono">{{ $dispatch->reference }}</strong><p class="subtle">{{ $dispatch->handed_over_at?__('HANDED OVER'):__('DRAFT · NOT YET HANDED OVER') }}</p>
 </div>
 </div>
 <dl class="summary-list">
 <div>
 <dt>
-Partner / date
+{{ __('Partner / date') }}
 </dt>
 <dd>
-{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->format('d M Y') }}
+{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}
 </dd>
 </div>
 <div>
 <dt>
-Flight / external AWB
+{{ __('Flight / external AWB') }}
 </dt>
 <dd>
 {{ $dispatch->flight?:'—' }} / {{ $dispatch->awb?:'—' }}
@@ -52,19 +53,19 @@ Flight / external AWB
 #
 </th>
 <th>
-Tracking
+{{ __('Tracking') }}
 </th>
 <th>
-Sender / recipient
+{{ __('Sender / recipient') }}
 </th>
 <th>
-Destination
+{{ __('Destination') }}
 </th>
 <th>
-Pieces
+{{ __('Pieces') }}
 </th>
 <th>
-Weight
+{{ __('Weight') }}
 </th>
 </tr>
 </thead>
@@ -94,9 +95,9 @@ Weight
 </tbody>
 </table>
 </div>
-<p class="subtle section-gap">{{ $dispatch->shipments->count() }} shipments · {{ $dispatch->shipments->sum('quantity') }} pieces · Total weight {{ $dispatch->shipments->reduce(fn($total,$shipment)=>bcadd($total,$shipment->actual_weight,3),'0.000') }} {{ $dispatch->shipments->first()?->weight_unit }}</p><p class="preserve subtle">{{ $dispatch->notes }}</p>
+<p class="subtle section-gap">{{ $dispatch->shipments->count() }} {{ __('shipments ·') }} {{ $dispatch->shipments->sum('quantity') }} {{ __('pieces · Total weight') }} {{ $dispatch->shipments->reduce(fn($total,$shipment)=>bcadd($total,$shipment->actual_weight,3),'0.000') }} {{ $dispatch->shipments->first()?->weight_unit }}</p><p class="preserve subtle">{{ $dispatch->notes }}</p>
 <div class="two-columns section-gap">
-<p>Handed over by: __________________<br><small>Date / time: __________________</small></p><p>Received by: __________________<br><small>Partner signature: __________________</small></p>
+<p>{{ __('Handed over by: __________________') }}<br><small>{{ __('Date / time: __________________') }}</small></p><p>{{ __('Received by: __________________') }}<br><small>{{ __('Partner signature: __________________') }}</small></p>
 </div>
 </main>
 <script src="{{ asset('js/app.js') }}" defer></script>

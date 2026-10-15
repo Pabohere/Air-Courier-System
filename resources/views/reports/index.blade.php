@@ -1,80 +1,80 @@
-@extends('layouts.app') @section('title','Bookkeeping') @section('content')
+@extends('layouts.app') @section('title',__('Bookkeeping')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-CLEAR RECORDS, CONFIDENT DAILY CLOSE
+{{ __('CLEAR RECORDS, CONFIDENT DAILY CLOSE') }}
 </div>
 <h1>
-Bookkeeping & reports
+{{ __('Bookkeeping & reports') }}
 </h1>
-<p class="subtle">Shipment charges, receipts and balances. No profit estimate.</p>
+<p class="subtle">{{ __('Shipment charges, receipts and balances. No profit estimate.') }}</p>
 </div>
 <div class="actions">
-<a class="button secondary" href="{{ route('reports.index',['from'=>today()->startOfMonth()->toDateString(),'to'=>today()->endOfMonth()->toDateString()]) }}">This month</a><a class="button secondary" href="{{ route('reports.index') }}">Today</a>
+<a class="button secondary" href="{{ route('reports.index',['from'=>today()->startOfMonth()->toDateString(),'to'=>today()->endOfMonth()->toDateString()]) }}">{{ __('This month') }}</a><a class="button secondary" href="{{ route('reports.index') }}">{{ __('Today') }}</a>
 </div>
 </div>
 <form method="get" class="filters">
 <label>
-From<input type="date" name="from" value="{{ $from }}" required>
+{{ __('From') }}<input type="date" name="from" value="{{ $from }}" required>
 </label>
 <label>
-To<input type="date" name="to" value="{{ $to }}" required>
+{{ __('To') }}<input type="date" name="to" value="{{ $to }}" required>
 </label>
-<button class="button">Apply dates</button>
+<button class="button">{{ __('Apply dates') }}</button>
 </form>
 <div class="metrics">
 <div class="metric">
 <div class="metric-label">
-Shipment charges
+{{ __('Shipment charges') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::display($report['charges']) }}<small>{{ $currency }}</small>
 </div>
 <div class="metric-foot">
-{{ $report['shipments']->count() }} bookings · {{ $report['cancelled'] }} cancelled
+{{ $report['shipments']->count() }} {{ __('bookings ·') }} {{ $report['cancelled'] }} {{ __('cancelled') }}
 </div>
 </div>
 <div class="metric accent">
 <div class="metric-label">
-Payments received
+{{ __('Payments received') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::display($report['received']) }}<small>{{ $currency }}</small>
 </div>
 <div class="metric-foot">
-By payment date
+{{ __('By payment date') }}
 </div>
 </div>
 <div class="metric">
 <div class="metric-label">
-Refunds
+{{ __('Refunds') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::display($report['refunds']) }}<small>{{ $currency }}</small>
 </div>
 <div class="metric-foot">
-Net receipts: {{ \App\Services\Money::display($report['net']) }}
+{{ __('Net receipts:') }} {{ \App\Services\Money::display($report['net']) }}
 </div>
 </div>
 <div class="metric">
 <div class="metric-label">
-Current outstanding · all dates
+{{ __('Current outstanding · all dates') }}
 </div>
 <div class="metric-value">
 {{ \App\Services\Money::display($report['outstanding']->sum(fn($s)=>$s->balanceCents())) }}<small>{{ $currency }}</small>
 </div>
 <div class="metric-foot">
-Includes cancelled shipments awaiting review
+{{ __('Includes cancelled shipments awaiting review') }}
 </div>
 </div>
 </div>
 <div class="card">
 <div class="card-head">
 <h2>
-Receipts by payment method
+{{ __('Receipts by payment method') }}
 </h2>
 <div class="actions">
-<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'payments']) }}">Payments CSV ↓</a><a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'shipments']) }}">Bookings CSV ↓</a>
+<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'payments']) }}">{{ __('Payments CSV ↓') }}</a><a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'shipments']) }}">{{ __('Bookings CSV ↓') }}</a>
 </div>
 </div>
 <div class="table-wrap">
@@ -82,16 +82,16 @@ Receipts by payment method
 <thead>
 <tr>
 <th>
-Method
+{{ __('Method') }}
 </th>
 <th class="right">
-Received
+{{ __('Received') }}
 </th>
 <th class="right">
-Refunds
+{{ __('Refunds') }}
 </th>
 <th class="right">
-Net receipts
+{{ __('Net receipts') }}
 </th>
 </tr>
 </thead>
@@ -99,7 +99,7 @@ Net receipts
 @forelse($report['methods'] as $method)
 <tr>
 <td>
-{{ $method['name'] }}
+{{ __($method['name']) }}
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($method['received']) }}
@@ -114,7 +114,7 @@ Net receipts
 @empty
 <tr>
 <td colspan="4" class="empty">
-No payments in this date range.
+{{ __('No payments in this date range.') }}
 </td>
 </tr>
 @endforelse
@@ -125,7 +125,7 @@ No payments in this date range.
 <div class="card">
 <div class="card-head">
 <h2>
-Payment entries
+{{ __('Payment entries') }}
 </h2>
 <span class="subtle">{{ $from }} — {{ $to }}</span>
 </div>
@@ -134,19 +134,19 @@ Payment entries
 <thead>
 <tr>
 <th>
-Date
+{{ __('Date') }}
 </th>
 <th>
-Shipment
+{{ __('Shipment') }}
 </th>
 <th>
-Type / method
+{{ __('Type / method') }}
 </th>
 <th>
-Reference / staff
+{{ __('Reference / staff') }}
 </th>
 <th class="right">
-Amount
+{{ __('Amount') }}
 </th>
 </tr>
 </thead>
@@ -154,13 +154,13 @@ Amount
 @forelse($report['payments'] as $payment)
 <tr>
 <td>
-{{ $payment->payment_date->format('d M Y') }}
+{{ $payment->payment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}
 </td>
 <td>
 <a class="mono" href="{{ route('shipments.show',$payment->shipment) }}">{{ $payment->shipment->tracking_number }}</a>
 </td>
 <td>
-{{ ucfirst($payment->type) }}<small>{{ $payment->method->name }}</small>
+{{ __(ucfirst($payment->type)) }}<small>{{ __($payment->method->name) }}</small>
 </td>
 <td>
 {{ $payment->reference?:'—' }}<small>{{ $payment->staff->name }}</small>
@@ -172,7 +172,7 @@ Amount
 @empty
 <tr>
 <td colspan="5" class="empty">
-No entries for these dates.
+{{ __('No entries for these dates.') }}
 </td>
 </tr>
 @endforelse
@@ -184,36 +184,36 @@ No entries for these dates.
 <div class="card">
 <div class="card-head">
 <h2>
-Reconcile receipts
+{{ __('Reconcile receipts') }}
 </h2>
 </div>
 <div class="card-body">
-<p class="subtle">Enter actual net receipts (received less refunded) for a single day and method. A negative amount is allowed for refund-only days.</p>
+<p class="subtle">{{ __('Enter actual net receipts (received less refunded) for a single day and method. A negative amount is allowed for refund-only days.') }}</p>
 <form method="post" action="{{ route('reports.reconcile') }}">
 @csrf
 <div class="field-grid">
 <label>
-Date<input type="date" name="date" value="{{ old('date',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
+{{ __('Date') }}<input type="date" name="date" value="{{ old('date',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
 </label>
 <label>
-Payment method
+{{ __('Payment method') }}
 <select name="payment_method_id" required>
 @foreach($methods as $method)
 <option value="{{ $method->id }}">
-{{ $method->name }}
+{{ __($method->name) }}
 </option>
 @endforeach
 </select>
 </label>
 <label class="full">
-Actual net receipts ({{ $currency }})<input name="actual" type="number" step="0.01" value="{{ old('actual') }}" required>
+{{ __('Actual net receipts (') }}{{ $currency }})<input name="actual" type="number" step="0.01" value="{{ old('actual') }}" required>
 </label>
 <label class="full">
-Notes / reason for any difference<textarea name="notes">{{ old('notes') }}</textarea>
+{{ __('Notes / reason for any difference') }}<textarea name="notes">{{ old('notes') }}</textarea>
 </label>
 </div>
 <div class="form-actions">
-<button class="button">Save reconciliation</button>
+<button class="button">{{ __('Save reconciliation') }}</button>
 </div>
 </form>
 </div>
@@ -221,18 +221,18 @@ Notes / reason for any difference<textarea name="notes">{{ old('notes') }}</text
 <div class="card">
 <div class="card-head">
 <h2>
-Reconciliation history
+{{ __('Reconciliation history') }}
 </h2>
 </div>
 @forelse($reconciliations as $item)@php($row=$item['record'])
 <details>
 <summary>
-{{ $row->date->format('d M') }} · {{ $row->method->name }} <span class="badge">{{ $item['current']['version']!=$row->ledger_version?'Review: new ledger entries':(\App\Services\Money::decimal($item['current']['expected'])!==$row->expected?'Review: changed ledger':($row->expected===$row->actual?'Matched':'Variance')) }}</span>
+{{ $row->date->locale(app()->getLocale())->translatedFormat('d M') }} · {{ $row->method->name }} <span class="badge">{{ $item['current']['version']!=$row->ledger_version?__('Review: new ledger entries'):(\App\Services\Money::decimal($item['current']['expected'])!==$row->expected?__('Review: changed ledger'):($row->expected===$row->actual?__('Matched'):__('Variance'))) }}</span>
 </summary>
 <dl class="summary-list">
 <div>
 <dt>
-Recorded net receipts
+{{ __('Recorded net receipts') }}
 </dt>
 <dd>
 {{ $row->expected }}
@@ -240,7 +240,7 @@ Recorded net receipts
 </div>
 <div>
 <dt>
-Actual receipts
+{{ __('Actual receipts') }}
 </dt>
 <dd>
 {{ $row->actual }}
@@ -248,7 +248,7 @@ Actual receipts
 </div>
 <div>
 <dt>
-Difference
+{{ __('Difference') }}
 </dt>
 <dd>
 {{ \App\Services\Money::decimal((int)bcmul(bcsub($row->actual,$row->expected,2),'100',0)) }}
@@ -256,18 +256,18 @@ Difference
 </div>
 <div>
 <dt>
-Current ledger
+{{ __('Current ledger') }}
 </dt>
 <dd>
 {{ \App\Services\Money::decimal($item['current']['expected']) }}
 </dd>
 </div>
 </dl>
-<p class="subtle preserve">{{ $row->notes }}</p><p class="help">{{ $row->staff->name }} · {{ $row->created_at->format('d M Y H:i') }}</p>
+<p class="subtle preserve">{{ $row->notes }}</p><p class="help">{{ $row->staff->name }} · {{ $row->created_at->locale(app()->getLocale())->translatedFormat('d M Y H:i') }}</p>
 </details>
 @empty
 <div class="empty">
-No saved reconciliations for this range.
+{{ __('No saved reconciliations for this range.') }}
 </div>
 @endforelse
 </div>
@@ -276,11 +276,11 @@ No saved reconciliations for this range.
 <div class="card-head">
 <div>
 <h2>
-Outstanding balances
+{{ __('Outstanding balances') }}
 </h2>
-<p class="subtle">Current balances across all booking dates; not a historical balance report.</p>
+<p class="subtle">{{ __('Current balances across all booking dates; not a historical balance report.') }}</p>
 </div>
-<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'outstanding']) }}">Outstanding CSV ↓</a>
+<a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'outstanding']) }}">{{ __('Outstanding CSV ↓') }}</a>
 </div>
 @include('shipments.table',['shipments'=>$report['outstanding']])
 </div>

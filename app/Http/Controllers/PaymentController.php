@@ -18,13 +18,13 @@ class PaymentController extends Controller
     {
         $service->recordPayment($shipment, $this->validated($request), $request->user());
 
-        return back()->with('success', 'Payment recorded.');
+        return back()->with('success', __('Payment recorded.'));
     }
 
     public function refund(Request $request, Shipment $shipment, CourierService $service): RedirectResponse
     {
         $service->refund($shipment, $this->validated($request, true), $request->user());
 
-        return back()->with('success', 'Refund recorded with the original payment preserved.');
+        return back()->with('success', __('Refund recorded with the original payment preserved.'));
     }
 }

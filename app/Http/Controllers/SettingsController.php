@@ -32,14 +32,14 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
         DB::transaction(function () use ($data, $request, $service) {
             $settings = CompanySetting::query()->lockForUpdate()->firstOrFail();
             if (Shipment::exists() && ($settings->currency !== $data['currency'] || $settings->weight_unit !== $data['weight_unit'])) {
-                throw ValidationException::withMessages(['currency' => 'Currency and weight unit are locked after the first booking to preserve consistent records.']);
+                throw ValidationException::withMessages(['currency' => __('Currency and weight unit are locked after the first booking to preserve consistent records.')]);
             }
             $before = $settings->toArray();
             $settings->update($data);
             $service->audit($request->user(), 'settings.company', $settings, $before);
         }, 3);
 
-        return back()->with('success', 'Company settings saved.');
+        return back()->with('success', __('Company settings saved.'));
     }
 
     public function destination(Request $request, CourierService $service): RedirectResponse
@@ -55,7 +55,7 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
             $service->audit($request->user(), 'settings.rate', $destination, $before);
         }, 3);
 
-        return back()->with('success', 'Destination and rate saved. Existing shipment prices are unchanged.');
+        return back()->with('success', __('Destination and rate saved. Existing shipment prices are unchanged.'));
     }
 
     public function method(Request $request, CourierService $service): RedirectResponse
@@ -68,7 +68,7 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
             $service->audit($request->user(), 'settings.payment_method', $method, $before);
         });
 
-        return back()->with('success', 'Payment method saved.');
+        return back()->with('success', __('Payment method saved.'));
     }
 
     public function user(Request $request, CourierService $service): RedirectResponse
@@ -78,7 +78,7 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
             $admins = User::where('role', 'admin')->where('active', true)->lockForUpdate()->get();
             $user = isset($data['user_id']) ? User::query()->lockForUpdate()->findOrFail($data['user_id']) : new User;
             if ($user->exists && $user->active && $user->isAdmin() && ($data['role'] !== 'admin' || ! $data['active']) && $admins->count() <= 1) {
-                throw ValidationException::withMessages(['role' => 'At least one active administrator is required.']);
+                throw ValidationException::withMessages(['role' => __('At least one active administrator is required.')]);
             }
             $before = $user->exists ? $user->only(['name', 'email', 'role', 'active']) : null;
             $values = collect($data)->only(['name', 'email', 'role', 'active'])->all();
@@ -92,7 +92,7 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
             $service->audit($request->user(), 'settings.user', $user, $before, $user->only(['name', 'email', 'role', 'active']) + ['password_changed' => filled($data['password'] ?? null)]);
         }, 3);
 
-        return back()->with('success', 'User account saved.');
+        return back()->with('success', __('User account saved.'));
     }
 
     public function audit(): View

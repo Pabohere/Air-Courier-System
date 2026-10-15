@@ -1,22 +1,22 @@
-@extends('layouts.app') @section('title','Warehouse & dispatch') @section('content')
+@extends('layouts.app') @section('title',__('Warehouse & dispatch')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-THE NEXT LEG OF THE JOURNEY
+{{ __('THE NEXT LEG OF THE JOURNEY') }}
 </div>
 <h1>
-Warehouse & dispatch
+{{ __('Warehouse & dispatch') }}
 </h1>
-<p class="subtle">Prepare manifests, assign ready parcels and record partner handover.</p>
+<p class="subtle">{{ __('Prepare manifests, assign ready parcels and record partner handover.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('shipments.index',['status'=>'Received']) }}">View warehouse parcels →</a>
+<a class="button secondary" href="{{ route('shipments.index',['status'=>'Received']) }}">{{ __('View warehouse parcels →') }}</a>
 </div>
 <div class="card">
 <div class="card-head">
 <h2>
-Create a dispatch
+{{ __('Create a dispatch') }}
 </h2>
-<span class="badge">{{ $ready->count() }} ready & unassigned</span>
+<span class="badge">{{ $ready->count() }} {{ __('ready & unassigned') }}</span>
 </div>
 <div class="card-body">
 <form method="post" action="{{ route('dispatches.store') }}">
@@ -24,26 +24,26 @@ Create a dispatch
 <div class="two-columns">
 <div class="field-grid">
 <label class="full">
-Airline / courier partner<input name="partner" value="{{ old('partner') }}" maxlength="150" required>
+{{ __('Airline / courier partner') }}<input name="partner" value="{{ old('partner') }}" maxlength="150" required>
 </label>
 <label>
-Dispatch date<input type="date" name="dispatch_date" value="{{ old('dispatch_date',today()->toDateString()) }}" required>
+{{ __('Dispatch date') }}<input type="date" name="dispatch_date" value="{{ old('dispatch_date',today()->toDateString()) }}" required>
 </label>
 <label>
-Flight details<input name="flight" value="{{ old('flight') }}" maxlength="100">
+{{ __('Flight details') }}<input name="flight" value="{{ old('flight') }}" maxlength="100">
 </label>
 <label class="full">
-External AWB number<input name="awb" value="{{ old('awb') }}" maxlength="100">
+{{ __('External AWB number') }}<input name="awb" value="{{ old('awb') }}" maxlength="100">
 </label>
 <label class="full">
-Notes<textarea name="notes">{{ old('notes') }}</textarea>
+{{ __('Notes') }}<textarea name="notes">{{ old('notes') }}</textarea>
 </label>
 </div>
 <div>
 <h3>
-Select shipments
+{{ __('Select shipments') }}
 </h3>
-<p class="help">Only parcels marked Ready for Dispatch can be assigned.</p>
+<p class="help">{{ __('Only parcels marked Ready for Dispatch can be assigned.') }}</p>
 <div class="checklist">
 @forelse($ready as $shipment)
 <label>
@@ -51,14 +51,14 @@ Select shipments
 </label>
 @empty
 <div class="empty">
-No parcels ready for dispatch.
+{{ __('No parcels ready for dispatch.') }}
 </div>
 @endforelse
 </div>
 </div>
 </div>
 <div class="form-actions">
-<button class="button" @disabled($ready->isEmpty())>Create draft dispatch →</button>
+<button class="button" @disabled($ready->isEmpty())>{{ __('Create draft dispatch →') }}</button>
 </div>
 </form>
 </div>
@@ -66,7 +66,7 @@ No parcels ready for dispatch.
 <div class="card">
 <div class="card-head">
 <h2>
-Dispatch records
+{{ __('Dispatch records') }}
 </h2>
 </div>
 <div class="table-wrap">
@@ -74,19 +74,19 @@ Dispatch records
 <thead>
 <tr>
 <th>
-Dispatch
+{{ __('Dispatch') }}
 </th>
 <th>
-Partner
+{{ __('Partner') }}
 </th>
 <th>
-Date / flight
+{{ __('Date / flight') }}
 </th>
 <th>
-Parcels
+{{ __('Parcels') }}
 </th>
 <th>
-Handover
+{{ __('Handover') }}
 </th>
 <th>
 </th>
@@ -96,28 +96,28 @@ Handover
 @forelse($dispatches as $dispatch)
 <tr>
 <td>
-<a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a><small>{{ $dispatch->awb?:'No external AWB' }}</small>
+<a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a><small>{{ $dispatch->awb?:__('No external AWB') }}</small>
 </td>
 <td>
 {{ $dispatch->partner }}
 </td>
 <td>
-{{ $dispatch->dispatch_date->format('d M Y') }}<small>{{ $dispatch->flight }}</small>
+{{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}<small>{{ $dispatch->flight }}</small>
 </td>
 <td>
 {{ $dispatch->shipments_count }}
 </td>
 <td>
-<span class="badge">{{ $dispatch->handed_over_at?'Handed over':'Draft' }}</span>
+<span class="badge">{{ $dispatch->handed_over_at?__('Handed over'):__('Draft') }}</span>
 </td>
 <td>
-<a href="{{ route('dispatches.show',$dispatch) }}">View →</a>
+<a href="{{ route('dispatches.show',$dispatch) }}">{{ __('View →') }}</a>
 </td>
 </tr>
 @empty
 <tr>
 <td colspan="6" class="empty">
-No dispatches created.
+{{ __('No dispatches created.') }}
 </td>
 </tr>
 @endforelse

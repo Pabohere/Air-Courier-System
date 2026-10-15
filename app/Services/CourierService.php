@@ -39,11 +39,11 @@ class CourierService
                 abort_unless($existing->created_by === $user->id, 403);
                 foreach (['customer_id', 'destination_id', 'recipient_name', 'recipient_phone', 'recipient_address', 'description', 'quantity'] as $field) {
                     if ((string) $existing->$field !== (string) $data[$field]) {
-                        throw ValidationException::withMessages(['booking_key' => 'This booking form was already used for different details. Start a new booking.']);
+                        throw ValidationException::withMessages(['booking_key' => __('This booking form was already used for different details. Start a new booking.')]);
                     }
                 }
                 if ($existing->shipment_date->toDateString() !== $data['shipment_date'] || bccomp($existing->actual_weight, (string) $data['actual_weight'], 3) !== 0) {
-                    throw ValidationException::withMessages(['booking_key' => 'This booking form was already used for different details. Start a new booking.']);
+                    throw ValidationException::withMessages(['booking_key' => __('This booking form was already used for different details. Start a new booking.')]);
                 }
 
                 return $existing;
@@ -51,7 +51,7 @@ class CourierService
             $customer = Customer::findOrFail($data['customer_id']);
             $destination = Destination::with('rate')->where('active', true)->findOrFail($data['destination_id']);
             if (! $destination->rate) {
-                throw ValidationException::withMessages(['destination_id' => 'Configure a rate for this destination first.']);
+                throw ValidationException::withMessages(['destination_id' => __('Configure a rate for this destination first.')]);
             }
             $snapshot = $destination->rate->only(['base_charge', 'per_weight', 'minimum_charge', 'additional_charge']);
             $shipment = Shipment::create(array_merge(collect($data)->only(['booking_key', 'customer_id', 'destination_id', 'recipient_name', 'recipient_phone', 'recipient_address', 'shipment_date', 'description', 'quantity', 'actual_weight'])->all(), [
@@ -71,16 +71,16 @@ class CourierService
         DB::transaction(function () use ($shipment, $status, $notes, $user) {
             $locked = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
             if (! in_array($status, self::TRANSITIONS[$locked->status] ?? [], true)) {
-                throw ValidationException::withMessages(['status' => 'This status transition is not permitted.']);
+                throw ValidationException::withMessages(['status' => __('This status transition is not permitted.')]);
             }
             if ($locked->dispatch_id && in_array($status, ['Processing', 'Received', 'Cancelled', 'Ready for Dispatch'], true)) {
-                throw ValidationException::withMessages(['status' => 'Remove this shipment from its draft dispatch first; handed-over shipments cannot return to warehouse stages.']);
+                throw ValidationException::withMessages(['status' => __('Remove this shipment from its draft dispatch first; handed-over shipments cannot return to warehouse stages.')]);
             }
             if (in_array($status, ['Exception', 'Cancelled'], true) && ! filled($notes)) {
-                throw ValidationException::withMessages(['notes' => 'A reason is required for exceptions and cancellations.']);
+                throw ValidationException::withMessages(['notes' => __('A reason is required for exceptions and cancellations.')]);
             }
             if (in_array($status, ['In Transit', 'Delivered'], true) && ! $locked->dispatch?->handed_over_at) {
-                throw ValidationException::withMessages(['status' => 'A recorded dispatch handover is required.']);
+                throw ValidationException::withMessages(['status' => __('A recorded dispatch handover is required.')]);
             }
             $before = $locked->toArray();
             $old = $locked->status;
@@ -101,12 +101,12 @@ class CourierService
                 return $existing;
             }
             if ($locked->status === 'Cancelled') {
-                throw ValidationException::withMessages(['amount' => 'Cancelled shipments cannot accept payments.']);
+                throw ValidationException::withMessages(['amount' => __('Cancelled shipments cannot accept payments.')]);
             }
             $method = PaymentMethod::where('active', true)->findOrFail($data['payment_method_id']);
             $amount = Money::cents($data['amount']);
             if ($amount <= 0 || $amount > $locked->balanceCents()) {
-                throw ValidationException::withMessages(['amount' => 'Payment must be positive and cannot exceed the outstanding balance.']);
+                throw ValidationException::withMessages(['amount' => __('Payment must be positive and cannot exceed the outstanding balance.')]);
             }
             $payment = Payment::create(['shipment_id' => $locked->id, 'payment_method_id' => $method->id, 'type' => 'payment', 'amount' => Money::decimal($amount), 'currency' => $locked->currency, 'payment_date' => $data['payment_date'], 'reference' => $data['reference'] ?? null, 'submission_key' => $data['submission_key'], 'staff_id' => $user->id]);
             $this->audit($user, 'payment.recorded', $payment);
@@ -118,7 +118,7 @@ class CourierService
     private function validateReplay(Payment $existing, Shipment $shipment, array $data, User $user, string $type): void
     {
         if ($existing->shipment_id !== $shipment->id || $existing->staff_id !== $user->id || $existing->type !== $type || Money::cents($existing->amount) !== Money::cents($data['amount']) || $existing->payment_date->format('Y-m-d') !== $data['payment_date'] || ($type === 'payment' && $existing->payment_method_id !== (int) $data['payment_method_id']) || ($existing->reference ?? '') !== ($data['reference'] ?? '') || ($type === 'refund' && ($existing->original_payment_id !== (int) $data['original_payment_id'] || $existing->reason !== $data['reason']))) {
-            throw ValidationException::withMessages(['submission_key' => 'This submission was already used for a different transaction. Reload the form.']);
+            throw ValidationException::withMessages(['submission_key' => __('This submission was already used for a different transaction. Reload the form.')]);
         }
     }
 
@@ -138,7 +138,7 @@ class CourierService
             $refunded = Payment::where('original_payment_id', $original->id)->get()->sum(fn (Payment $p) => Money::cents($p->amount));
             $amount = Money::cents($data['amount']);
             if (! filled($data['reason']) || $amount <= 0 || $amount > Money::cents($original->amount) - $refunded) {
-                throw ValidationException::withMessages(['amount' => 'Enter a positive refund within the unrefunded original payment and a reason.']);
+                throw ValidationException::withMessages(['amount' => __('Enter a positive refund within the unrefunded original payment and a reason.')]);
             }
             $payment = Payment::create(['shipment_id' => $locked->id, 'payment_method_id' => $original->payment_method_id, 'original_payment_id' => $original->id, 'type' => 'refund', 'amount' => Money::decimal($amount), 'currency' => $locked->currency, 'payment_date' => $data['payment_date'], 'reference' => $data['reference'] ?? null, 'reason' => $data['reason'], 'submission_key' => $data['submission_key'], 'staff_id' => $user->id]);
             $this->audit($user, 'payment.refunded', $payment);
@@ -153,7 +153,7 @@ class CourierService
             $ids = collect($data['shipments'])->map(fn ($id) => (int) $id)->sort()->values();
             $shipments = Shipment::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get();
             if ($shipments->count() !== $ids->count() || $shipments->contains(fn ($s) => $s->status !== 'Ready for Dispatch' || $s->dispatch_id !== null)) {
-                throw ValidationException::withMessages(['shipments' => 'Choose unassigned shipments that are Ready for Dispatch.']);
+                throw ValidationException::withMessages(['shipments' => __('Choose unassigned shipments that are Ready for Dispatch.')]);
             }
             $dispatch = Dispatch::create(collect($data)->only(['partner', 'dispatch_date', 'flight', 'awb', 'notes'])->all() + ['reference' => 'DSP-'.strtoupper(Str::random(10)), 'created_by' => $user->id]);
             foreach ($shipments as $s) {
@@ -175,11 +175,11 @@ class CourierService
                 return;
             }
             if ($locked->dispatch_date->isFuture() && ! $locked->dispatch_date->isToday()) {
-                throw ValidationException::withMessages(['dispatch' => 'Cannot hand over a future-dated dispatch.']);
+                throw ValidationException::withMessages(['dispatch' => __('Cannot hand over a future-dated dispatch.')]);
             }
             $shipments = $locked->shipments()->orderBy('id')->lockForUpdate()->get();
             if ($shipments->isEmpty() || $shipments->contains(fn ($s) => $s->status !== 'Ready for Dispatch')) {
-                throw ValidationException::withMessages(['dispatch' => 'All assigned shipments must be Ready for Dispatch before handover.']);
+                throw ValidationException::withMessages(['dispatch' => __('All assigned shipments must be Ready for Dispatch before handover.')]);
             }
             $before = $locked->toArray();
             $locked->update(['handed_over_at' => now(), 'handed_over_by' => $user->id]);
@@ -199,7 +199,7 @@ class CourierService
             $locked = Dispatch::query()->lockForUpdate()->findOrFail($dispatch->id);
             $s = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
             if ($locked->handed_over_at || $s->dispatch_id !== $locked->id) {
-                throw ValidationException::withMessages(['dispatch' => 'Only shipments in this draft dispatch can be removed.']);
+                throw ValidationException::withMessages(['dispatch' => __('Only shipments in this draft dispatch can be removed.')]);
             }
             $before = $s->toArray();
             $s->update(['dispatch_id' => null, 'updated_by' => $user->id]);

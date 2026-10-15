@@ -1,33 +1,33 @@
-@extends('layouts.app') @section('title','System settings') @section('content')
+@extends('layouts.app') @section('title',__('System settings')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-ADMINISTRATION
+{{ __('ADMINISTRATION') }}
 </div>
 <h1>
-System settings
+{{ __('System settings') }}
 </h1>
-<p class="subtle">Company details, destination rates, payment methods and staff access.</p>
+<p class="subtle">{{ __('Company details, destination rates, payment methods and staff access.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('settings.audit') }}">Audit history →</a>
+<a class="button secondary" href="{{ route('settings.audit') }}">{{ __('Audit history →') }}</a>
 </div>
 <div class="card">
 <div class="card-head">
 <h2>
-Company & receipt details
+{{ __('Company & receipt details') }}
 </h2>
 </div>
 <div class="card-body">
 <form method="post" action="{{ route('settings.company') }}">
 @csrf
 <div class="field-grid">
-@foreach(['name'=>'Company name','phone'=>'Phone','currency'=>'Currency (3-letter code)'] as $field=>$label)
+@foreach(['name'=>__('Company name'),'phone'=>__('Phone'),'currency'=>__('Currency (3-letter code)')] as $field=>$label)
 <label>
-{{ $label }}<input name="{{ $field }}" value="{{ old($field,$settings->$field) }}" @required($field!=='phone')>
+{{ __($label) }}<input name="{{ $field }}" value="{{ old($field,$settings->$field) }}" @required($field!=='phone')>
 </label>
 @endforeach
 <label>
-Weight unit
+{{ __('Weight unit') }}
 <select name="weight_unit">
 @foreach(['kg','lb'] as $unit)
 <option @selected($settings->
@@ -37,15 +37,15 @@ weight_unit===$unit)>{{ $unit }}
 </select>
 </label>
 <label>
-Address<textarea name="address">{{ old('address',$settings->address) }}</textarea>
+{{ __('Address') }}<textarea name="address">{{ old('address',$settings->address) }}</textarea>
 </label>
 <label>
-Receipt footer<textarea name="receipt_footer">{{ old('receipt_footer',$settings->receipt_footer) }}</textarea>
+{{ __('Receipt footer') }}<textarea name="receipt_footer">{{ old('receipt_footer',$settings->receipt_footer) }}</textarea>
 </label>
 </div>
-<p class="help">Set currency and weight unit before the first booking. They are locked once bookings exist.</p>
+<p class="help">{{ __('Set currency and weight unit before the first booking. They are locked once bookings exist.') }}</p>
 <div class="form-actions">
-<button class="button">Save company details</button>
+<button class="button">{{ __('Save company details') }}</button>
 </div>
 </form>
 </div>
@@ -54,22 +54,22 @@ Receipt footer<textarea name="receipt_footer">{{ old('receipt_footer',$settings-
 <div class="card-head">
 <div>
 <h2>
-Destinations & rates
+{{ __('Destinations & rates') }}
 </h2>
-<p class="subtle">Formula: max(minimum, base + weight × rate) + additional charge. Existing booking prices stay fixed.</p>
+<p class="subtle">{{ __('Formula: max(minimum, base + weight × rate) + additional charge. Existing booking prices stay fixed.') }}</p>
 </div>
 </div>
 @foreach($destinations as $destination)
 <details>
 <summary>
-{{ $destination->country }} <span class="badge">{{ $destination->active?'Active':'Inactive' }}</span>
+{{ $destination->country }} <span class="badge">{{ $destination->active?__('Active'):__('Inactive') }}</span>
 </summary>
 @include('settings.rate-form',['destination'=>$destination])
 </details>
 @endforeach
 <details>
 <summary>
-＋ Add destination & rate
+{{ __('＋ Add destination & rate') }}
 </summary>
 @include('settings.rate-form',['destination'=>new \App\Models\Destination])
 </details>
@@ -78,20 +78,20 @@ Destinations & rates
 <div class="card">
 <div class="card-head">
 <h2>
-Payment methods
+{{ __('Payment methods') }}
 </h2>
 </div>
 @foreach($methods as $method)
 <details>
 <summary>
-{{ $method->name }} · {{ $method->active?'Active':'Inactive' }}
+{{ __($method->name) }} · {{ $method->active?__('Active'):__('Inactive') }}
 </summary>
 @include('settings.method-form',['method'=>$method])
 </details>
 @endforeach
 <details>
 <summary>
-＋ Add payment method
+{{ __('＋ Add payment method') }}
 </summary>
 @include('settings.method-form',['method'=>new \App\Models\PaymentMethod])
 </details>
@@ -99,39 +99,39 @@ Payment methods
 <div class="card">
 <div class="card-head">
 <h2>
-Role permissions
+{{ __('Role permissions') }}
 </h2>
 </div>
 <div class="card-body">
 <h3>
-Staff
+{{ __('Staff') }}
 </h3>
-<p class="subtle">Manage customers, book shipments, update parcel status, record payments, prepare dispatches, view/export reports and reconcile receipts.</p>
+<p class="subtle">{{ __('Manage customers, book shipments, update parcel status, record payments, prepare dispatches, view/export reports and reconcile receipts.') }}</p>
 <h3>
-Admin
+{{ __('Admin') }}
 </h3>
-<p class="subtle">All staff permissions, plus refunds, company settings, destination rates, payment methods, user management and audit history.</p><p class="help">Financial entries cannot be edited or deleted. Use an authorized refund and replacement payment to correct a record.</p>
+<p class="subtle">{{ __('All staff permissions, plus refunds, company settings, destination rates, payment methods, user management and audit history.') }}</p><p class="help">{{ __('Financial entries cannot be edited or deleted. Use an authorized refund and replacement payment to correct a record.') }}</p>
 </div>
 </div>
 </div>
 <div class="card">
 <div class="card-head">
 <h2>
-Staff accounts
+{{ __('Staff accounts') }}
 </h2>
-<span class="subtle">At least one active administrator is required.</span>
+<span class="subtle">{{ __('At least one active administrator is required.') }}</span>
 </div>
 @foreach($users as $staff)
 <details>
 <summary>
-{{ $staff->name }} · {{ $staff->email }} <span class="badge">{{ ucfirst($staff->role) }} · {{ $staff->active?'Active':'Inactive' }}</span>
+{{ $staff->name }} · {{ $staff->email }} <span class="badge">{{ __(ucfirst($staff->role)) }} · {{ $staff->active?__('Active'):__('Inactive') }}</span>
 </summary>
 @include('settings.user-form',['staff'=>$staff])
 </details>
 @endforeach
 <details>
 <summary>
-＋ Add staff account
+{{ __('＋ Add staff account') }}
 </summary>
 @include('settings.user-form',['staff'=>new \App\Models\User])
 </details>
