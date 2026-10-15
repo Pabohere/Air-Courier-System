@@ -110,6 +110,8 @@
 </dt>
 <dd>
 <a href="{{ route('dispatches.show',$shipment->dispatch) }}">{{ $shipment->dispatch->reference }}</a>
+<small>{{ __('Carrier') }}: {{ $shipment->dispatch->carrier_name ?: __('Carrier not recorded') }}</small>
+<small>{{ __('Flight details') }}: {{ $shipment->dispatch->flight ?: '—' }} · <x-branch-route :record="$shipment->dispatch" /></small>
 </dd>
 </div>
 @endif

@@ -248,7 +248,7 @@ class CourierWorkflowTest extends TestCase
     {
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
-        $dispatch = app(CourierService::class)->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        $dispatch = app(CourierService::class)->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $this->actingAs($user)->post(route('dispatches.handover', $dispatch))->assertRedirect();
         $this->assertSame('Dispatched', $shipment->fresh()->status);
         $this->assertNotNull($dispatch->fresh()->handed_over_at);
@@ -258,7 +258,7 @@ class CourierWorkflowTest extends TestCase
     public function test_unready_parcel_cannot_be_assigned_to_dispatch(): void
     {
         [$user,$shipment] = $this->booked();
-        $this->actingAs($user)->post(route('dispatches.store'), ['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]])->assertSessionHasErrors('shipments');
+        $this->actingAs($user)->post(route('dispatches.store'), ['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]])->assertSessionHasErrors('shipments');
         $this->assertDatabaseCount('dispatches', 0);
         $this->assertNull($shipment->fresh()->dispatch_id);
     }
@@ -267,7 +267,7 @@ class CourierWorkflowTest extends TestCase
     {
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
-        app(CourierService::class)->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        app(CourierService::class)->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $this->actingAs($user)->post(route('shipments.status', $shipment), ['status' => 'Cancelled', 'notes' => 'Changed plan'])->assertSessionHasErrors('status');
         $this->assertSame('Ready for Dispatch', $shipment->fresh()->status);
     }
@@ -398,7 +398,7 @@ class CourierWorkflowTest extends TestCase
     {
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
-        $dispatch = app(CourierService::class)->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        $dispatch = app(CourierService::class)->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $this->actingAs($user)->get(route('shipments.receipt', $shipment))->assertOk()->assertSee($shipment->tracking_number);
         $this->get(route('dispatches.manifest', $dispatch))->assertOk()->assertSee($dispatch->reference);
     }
@@ -453,7 +453,7 @@ class CourierWorkflowTest extends TestCase
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
         $service = app(CourierService::class);
-        $dispatch = $service->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        $dispatch = $service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $service->handover($dispatch, $user);
         $this->actingAs($user)->post(route('dispatches.handover', $dispatch))->assertRedirect();
         $this->assertSame(1, $shipment->events()->where('status', 'Dispatched')->count());
@@ -464,7 +464,7 @@ class CourierWorkflowTest extends TestCase
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
         $service = app(CourierService::class);
-        $dispatch = $service->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        $dispatch = $service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $service->handover($dispatch, $user);
         $service->transition($shipment, 'In Transit', null, $user);
         $service->transition($shipment, 'Delivered', null, $user);
@@ -476,7 +476,7 @@ class CourierWorkflowTest extends TestCase
     {
         [$user,$shipment] = $this->booked();
         $this->ready($shipment, $user);
-        $dispatch = app(CourierService::class)->createDispatch(['partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
+        $dispatch = app(CourierService::class)->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test Air', 'dispatch_date' => today()->toDateString(), 'shipments' => [$shipment->id]], $user);
         $this->actingAs($user)->delete(route('dispatches.unassign', [$dispatch, $shipment]))->assertRedirect();
         $this->assertNull($shipment->fresh()->dispatch_id);
         $this->assertSame('Ready for Dispatch', $shipment->fresh()->status);

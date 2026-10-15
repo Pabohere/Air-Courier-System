@@ -23,6 +23,7 @@
 @csrf
 <div class="two-columns">
 <div class="field-grid">
+<label class="full">{{ __('Carrier name (person carrying the parcels)') }}<input name="carrier_name" value="{{ old('carrier_name') }}" maxlength="150" required><span class="help">{{ __('Enter the person’s name separately from the airline or courier company.') }}</span></label>
 <label class="full">
 {{ __('Airline / courier partner') }}<input name="partner" value="{{ old('partner') }}" maxlength="150" required>
 </label>
@@ -70,6 +71,7 @@
 {{ __('Dispatch records') }}
 </h2>
 </div>
+<form class="filters card-body" method="get" action="{{ route('dispatches.index') }}"><label>{{ __('Search carrier / parcel / flight') }}<input name="q" value="{{ request('q') }}" maxlength="150"></label><button class="button secondary">{{ __('Search') }}</button>@if(request()->filled('q'))<a href="{{ route('dispatches.index') }}">{{ __('Clear search') }}</a>@endif</form>
 <div class="table-wrap">
 <table>
 <thead>
@@ -78,7 +80,7 @@
 {{ __('Dispatch') }}
 </th>
 <th>
-{{ __('Partner') }}
+{{ __('Carrier / airline') }}
 </th>
 <th>
 {{ __('Date / flight') }}
@@ -100,7 +102,7 @@
 <a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a><small>{{ $dispatch->awb?:__('No external AWB') }}</small>
 </td>
 <td>
-{{ $dispatch->partner }}<small><x-branch-route :record="$dispatch" /></small>
+<strong>{{ $dispatch->carrier_name ?: __('Carrier not recorded') }}</strong><small>{{ $dispatch->partner }}</small><small><x-branch-route :record="$dispatch" /></small>
 </td>
 <td>
 {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}<small>{{ $dispatch->flight }}</small>

@@ -513,5 +513,13 @@
   "External source": "ပြင်ပအချက်အလက်ရင်းမြစ်",
   "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.": "ထွက်ခွာနှင့် ဆိုက်ရောက်ချိန်ကို သက်ဆိုင်ရာလေဆိပ်၏ ဒေသစံတော်ချိန်ဖြင့် စစ်ဆေးပါ။ ရန်ကုန် UTC+06:30၊ စင်ကာပူ UTC+08:00 ဖြစ်ပါသည်။",
   "Automatic live updates are not connected": "အလိုအလျောက် live update မချိတ်ဆက်ရသေးပါ",
-  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "ဤခလုတ်များက FlightAware ကို ဖွင့်ပေးပါသည်။ လက်ရှိစနစ်သည် FlightAware flight data ကို ဆွဲယူခြင်း သို့မဟုတ် အလိုအလျောက် ပြန်တင်ခြင်း မပြုလုပ်သေးပါ။ ဤစာမျက်နှာအတွင်း အလိုအလျောက် update ရရန် လုပ်ငန်းသုံးခွင့်ရှိသော API ချိတ်ဆက်မှု လိုအပ်ပါသည်။"
+  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "ဤခလုတ်များက FlightAware ကို ဖွင့်ပေးပါသည်။ လက်ရှိစနစ်သည် FlightAware flight data ကို ဆွဲယူခြင်း သို့မဟုတ် အလိုအလျောက် ပြန်တင်ခြင်း မပြုလုပ်သေးပါ။ ဤစာမျက်နှာအတွင်း အလိုအလျောက် update ရရန် လုပ်ငန်းသုံးခွင့်ရှိသော API ချိတ်ဆက်မှု လိုအပ်ပါသည်။",
+  "Carrier name (person carrying the parcels)": "သယ်ယူပို့ဆောင်သူ အမည် (ပါဆယ်သယ်မည့်သူ)",
+  "Enter the person’s name separately from the airline or courier company.": "လေကြောင်းလိုင်း သို့မဟုတ် courier ကုမ္ပဏီနှင့် သီးခြားအနေဖြင့် ပါဆယ်သယ်မည့်သူ၏ အမည်ကို ထည့်ပါ။",
+  "Enter the name of the person carrying these parcels.": "ဤပါဆယ်များကို သယ်ယူပို့ဆောင်မည့်သူ၏ အမည်ကို ထည့်ပါ။",
+  "Carrier / airline": "သယ်ယူသူ / လေကြောင်းလိုင်း",
+  "Carrier not recorded": "သယ်ယူသူအမည် မှတ်တမ်းမရှိသေးပါ",
+  "Carrier": "သယ်ယူပို့ဆောင်သူ",
+  "Search carrier / parcel / flight": "သယ်ယူသူ / ပါဆယ် / flight ရှာရန်",
+  "Clear search": "ရှာဖွေမှု ဖယ်ရန်"
 }

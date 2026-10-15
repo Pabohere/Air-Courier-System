@@ -197,6 +197,7 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'carrier_name' => 'carrier name', ],
 
 ];

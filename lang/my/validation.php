@@ -36,6 +36,7 @@ return array_replace_recursive(require __DIR__.'/../en/validation.php', [
         'symbols' => ':attribute တွင် သင်္ကေတ အနည်းဆုံးတစ်ခု ပါရပါမည်။',
     ],
     'attributes' => [
+        'carrier_name' => 'သယ်ယူပို့ဆောင်သူ အမည်',
         'name' => 'အမည်', 'email' => 'အီးမေးလ်', 'password' => 'စကားဝှက်', 'password_confirmation' => 'စကားဝှက်အတည်ပြုချက်',
         'phone' => 'ဖုန်းနံပါတ်', 'address' => 'လိပ်စာ', 'notes' => 'မှတ်ချက်', 'customer_id' => 'ဖောက်သည်', 'destination_id' => 'နိုင်ငံ',
         'recipient_name' => 'လက်ခံသူအမည်', 'recipient_phone' => 'လက်ခံသူဖုန်း', 'recipient_address' => 'လက်ခံသူလိပ်စာ',

@@ -12,6 +12,6 @@ class DispatchFactory extends Factory
 {
     public function definition(): array
     {
-        return ['reference' => 'DSP-'.Str::random(12), 'partner' => 'Test Partner', 'dispatch_date' => today(), 'created_by' => User::factory()];
+        return ['carrier_name' => 'Test parcel carrier', 'reference' => 'DSP-'.Str::random(12), 'partner' => 'Test Partner', 'dispatch_date' => today(), 'created_by' => User::factory()];
     }
 }

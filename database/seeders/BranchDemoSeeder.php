@@ -42,7 +42,7 @@ class BranchDemoSeeder extends Seeder
                     continue;
                 }
                 $service->transition($shipment, 'Ready for Dispatch', null, $originStaff);
-                $dispatch = $service->createDispatch(['partner' => 'Fictional demo airline', 'flight' => 'DEMO '.$origin->code.'-'.$destination->code, 'dispatch_date' => now($origin->timezone)->toDateString(), 'flight_departure_at' => now($origin->timezone)->format('Y-m-d\TH:i'), 'notes' => 'Fictional sample flight, not a real airline schedule.', 'shipments' => [$shipment->id]], $originStaff);
+                $dispatch = $service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Fictional demo airline', 'flight' => 'DEMO '.$origin->code.'-'.$destination->code, 'dispatch_date' => now($origin->timezone)->toDateString(), 'flight_departure_at' => now($origin->timezone)->format('Y-m-d\TH:i'), 'notes' => 'Fictional sample flight, not a real airline schedule.', 'shipments' => [$shipment->id]], $originStaff);
                 $service->handover($dispatch, $originStaff);
                 if ($stage === 'incoming') {
                     continue;

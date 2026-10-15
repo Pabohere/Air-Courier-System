@@ -513,5 +513,13 @@
   "External source": "External source",
   "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.": "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.",
   "Automatic live updates are not connected": "Automatic live updates are not connected",
-  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page."
+  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.",
+  "Carrier name (person carrying the parcels)": "Carrier name (person carrying the parcels)",
+  "Enter the person’s name separately from the airline or courier company.": "Enter the person’s name separately from the airline or courier company.",
+  "Enter the name of the person carrying these parcels.": "Enter the name of the person carrying these parcels.",
+  "Carrier / airline": "Carrier / airline",
+  "Carrier not recorded": "Carrier not recorded",
+  "Carrier": "Carrier",
+  "Search carrier / parcel / flight": "Search carrier / parcel / flight",
+  "Clear search": "Clear search"
 }

@@ -178,6 +178,12 @@ class CourierService
 
     public function createDispatch(array $data, User $user): Dispatch
     {
+        $carrier = validator(['carrier_name' => $data['carrier_name'] ?? null], ['carrier_name' => 'required|string|max:150'])->validate();
+        $data['carrier_name'] = trim($carrier['carrier_name']);
+        if ($data['carrier_name'] === '') {
+            throw ValidationException::withMessages(['carrier_name' => __('Enter the name of the person carrying these parcels.')]);
+        }
+
         return DB::transaction(function () use ($data, $user) {
             $ids = collect($data['shipments'])->map(fn ($id) => (int) $id)->sort()->values();
             $shipments = Shipment::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get();
@@ -204,7 +210,7 @@ class CourierService
                 }
                 $route['flight_departure_at'] = $departure->setTimezone(config('app.timezone'));
             }
-            $dispatch = Dispatch::create(collect($data)->only(['partner', 'dispatch_date', 'flight', 'awb', 'notes'])->all() + $route + ['reference' => 'DSP-'.strtoupper(Str::random(10)), 'created_by' => $user->id]);
+            $dispatch = Dispatch::create(collect($data)->only(['carrier_name', 'partner', 'dispatch_date', 'flight', 'awb', 'notes'])->all() + $route + ['reference' => 'DSP-'.strtoupper(Str::random(10)), 'created_by' => $user->id]);
             foreach ($shipments as $s) {
                 $before = $s->toArray();
                 $s->update(['dispatch_id' => $dispatch->id, 'updated_by' => $user->id]);

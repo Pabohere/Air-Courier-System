@@ -52,7 +52,7 @@ class BranchWorkflowTest extends TestCase
     {
         $this->ready($shipment, $origin);
 
-        return $this->service->createDispatch(['partner' => 'Sample airline', 'flight' => 'TEST123', 'dispatch_date' => now($origin->branch->timezone)->toDateString(), 'flight_departure_at' => now($origin->branch->timezone)->format('Y-m-d\TH:i'), 'shipments' => [$shipment->id]], $origin);
+        return $this->service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Sample airline', 'flight' => 'TEST123', 'dispatch_date' => now($origin->branch->timezone)->toDateString(), 'flight_departure_at' => now($origin->branch->timezone)->format('Y-m-d\TH:i'), 'shipments' => [$shipment->id]], $origin);
     }
 
     private function arrive(Shipment $shipment, User $origin, User $destination): void
@@ -139,7 +139,7 @@ class BranchWorkflowTest extends TestCase
     {
         $s = $this->service->book($this->data($this->ygn), $this->ygn);
         $this->ready($s, $this->ygn);
-        $this->actingAs($this->ygn)->post(route('dispatches.store'), ['partner' => 'Test', 'dispatch_date' => today()->toDateString(), 'shipments' => [$s->id]])->assertSessionHasErrors('flight');
+        $this->actingAs($this->ygn)->post(route('dispatches.store'), ['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test', 'dispatch_date' => today()->toDateString(), 'shipments' => [$s->id]])->assertSessionHasErrors('flight');
         $this->assertDatabaseCount('dispatches', 0);
     }
 
@@ -149,7 +149,7 @@ class BranchWorkflowTest extends TestCase
         $sg = $this->service->book($this->data($this->sg, 'SGD', '20.00'), $this->sg);
         $this->ready($ygn, $this->ygn);
         $this->ready($sg, $this->sg);
-        $this->actingAs($this->ygn)->post(route('dispatches.store'), ['partner' => 'Test', 'dispatch_date' => today()->toDateString(), 'flight' => 'TEST', 'flight_departure_at' => today()->format('Y-m-d').'T15:00', 'shipments' => [$ygn->id, $sg->id]])->assertSessionHasErrors('shipments');
+        $this->actingAs($this->ygn)->post(route('dispatches.store'), ['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test', 'dispatch_date' => today()->toDateString(), 'flight' => 'TEST', 'flight_departure_at' => today()->format('Y-m-d').'T15:00', 'shipments' => [$ygn->id, $sg->id]])->assertSessionHasErrors('shipments');
         $this->assertDatabaseCount('dispatches', 0);
         $this->assertNull($ygn->fresh()->dispatch_id);
     }
@@ -281,7 +281,7 @@ class BranchWorkflowTest extends TestCase
     {
         $s = $this->service->book($this->data($this->sg, 'SGD', '10.00'), $this->sg);
         $this->ready($s, $this->sg);
-        $this->actingAs($this->sg)->post(route('dispatches.store'), ['partner' => 'Test', 'flight' => 'TEST', 'dispatch_date' => today()->toDateString(), 'flight_departure_at' => today()->addDay()->format('Y-m-d').'T17:00', 'shipments' => [$s->id]])->assertSessionHasErrors('flight_departure_at');
+        $this->actingAs($this->sg)->post(route('dispatches.store'), ['carrier_name' => 'Sample parcel carrier', 'partner' => 'Test', 'flight' => 'TEST', 'dispatch_date' => today()->toDateString(), 'flight_departure_at' => today()->addDay()->format('Y-m-d').'T17:00', 'shipments' => [$s->id]])->assertSessionHasErrors('flight_departure_at');
     }
 
     public function test_local_branch_demo_is_idempotent_and_keeps_two_routes(): void
