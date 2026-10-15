@@ -986,3 +986,12 @@ html[lang="my"] label,html[lang="my"] td { font-size:13px; }
 html[lang="my"] .metric-label { font-size:12px; }
 html[lang="my"] .metric-foot,html[lang="my"] .help,html[lang="my"] th { font-size:11px; }
 html[lang="my"] .intro-banner p { font-size:13px; }
+
+.storage-entry-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
+}
+.storage-entry-actions .button { white-space: normal; max-width: 220px; }

@@ -26,6 +26,9 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/dashboard/{side}', DashboardController::class)->whereIn('side', ['ygn', 'sg'])->name('dashboard.branch');
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/{shipment}/edit', [InventoryController::class, 'edit'])->name('inventory.edit');
+    Route::delete('/inventory/{shipment}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
+    Route::post('/inventory/{shipment}/restore', [InventoryController::class, 'restore'])->name('inventory.restore');
     Route::post('/inventory/{shipment}/move', [InventoryController::class, 'move'])->name('inventory.move');
     Route::post('/inventory/{shipment}/return', [InventoryController::class, 'returnToSender'])->name('inventory.return');
     Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');

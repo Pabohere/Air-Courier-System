@@ -556,5 +556,21 @@
   "Receiving area": "လက်ခံသိမ်းဆည်းရာနေရာ",
   "Unassigned storage": "Storage နေရာ မသတ်မှတ်ရသေးပါ",
   "Totals cover all stock at this branch. Draft dispatches remain in storage until physical handover. Cancellation alone does not remove a parcel from storage.": "စုစုပေါင်းမှာ ဤဆိုင်ခွဲရှိ storage အားလုံးဖြစ်ပါသည်။ Draft ပါဆယ်များကို အမှန်တကယ် လက်လွှဲမှ storage မှထုတ်ပါမည်။ Cancel လုပ်ရုံဖြင့် ပါဆယ်ကို storage မှ မထုတ်ပါ။",
-  "Storage is released only at carrier handover, customer collection, or a recorded physical return after cancellation.": "သယ်ယူသူထံ လွှဲပေးချိန်၊ customer လာထုတ်ချိန် သို့မဟုတ် Cancel ပြီး ပို့သူထံ အမှန်တကယ် ပြန်ပေးမှသာ storage စာရင်းက ထုတ်ပါသည်။"
+  "Storage is released only at carrier handover, customer collection, or a recorded physical return after cancellation.": "သယ်ယူသူထံ လွှဲပေးချိန်၊ customer လာထုတ်ချိန် သို့မဟုတ် Cancel ပြီး ပို့သူထံ အမှန်တကယ် ပြန်ပေးမှသာ storage စာရင်းက ထုတ်ပါသည်။",
+  "＋ Create storage entry": "＋ သိုလှောင်စာရင်းအသစ်ထည့်ရန်",
+  "Storage entries": "သိုလှောင်စာရင်းများ",
+  "Active entries": "လက်ရှိစာရင်းများ",
+  "Deleted entries": "ဖျက်ထားသောစာရင်းများ",
+  "View / restore": "ကြည့်ရန် / ပြန်ယူရန်",
+  "Update / delete": "ပြင်ရန် / ဖျက်ရန်",
+  "Back to storage": "သိုလှောင်စာရင်းသို့ ပြန်ရန်",
+  "Parcel details": "ပါဆယ်အချက်အလက်",
+  "Restore entry": "စာရင်းပြန်ယူရန်",
+  "Update storage entry": "သိုလှောင်စာရင်း ပြင်ဆင်ရန်",
+  "Delete storage entry": "သိုလှောင်စာရင်း ဖျက်ရန်",
+  "Move this storage entry to deleted entries? You can restore it later.": "ဤစာရင်းကို ဖျက်ထားသောစာရင်းများထဲ ရွှေ့မလား။ နောက်မှ ပြန်ယူနိုင်ပါသည်။",
+  "Deleted entries can be restored. Totals include deleted entries while parcels remain physically in storage. Use handover, collection or return to record physical stock leaving.": "ဖျက်ထားသောစာရင်းကို ပြန်ယူနိုင်ပါသည်။ ပါဆယ်ဆိုင်မှာရှိနေသေးလျှင် စုစုပေါင်းလက်ကျန်မှာ ဆက်တွက်ထားပါသည်။ ပစ္စည်းတကယ်ထွက်လျှင် သယ်ယူသူထံလွှဲခြင်း၊ လာထုတ်ခြင်း သို့မဟုတ် ပေးပို့သူထံပြန်ပေးခြင်းကို မှတ်တမ်းတင်ပါ။",
+  "Storage entry moved to deleted entries. Physical stock and shipment records are preserved.": "ဖျက်ထားသောစာရင်းထဲ ရွှေ့ပြီးပါပြီ။ ပါဆယ်လက်ကျန်နှင့် ပို့ဆောင်မှုမှတ်တမ်းများ ဆက်လက်ရှိနေပါသည်။",
+  "Storage entry restored.": "သိုလှောင်စာရင်း ပြန်ယူပြီးပါပြီ။",
+  "Save changes": "ပြင်ဆင်ချက် သိမ်းရန်"
 }

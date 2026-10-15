@@ -20,7 +20,7 @@ class InventoryService
             }
             $location = $this->location($location);
             $before = $locked->toArray();
-            $locked->update(['in_storage' => true, 'storage_location' => $location, 'stored_at' => now(), 'updated_by' => $user->id]);
+            $locked->update(['inventory_archived_at' => null, 'inventory_archive_reason' => null, 'in_storage' => true, 'storage_location' => $location, 'stored_at' => now(), 'updated_by' => $user->id]);
             $this->record($locked, $user, 'Stored', null, $location, null, $before);
         }, 3);
     }
@@ -57,6 +57,23 @@ class InventoryService
             if ($type === 'Returned to sender') {
                 $locked->update(['current_branch_id' => null]);
             }
+        }, 3);
+    }
+
+    public function archive(Shipment $shipment, User $user, ?string $reason, bool $restore = false): void
+    {
+        DB::transaction(function () use ($shipment, $user, $reason, $restore): void {
+            $locked = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
+            $this->authorizeStored($locked, $user);
+            if ($restore === ($locked->inventory_archived_at === null)) {
+                return;
+            }
+            if (! $restore) {
+                $reason = validator(['reason' => trim($reason ?? '')], ['reason' => 'required|string|max:2000'])->validate()['reason'];
+            }
+            $before = $locked->toArray();
+            $locked->update(['inventory_archived_at' => $restore ? null : now(), 'inventory_archive_reason' => $restore ? null : $reason, 'updated_by' => $user->id]);
+            app(CourierService::class)->audit($user, $restore ? 'inventory.restored' : 'inventory.archived', $locked, $before);
         }, 3);
     }
 
