@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class FlightScheduleTest extends TestCase
@@ -47,6 +48,23 @@ class FlightScheduleTest extends TestCase
             ->assertSee('နိုင်ငံတကာ လေယာဉ်အချိန်ဇယား')
             ->assertSee('လေဆိပ် website ဖွင့်ရန်');
         $this->get(route('customers.index'))->assertOk()->assertSee(route('flights.index'), false)->assertSee('လေယာဉ်အချိန်ဇယား');
+    }
+
+    public function test_flightaware_route_links_are_available_without_claiming_an_api_connection(): void
+    {
+        Http::preventStrayRequests();
+        $this->actingAs(User::factory()->admin()->create())->withSession(['dashboard_branch_code' => 'SG'])
+            ->get(route('flights.index'))->assertOk()->assertViewHas('selectedSide', 'SG')
+            ->assertSee('https://www.flightaware.com/live/findflight/VYYY/WSSS', false)
+            ->assertSee('https://www.flightaware.com/live/findflight/WSSS/VYYY', false)
+            ->assertSee('Automatic live updates are not connected')->assertSee('does not import or refresh FlightAware flight data');
+        Http::assertNothingSent();
+    }
+
+    public function test_flightaware_connection_status_is_translated(): void
+    {
+        $this->actingAs(User::factory()->create())->withSession(['locale' => 'my'])
+            ->get(route('flights.index'))->assertOk()->assertSee('အလိုအလျောက် live update မချိတ်ဆက်ရသေးပါ');
     }
 
     public function test_inactive_accounts_cannot_access_the_flight_schedule(): void

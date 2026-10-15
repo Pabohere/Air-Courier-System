@@ -3,12 +3,23 @@
 @section('content')
 <div class="page-heading flight-page-heading">
     <div>
-        <div class="eyebrow">{{ __('YANGON INTERNATIONAL AIRPORT') }}</div>
+        <div class="eyebrow">FLIGHTAWARE · YGN ↔ SG</div>
         <h1>{{ __('International flight schedule') }}</h1>
-        <p class="subtle">{{ __('Official published timetable for planning your next handover.') }}</p>
+        <p class="subtle">{{ __('Check the route on FlightAware. The airport timetable below is a published reference.') }}</p>
     </div>
     <a class="button" href="{{ $sourceUrl }}" target="_blank" rel="noopener noreferrer">{{ __('Open airport website') }} ↗</a>
 </div>
+
+<section class="card">
+    <div class="card-head"><div><h2>{{ __('FlightAware route tracking') }}</h2><p class="subtle">{{ __('Choose a direction to view current flight information on FlightAware.') }}</p></div><span class="badge">{{ __('External source') }}</span></div>
+    <div class="card-body flightaware-links">
+    @foreach($flightAwareRoutes as $side => $url)
+        <a class="button {{ $selectedSide === $side ? '' : 'secondary' }}" href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ $side === 'YGN' ? 'YGN → SG · RGN → SIN' : 'SG → YGN · SIN → RGN' }} ↗</a>
+    @endforeach
+    <p class="help">{{ __('Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.') }}</p>
+    <div class="schedule-alert" role="note"><strong>{{ __('Automatic live updates are not connected') }}</strong><p>{{ __('These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.') }}</p></div>
+    </div>
+</section>
 
 <section class="card flight-route" aria-label="{{ __('Yangon–Singapore courier route') }}">
     <div class="flight-route-airport">

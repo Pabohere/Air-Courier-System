@@ -506,5 +506,12 @@
   "Sign in to :branch →": "Sign in to :branch →",
   "Staff must use their assigned branch. Admin can choose either side.": "Staff must use their assigned branch. Admin can choose either side.",
   "Check your email, password and selected branch.": "Check your email, password and selected branch.",
-  "Local branch time": "Local branch time"
+  "Local branch time": "Local branch time",
+  "Check the route on FlightAware. The airport timetable below is a published reference.": "Check the route on FlightAware. The airport timetable below is a published reference.",
+  "FlightAware route tracking": "FlightAware route tracking",
+  "Choose a direction to view current flight information on FlightAware.": "Choose a direction to view current flight information on FlightAware.",
+  "External source": "External source",
+  "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.": "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.",
+  "Automatic live updates are not connected": "Automatic live updates are not connected",
+  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page."
 }

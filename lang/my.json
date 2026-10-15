@@ -506,5 +506,12 @@
   "Sign in to :branch →": ":branch သို့ ဝင်ရောက်ရန် →",
   "Staff must use their assigned branch. Admin can choose either side.": "ဝန်ထမ်းများသည် မိမိဆိုင်ခွဲကို ရွေးရပါမည်။ Admin သည် နှစ်ဖက်လုံး ရွေးနိုင်ပါသည်။",
   "Check your email, password and selected branch.": "အီးမေးလ်၊ စကားဝှက်နှင့် ရွေးထားသော ဆိုင်ခွဲကို စစ်ဆေးပါ။",
-  "Local branch time": "ဆိုင်ခွဲ၏ ဒေသစံတော်ချိန်"
+  "Local branch time": "ဆိုင်ခွဲ၏ ဒေသစံတော်ချိန်",
+  "Check the route on FlightAware. The airport timetable below is a published reference.": "FlightAware တွင် လေကြောင်းခရီးစဉ်ကို ကြည့်နိုင်ပါသည်။ အောက်ပါလေဆိပ်အချိန်ဇယားမှာ ထုတ်ပြန်ထားသော ကိုးကားဇယား ဖြစ်ပါသည်။",
+  "FlightAware route tracking": "FlightAware ခရီးစဉ်ကြည့်ရန်",
+  "Choose a direction to view current flight information on FlightAware.": "FlightAware တွင် လက်ရှိ flight အချက်အလက်ကို ကြည့်ရန် ခရီးစဉ်ဦးတည်ရာ ရွေးပါ။",
+  "External source": "ပြင်ပအချက်အလက်ရင်းမြစ်",
+  "Departure and arrival times should be checked in each airport’s local timezone: Yangon UTC+06:30 and Singapore UTC+08:00.": "ထွက်ခွာနှင့် ဆိုက်ရောက်ချိန်ကို သက်ဆိုင်ရာလေဆိပ်၏ ဒေသစံတော်ချိန်ဖြင့် စစ်ဆေးပါ။ ရန်ကုန် UTC+06:30၊ စင်ကာပူ UTC+08:00 ဖြစ်ပါသည်။",
+  "Automatic live updates are not connected": "အလိုအလျောက် live update မချိတ်ဆက်ရသေးပါ",
+  "These links open FlightAware. This system does not import or refresh FlightAware flight data. A business-licensed API connection is required for automatic updates inside this page.": "ဤခလုတ်များက FlightAware ကို ဖွင့်ပေးပါသည်။ လက်ရှိစနစ်သည် FlightAware flight data ကို ဆွဲယူခြင်း သို့မဟုတ် အလိုအလျောက် ပြန်တင်ခြင်း မပြုလုပ်သေးပါ။ ဤစာမျက်နှာအတွင်း အလိုအလျောက် update ရရန် လုပ်ငန်းသုံးခွင့်ရှိသော API ချိတ်ဆက်မှု လိုအပ်ပါသည်။"
 }
