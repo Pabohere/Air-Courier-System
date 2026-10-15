@@ -505,5 +505,6 @@
   "Sign in to :branch dashboard": ":branch ဒက်ရှ်ဘုတ်သို့ ဝင်ရောက်ရန်",
   "Sign in to :branch →": ":branch သို့ ဝင်ရောက်ရန် →",
   "Staff must use their assigned branch. Admin can choose either side.": "ဝန်ထမ်းများသည် မိမိဆိုင်ခွဲကို ရွေးရပါမည်။ Admin သည် နှစ်ဖက်လုံး ရွေးနိုင်ပါသည်။",
-  "Check your email, password and selected branch.": "အီးမေးလ်၊ စကားဝှက်နှင့် ရွေးထားသော ဆိုင်ခွဲကို စစ်ဆေးပါ။"
+  "Check your email, password and selected branch.": "အီးမေးလ်၊ စကားဝှက်နှင့် ရွေးထားသော ဆိုင်ခွဲကို စစ်ဆေးပါ။",
+  "Local branch time": "ဆိုင်ခွဲ၏ ဒေသစံတော်ချိန်"
 }

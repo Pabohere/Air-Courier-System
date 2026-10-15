@@ -505,5 +505,6 @@
   "Sign in to :branch dashboard": "Sign in to :branch dashboard",
   "Sign in to :branch →": "Sign in to :branch →",
   "Staff must use their assigned branch. Admin can choose either side.": "Staff must use their assigned branch. Admin can choose either side.",
-  "Check your email, password and selected branch.": "Check your email, password and selected branch."
+  "Check your email, password and selected branch.": "Check your email, password and selected branch.",
+  "Local branch time": "Local branch time"
 }

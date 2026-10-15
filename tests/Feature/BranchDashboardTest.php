@@ -19,6 +19,7 @@ class BranchDashboardTest extends TestCase
     {
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
+        $this->travelTo(Carbon::parse('2026-10-15 12:00:00', 'Asia/Yangon'));
     }
 
     public function test_admin_has_two_dashboard_pages_with_distinct_currency_and_branch_context(): void
@@ -112,6 +113,26 @@ class BranchDashboardTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())->withSession(['locale' => 'my'])
             ->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()->assertSee('SG ဒက်ရှ်ဘုတ်')
             ->assertViewHas('report', fn ($report) => $report['charges'] === 2300);
+    }
+
+    public function test_selected_dashboard_clock_and_daily_totals_use_the_branch_timezone_across_midnight(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-15 16:15:00', 'UTC'));
+        $this->actingAs(User::factory()->admin()->create());
+        foreach ([['YGN', 'MMK', 'Asia/Yangon', '2026-10-15', '22:45:00', '+06:30'], ['SG', 'SGD', 'Asia/Singapore', '2026-10-16', '00:15:00', '+08:00']] as [$code, $currency, $timezone, $date, $time, $offset]) {
+            $branch = Branch::where('code', $code)->firstOrFail();
+            $other = Branch::where('code', '!=', $code)->firstOrFail();
+            $parcel = Shipment::factory()->create(['origin_branch_id' => $branch->id, 'destination_branch_id' => $other->id, 'currency' => $currency, 'shipment_date' => $date, 'price' => '40.00']);
+            Shipment::factory()->create(['origin_branch_id' => $branch->id, 'destination_branch_id' => $other->id, 'currency' => $currency, 'shipment_date' => Carbon::parse($date)->subDay()->toDateString(), 'price' => '99.00']);
+            Payment::factory()->create(['shipment_id' => $parcel->id, 'branch_id' => $branch->id, 'currency' => $currency, 'payment_date' => $date, 'amount' => '10.00']);
+            Payment::factory()->create(['shipment_id' => $parcel->id, 'branch_id' => $branch->id, 'currency' => $currency, 'payment_date' => Carbon::parse($date)->subDay()->toDateString(), 'amount' => '5.00']);
+            $this->withSession(['dashboard_branch_code' => $code])->get(route('dashboard'))->assertOk()
+                ->assertSee('data-timezone="'.$timezone.'"', false)->assertSee('UTC'.$offset)
+                ->assertSee('datetime="'.$date.'T'.$time.$offset.'"', false)
+                ->assertViewHas('branchNow', fn ($now) => $now->toDateString() === $date && $now->format('H:i:s') === $time)
+                ->assertViewHas('report', fn ($report) => $report['charges'] === 4000 && $report['received'] === 1000);
+        }
+        $this->assertSame('Asia/Yangon', config('app.timezone'));
     }
 
     public function test_dashboards_require_login_and_reject_unknown_sides_or_currency(): void

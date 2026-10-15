@@ -9,11 +9,15 @@
 <h1>
 {{ __(':branch dashboard', ['branch' => $branch->code]) }}
 </h1>
-<p class="subtle">{{ \Carbon\Carbon::parse(\App\Services\BranchAccess::todayFor($branchId))->locale(app()->getLocale())->translatedFormat('l, d F Y') }} {{ __('· A clear picture of today\'s activity.') }}</p>
+<p class="subtle">{{ $branchNow->locale(app()->getLocale())->translatedFormat('l, d F Y') }} {{ __('· A clear picture of today\'s activity.') }}</p>
 </div>
 <a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branchId]) }}">{{ __('＋ New shipment') }}</a>
 </div>
 <div class="dashboard-identity" data-side="{{ strtolower($branch->code) }}"><strong>{{ $branch->code }}</strong><div>{{ __($branch->name) }}<small>{{ $branch->code === 'YGN' ? 'YGN → SG' : 'SG → YGN' }}</small></div></div>
+<div class="branch-local-clock">
+<div><span>{{ __('Local branch time') }}</span><strong>{{ $branch->code }} · {{ $branch->timezone }} · UTC{{ $branchNow->format('P') }}</strong></div>
+<time data-branch-clock data-timezone="{{ $branch->timezone }}" datetime="{{ $branchNow->toIso8601String() }}">{{ $branchNow->format('d M Y · H:i:s') }}</time>
+</div>
 <div class="metrics branch-operational-metrics">
 @foreach(['Outgoing parcels' => $outgoing, 'Incoming flights / parcels' => $incoming, 'Ready for Collection' => $readyForCollection] as $label => $count)
 <a class="metric" href="{{ route('branches.index', ['branch_id' => $branchId]) }}"><div class="metric-label">{{ __($label) }}</div><div class="metric-value">{{ $count }}</div></a>
@@ -32,7 +36,7 @@
 {{ $report['shipments']->count() }}
 </div>
 <div class="metric-foot">
-{{ __('Today ·') }} {{ $report['cancelled'] }} {{ __('cancelled') }}
+{{ $branchNow->format('d M Y') }} · {{ $report['cancelled'] }} {{ __('cancelled') }}
 </div>
 </div>
 <div class="metric">
@@ -136,4 +140,5 @@
 </div>
 </div>
 </div>
+<script src="{{ asset('js/branch-clock.js') }}" defer></script>
 @endsection

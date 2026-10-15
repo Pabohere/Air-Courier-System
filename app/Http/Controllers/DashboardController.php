@@ -26,11 +26,13 @@ class DashboardController extends Controller
         BranchAccess::authorize($user, $branch->id);
         $branchId = $branch->id;
         $currency = $request->input('currency') ?? ($branch->code === 'SG' ? 'SGD' : 'MMK');
-        $today = BranchAccess::todayFor($branchId);
+        $branchNow = now($branch->timezone)->toImmutable();
+        $today = $branchNow->toDateString();
         $parcels = Shipment::query()->where(fn ($query) => $query->where('origin_branch_id', $branchId)->orWhere('destination_branch_id', $branchId));
 
         return view('dashboard', [
             'branch' => $branch,
+            'branchNow' => $branchNow,
             'branchId' => $branchId,
             'currency' => $currency,
             'report' => $reports->summary($today, $today, $branchId, $currency),

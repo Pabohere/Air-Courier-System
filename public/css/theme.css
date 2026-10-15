@@ -625,3 +625,9 @@ html[data-theme="dark"] .login-branch-choice span,html[data-theme="dark"] .login
 .dashboard-identity[data-side="sg"]>strong { color:#e3a4cd; }
 html[data-theme="light"] .dashboard-identity>strong { color:#1d5dab; }
 html[data-theme="light"] .dashboard-identity[data-side="sg"]>strong { color:#6d226a; }
+
+.branch-local-clock { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 24px; padding:14px 20px; margin-bottom:24px; border:1px solid var(--line); border-radius:13px; background:var(--glass); }
+.branch-local-clock>div { display:flex; flex-direction:column; gap:3px; }
+.branch-local-clock span { color:var(--muted); font-size:13px; font-weight:550; }
+.branch-local-clock strong { font-size:14px; font-weight:650; }
+.branch-local-clock time { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
