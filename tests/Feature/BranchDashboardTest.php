@@ -96,9 +96,9 @@ class BranchDashboardTest extends TestCase
     {
         $ygn = Branch::where('code', 'YGN')->firstOrFail();
         $sg = Branch::where('code', 'SG')->firstOrFail();
-        Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'current_branch_id' => $ygn->id, 'status' => 'Processing']);
+        Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'in_storage' => true, 'current_branch_id' => $ygn->id, 'status' => 'Processing']);
         Shipment::factory()->create(['origin_branch_id' => $sg->id, 'destination_branch_id' => $ygn->id, 'status' => 'Dispatched']);
-        Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'current_branch_id' => $sg->id, 'status' => 'Ready for Collection']);
+        Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'in_storage' => true, 'current_branch_id' => $sg->id, 'status' => 'Ready for Collection']);
         $legacy = Shipment::factory()->create(['status' => 'Received']);
         $this->actingAs(User::factory()->admin()->create());
         $this->get(route('dashboard.branch', ['side' => 'ygn']))->assertOk()->assertViewHas('warehouse', 1)->assertViewHas('incoming', 1)->assertViewHas('outgoing', 2)->assertViewHas('readyForCollection', 0)->assertDontSee($legacy->tracking_number);

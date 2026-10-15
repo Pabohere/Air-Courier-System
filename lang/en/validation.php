@@ -198,6 +198,7 @@ return [
     */
 
     'attributes' => [
+        'storage_location' => 'storage location',
         'carrier_name' => 'carrier name', ],
 
 ];

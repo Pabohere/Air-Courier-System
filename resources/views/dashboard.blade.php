@@ -83,7 +83,7 @@
 </h2>
 <p>{{ __('Receive, process and prepare shipments for their next journey.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('branches.index', ['branch_id' => $branchId]) }}">{{ __('Branch operations') }} →</a>
+<a class="button secondary" href="{{ route('inventory.index', ['branch_id' => $branchId]) }}">{{ __('Parcel storage') }} →</a>
 </div>
 <div class="card">
 <div class="card-head">

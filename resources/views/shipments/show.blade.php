@@ -329,4 +329,5 @@ id)>{{ __($method->name) }}
 </div>
 </div>
 </div>
+@if($shipment->origin_branch_id) @include('inventory.parcel') @endif
 @endsection

@@ -109,7 +109,15 @@ class CourierService
             if ($status === 'Collected') {
                 $values += ['collector_name' => $collection['collector_name'], 'collection_reference' => $collection['collection_reference'] ?? null, 'collected_at' => now()];
             }
+            if ($status === 'Collected' && $locked->origin_branch_id) {
+                app(InventoryService::class)->release($locked, $user, 'Collected', $collection['collector_name']);
+                $locked->refresh();
+            }
             $locked->update($values);
+            if ($status === 'Arrived at Branch' && ! $locked->in_storage) {
+                app(InventoryService::class)->receive($locked, $user);
+                $locked->refresh();
+            }
             ShipmentEvent::create(['shipment_id' => $locked->id, 'from_status' => $old, 'status' => $status, 'notes' => $notes, 'staff_id' => $user->id]);
             $this->audit($user, 'shipment.status', $locked, $before);
         }, 3);
@@ -197,6 +205,9 @@ class CourierService
             $route = ['origin_branch_id' => $shipments->first()->origin_branch_id, 'destination_branch_id' => $shipments->first()->destination_branch_id];
             if ($origin) {
                 BranchAccess::authorize($user, $origin->id);
+                if ($shipments->contains(fn ($parcel) => ! $parcel->in_storage || $parcel->current_branch_id !== $origin->id)) {
+                    throw ValidationException::withMessages(['shipments' => __('All parcels must be in origin branch storage before dispatch.')]);
+                }
                 if (! filled($data['flight'] ?? null) || ! filled($data['flight_departure_at'] ?? null)) {
                     throw ValidationException::withMessages(['flight' => __('Enter the flight number and departure date/time for this branch transfer.')]);
                 }
@@ -243,6 +254,10 @@ class CourierService
             $locked->update(['handed_over_at' => now(), 'handed_over_by' => $user->id]);
             foreach ($shipments as $s) {
                 $old = $s->toArray();
+                if ($s->origin_branch_id) {
+                    app(InventoryService::class)->release($s, $user, 'Dispatched', $locked->reference.' · '.$locked->carrier_name.' · '.$locked->flight);
+                    $s->refresh();
+                }
                 $s->update(['status' => 'Dispatched', 'current_branch_id' => null, 'updated_by' => $user->id]);
                 ShipmentEvent::create(['shipment_id' => $s->id, 'from_status' => 'Ready for Dispatch', 'status' => 'Dispatched', 'notes' => 'Handed over: '.$locked->reference, 'staff_id' => $user->id]);
                 $this->audit($user, 'shipment.dispatched', $s, $old);
@@ -281,6 +296,8 @@ class CourierService
             if ($origin->id === $destination->id || ! in_array($data['currency'] ?? '', ['MMK', 'SGD'], true) || ! preg_match('/^\d{1,9}(\.\d{1,2})?$/D', (string) ($data['price'] ?? '')) || Money::cents($data['price']) <= 0) {
                 throw ValidationException::withMessages(['price' => __('Choose different branches, MMK or SGD, and a positive manual shipment charge.')]);
             }
+            $storageLocation = validator(['storage_location' => $data['storage_location'] ?? 'Receiving area'], ['storage_location' => 'required|string|max:100'])->validate()['storage_location'];
+            $storageLocation = trim($storageLocation);
             $fields = ['customer_id', 'origin_branch_id', 'destination_branch_id', 'recipient_name', 'recipient_phone', 'recipient_address', 'description', 'quantity', 'currency'];
             $existing = Shipment::where('booking_key', $data['booking_key'])->first();
             if ($existing) {
@@ -290,7 +307,8 @@ class CourierService
                         throw ValidationException::withMessages(['booking_key' => __('This booking form was already used for different details. Start a new booking.')]);
                     }
                 }
-                if ($existing->shipment_date->toDateString() !== $data['shipment_date'] || bccomp($existing->actual_weight, (string) $data['actual_weight'], 3) !== 0 || Money::cents($existing->price) !== Money::cents($data['price'])) {
+                $initialLocation = $existing->storageMovements()->where('type', 'Stored')->value('to_location');
+                if (($initialLocation !== null && $initialLocation !== $storageLocation) || $existing->shipment_date->toDateString() !== $data['shipment_date'] || bccomp($existing->actual_weight, (string) $data['actual_weight'], 3) !== 0 || Money::cents($existing->price) !== Money::cents($data['price'])) {
                     throw ValidationException::withMessages(['booking_key' => __('This booking form was already used for different details. Start a new booking.')]);
                 }
 
@@ -305,6 +323,8 @@ class CourierService
                 'rate_snapshot' => [], 'weight_unit' => 'kg', 'status' => 'Received', 'current_branch_id' => $origin->id,
                 'created_by' => $user->id, 'updated_by' => $user->id,
             ]);
+            app(InventoryService::class)->receive($shipment, $user, $storageLocation);
+            $shipment->refresh();
             ShipmentEvent::create(['shipment_id' => $shipment->id, 'status' => 'Received', 'staff_id' => $user->id, 'notes' => 'Parcel accepted at '.$origin->code.'; manual price and currency saved.']);
             $this->audit($user, 'shipment.booked', $shipment);
 
@@ -322,7 +342,7 @@ class CourierService
             $choices = ['In Transit', 'Arrived at Branch', 'Exception'];
         }
         if ($shipment->status === 'Exception') {
-            $prior = $shipment->events()->where('status', 'Exception')->latest('id')->first()?->from_status;
+            $prior = $shipment->events()->where('status', 'Exception')->reorder()->latest('id')->first()?->from_status;
             $choices = array_unique(array_merge([$prior], self::TRANSITIONS[$prior] ?? []));
         }
         $choices = array_filter($choices, fn ($status) => $status && ! in_array($status, ['Delivered', 'Exception'], true));

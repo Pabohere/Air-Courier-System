@@ -37,7 +37,7 @@ class DashboardController extends Controller
             'currency' => $currency,
             'report' => $reports->summary($today, $today, $branchId, $currency),
             'recent' => (clone $parcels)->with(['customer', 'payments', 'originBranch', 'destinationBranch'])->latest('id')->limit(8)->get(),
-            'warehouse' => (clone $parcels)->where('current_branch_id', $branchId)->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch', 'Arrived at Branch', 'Ready for Collection', 'Exception'])->count(),
+            'warehouse' => (clone $parcels)->where('current_branch_id', $branchId)->where('in_storage', true)->count(),
             'outgoing' => (clone $parcels)->where('origin_branch_id', $branchId)->whereNotIn('status', ['Collected', 'Cancelled', 'Delivered'])->count(),
             'incoming' => (clone $parcels)->where('destination_branch_id', $branchId)->whereIn('status', ['Dispatched', 'In Transit'])->count(),
             'readyForCollection' => (clone $parcels)->where('current_branch_id', $branchId)->where('status', 'Ready for Collection')->count(),

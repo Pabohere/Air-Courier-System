@@ -28,7 +28,7 @@ class DispatchCarrierTest extends TestCase
         $origin = Branch::where('code', $originCode)->firstOrFail();
         $destination = Branch::where('code', '!=', $originCode)->firstOrFail();
 
-        return Shipment::factory()->create(['status' => 'Ready for Dispatch', 'origin_branch_id' => $origin->id, 'destination_branch_id' => $destination->id, 'current_branch_id' => $origin->id]);
+        return Shipment::factory()->create(['in_storage' => true, 'storage_location' => 'Receiving area', 'status' => 'Ready for Dispatch', 'origin_branch_id' => $origin->id, 'destination_branch_id' => $destination->id, 'current_branch_id' => $origin->id]);
     }
 
     private function payload(Shipment $shipment): array

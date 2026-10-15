@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\FlightScheduleController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
@@ -24,6 +25,9 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/dashboard/{side}', DashboardController::class)->whereIn('side', ['ygn', 'sg'])->name('dashboard.branch');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::post('/inventory/{shipment}/move', [InventoryController::class, 'move'])->name('inventory.move');
+    Route::post('/inventory/{shipment}/return', [InventoryController::class, 'returnToSender'])->name('inventory.return');
     Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
     Route::get('/flight-schedule', FlightScheduleController::class)->name('flights.index');
     Route::resource('customers', CustomerController::class)->except('destroy');
