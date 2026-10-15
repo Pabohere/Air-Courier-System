@@ -57,7 +57,7 @@ class DemoSeeder extends Seeder
                 }
             }
             $ready = Shipment::where('status', 'Ready for Dispatch')->limit(2)->pluck('id')->all();
-            $dispatch = $service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Sample Air Partner', 'dispatch_date' => today()->toDateString(), 'flight' => 'DEMO 101', 'awb' => 'SAMPLE-AWB-001', 'shipments' => $ready, 'notes' => 'Fictional sample dispatch.'], $admin);
+            $dispatch = $service->createDispatch(['carrier_name' => 'Sample parcel carrier', 'partner' => 'Sample Air Partner', 'dispatch_date' => today()->toDateString(), 'flight' => 'DEMO 101', 'shipments' => $ready, 'notes' => 'Fictional sample dispatch.'], $admin);
             $service->handover($dispatch, $admin);
         });
     }

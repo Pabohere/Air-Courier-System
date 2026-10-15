@@ -221,7 +221,7 @@ class CourierService
                 }
                 $route['flight_departure_at'] = $departure->setTimezone(config('app.timezone'));
             }
-            $dispatch = Dispatch::create(collect($data)->only(['carrier_name', 'partner', 'dispatch_date', 'flight', 'awb', 'notes'])->all() + $route + ['reference' => 'DSP-'.strtoupper(Str::random(10)), 'created_by' => $user->id]);
+            $dispatch = Dispatch::create(collect($data)->only(['carrier_name', 'partner', 'dispatch_date', 'flight', 'notes'])->all() + $route + ['reference' => 'DSP-'.strtoupper(Str::random(10)), 'created_by' => $user->id]);
             foreach ($shipments as $s) {
                 $before = $s->toArray();
                 $s->update(['dispatch_id' => $dispatch->id, 'updated_by' => $user->id]);

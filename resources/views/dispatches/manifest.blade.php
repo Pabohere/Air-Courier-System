@@ -43,10 +43,10 @@
 </div>
 <div>
 <dt>
-{{ __('Flight / external AWB') }}
+{{ __('Flight details') }}
 </dt>
 <dd>
-{{ $dispatch->flight?:'—' }} / {{ $dispatch->awb?:'—' }}
+{{ $dispatch->flight?:'—' }}
 </dd>
 </div>
 </dl>

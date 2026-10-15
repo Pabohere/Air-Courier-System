@@ -24,7 +24,7 @@ class DispatchController extends Controller
 
     public function store(Request $request, CourierService $service): RedirectResponse
     {
-        $data = $request->validate(['carrier_name' => 'required|string|max:150', 'partner' => 'required|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'awb' => 'nullable|string|max:100', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
+        $data = $request->validate(['carrier_name' => 'required|string|max:150', 'partner' => 'required|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
         $dispatch = $service->createDispatch($data, $request->user());
 
         return redirect()->route('dispatches.show', $dispatch)->with('success', __('Draft dispatch created.'));

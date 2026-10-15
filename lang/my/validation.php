@@ -44,7 +44,7 @@ return array_replace_recursive(require __DIR__.'/../en/validation.php', [
         'shipment_date' => 'ပို့ဆောင်သည့်ရက်', 'description' => 'ပစ္စည်းအကြောင်းအရာ', 'quantity' => 'အရေအတွက်', 'actual_weight' => 'အလေးချိန်',
         'amount' => 'ငွေပမာဏ', 'payment_date' => 'ငွေပေးချေသည့်ရက်', 'payment_method_id' => 'ငွေပေးချေနည်း', 'reference' => 'ရည်ညွှန်းနံပါတ်',
         'reason' => 'အကြောင်းပြချက်', 'original_payment_id' => 'မူရင်းငွေလက်ခံမှု', 'submission_key' => 'တင်သွင်းမှုနံပါတ်', 'booking_key' => 'စာရင်းသွင်းမှုနံပါတ်',
-        'status' => 'အခြေအနေ', 'shipments' => 'ပို့ဆောင်မှုများ', 'partner' => 'မိတ်ဖက်', 'dispatch_date' => 'ထွက်ခွာမည့်ရက်', 'flight' => 'ခရီးစဉ်', 'awb' => 'AWB နံပါတ်',
+        'status' => 'အခြေအနေ', 'shipments' => 'ပို့ဆောင်မှုများ', 'partner' => 'မိတ်ဖက်', 'dispatch_date' => 'ထွက်ခွာမည့်ရက်', 'flight' => 'ခရီးစဉ်',
         'date' => 'ရက်စွဲ', 'from' => 'စတင်ရက်', 'to' => 'ပြီးဆုံးရက်', 'actual' => 'အမှန်တကယ်လက်ခံငွေ', 'country' => 'နိုင်ငံ', 'currency' => 'ငွေကြေး',
         'weight_unit' => 'အလေးချိန်ယူနစ်', 'role' => 'တာဝန်', 'active' => 'အသုံးပြုမှုအခြေအနေ', 'locale' => 'ဘာသာစကား', 'return_to' => 'ပြန်သွားမည့်လိပ်စာ',
         'base_charge' => 'အခြေခံခ', 'per_weight' => 'အလေးချိန်အလိုက်နှုန်း', 'minimum_charge' => 'အနည်းဆုံးခ', 'additional_charge' => 'ထပ်ဆောင်းခ',

@@ -33,14 +33,6 @@
 </div>
 <div>
 <dt>
-{{ __('External AWB') }}
-</dt>
-<dd>
-{{ $dispatch->awb?:'—' }}
-</dd>
-</div>
-<div>
-<dt>
 {{ __('Notes') }}
 </dt>
 <dd class="preserve">

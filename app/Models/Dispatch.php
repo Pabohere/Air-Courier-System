@@ -12,7 +12,7 @@ class Dispatch extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['carrier_name', 'flight_departure_at', 'origin_branch_id', 'destination_branch_id', 'reference', 'partner', 'dispatch_date', 'flight', 'awb', 'notes', 'handed_over_at', 'created_by', 'handed_over_by'];
+    protected $fillable = ['carrier_name', 'flight_departure_at', 'origin_branch_id', 'destination_branch_id', 'reference', 'partner', 'dispatch_date', 'flight', 'notes', 'handed_over_at', 'created_by', 'handed_over_by'];
 
     protected function casts(): array
     {

@@ -35,9 +35,6 @@
 </label>
 <label class="full">{{ __('Flight departure (origin branch local time)') }}<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}"><span class="help">{{ __('YGN: Asia/Yangon · SG: Asia/Singapore. Flight number and time are required for branch transfers.') }}</span></label>
 <label class="full">
-{{ __('External AWB number') }}<input name="awb" value="{{ old('awb') }}" maxlength="100">
-</label>
-<label class="full">
 {{ __('Notes') }}<textarea name="notes">{{ old('notes') }}</textarea>
 </label>
 </div>
@@ -99,7 +96,7 @@
 @forelse($dispatches as $dispatch)
 <tr>
 <td>
-<a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a><small>{{ $dispatch->awb?:__('No external AWB') }}</small>
+<a class="mono" href="{{ route('dispatches.show',$dispatch) }}">{{ $dispatch->reference }}</a>
 </td>
 <td>
 <strong>{{ $dispatch->carrier_name ?: __('Carrier not recorded') }}</strong><small>{{ $dispatch->partner }}</small><small><x-branch-route :record="$dispatch" /></small>
