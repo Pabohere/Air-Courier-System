@@ -35,6 +35,29 @@ class CourierService
 
     public function book(array $data, User $user): Shipment
     {
+        if (empty($data['customer_id']) && isset($data['customer_name'])) {
+            return DB::transaction(function () use ($data, $user): Shipment {
+                CompanySetting::query()->lockForUpdate()->firstOrFail();
+                $entry = validator($data, ['customer_name' => 'required|string|max:150', 'customer_phone' => 'required|string|max:50', 'customer_address' => 'nullable|string|max:2000'])->validate();
+                $existing = Shipment::where('booking_key', $data['booking_key'])->first();
+                if ($existing) {
+                    abort_unless($existing->created_by === $user->id, 403);
+                    if ($existing->sender['name'] !== $entry['customer_name'] || $existing->sender['phone'] !== $entry['customer_phone'] || ($existing->sender['address'] ?? '') !== ($entry['customer_address'] ?? '')) {
+                        throw ValidationException::withMessages(['booking_key' => __('This booking form was already used for different details. Start a new booking.')]);
+                    }
+                    $data['customer_id'] = $existing->customer_id;
+                } else {
+                    $customer = Customer::where('name', $entry['customer_name'])->where('phone', $entry['customer_phone'])->where('address', $entry['customer_address'] ?? '')->first();
+                    if (! $customer) {
+                        $customer = Customer::create(['name' => $entry['customer_name'], 'phone' => $entry['customer_phone'], 'address' => $entry['customer_address'] ?? '', 'created_by' => $user->id, 'updated_by' => $user->id]);
+                        $this->audit($user, 'customer.created', $customer);
+                    }
+                    $data['customer_id'] = $customer->id;
+                }
+
+                return $this->book($data, $user);
+            }, 3);
+        }
         if (isset($data['origin_branch_id'])) {
             return $this->bookBranch($data, $user);
         }
@@ -145,7 +168,8 @@ class CourierService
             if ($amount <= 0 || $amount > $locked->balanceCents()) {
                 throw ValidationException::withMessages(['amount' => __('Payment must be positive and cannot exceed the outstanding balance.')]);
             }
-            $payment = Payment::create(['shipment_id' => $locked->id, 'payment_method_id' => $method->id, 'branch_id' => $branchId, 'type' => 'payment', 'amount' => Money::decimal($amount), 'currency' => $locked->currency, 'payment_date' => $data['payment_date'], 'reference' => $data['reference'] ?? null, 'submission_key' => $data['submission_key'], 'staff_id' => $user->id]);
+            $details = PaymentDetails::values($data, $method);
+            $payment = Payment::create($details + ['shipment_id' => $locked->id, 'payment_method_id' => $method->id, 'branch_id' => $branchId, 'type' => 'payment', 'amount' => Money::decimal($amount), 'currency' => $locked->currency, 'payment_date' => $data['payment_date'], 'reference' => $data['reference'] ?? null, 'submission_key' => $data['submission_key'], 'staff_id' => $user->id]);
             $this->audit($user, 'payment.recorded', $payment);
 
             return $payment;
@@ -154,6 +178,12 @@ class CourierService
 
     private function validateReplay(Payment $existing, Shipment $shipment, array $data, User $user, string $type): void
     {
+        if ($type === 'payment') {
+            $details = PaymentDetails::values($data, $existing->method);
+            if (($existing->remark ?? '') !== ($details['remark'] ?? '') || Money::cents($existing->cash_tendered ?? $existing->amount) !== Money::cents($details['cash_tendered'] ?? $data['amount'])) {
+                throw ValidationException::withMessages(['submission_key' => __('This submission was already used for a different transaction. Reload the form.')]);
+            }
+        }
         if ($existing->shipment_id !== $shipment->id || $existing->staff_id !== $user->id || $existing->type !== $type || Money::cents($existing->amount) !== Money::cents($data['amount']) || $existing->payment_date->format('Y-m-d') !== $data['payment_date'] || ($type === 'payment' && $existing->payment_method_id !== (int) $data['payment_method_id']) || ($existing->reference ?? '') !== ($data['reference'] ?? '') || ($type === 'refund' && ($existing->original_payment_id !== (int) $data['original_payment_id'] || $existing->reason !== $data['reason']))) {
             throw ValidationException::withMessages(['submission_key' => __('This submission was already used for a different transaction. Reload the form.')]);
         }

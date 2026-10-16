@@ -54,9 +54,9 @@ class ReportController extends Controller
                 fputcsv($file, array_map(fn ($v) => is_string($v) && preg_match('/^[\s]*[=+@\-]/u', $v) ? "'".$v : $v, $row), ',', '"', '');
             };
             if ($type === 'payments') {
-                $write(array_map('__', ['Date', 'Tracking', 'Type', 'Method', 'Amount', 'Currency', 'Reference', 'Staff', 'Reason', 'Branch']));
+                $write(array_map('__', ['Date', 'Tracking', 'Type', 'Method', 'Amount', 'Currency', 'Reference', 'Staff', 'Reason', 'Branch', 'Remark', 'Cash received', 'Change returned']));
                 foreach ($report['payments'] as $p) {
-                    $write([$p->payment_date->toDateString(), $p->shipment->tracking_number, $p->type, $p->method->name, Money::decimal($p->signedCents()), $p->currency, $p->reference, $p->staff->name, $p->reason, $p->branch_id ? Branch::find($p->branch_id)?->code : 'Legacy']);
+                    $write([$p->payment_date->toDateString(), $p->shipment->tracking_number, $p->type, $p->method->name, Money::decimal($p->signedCents()), $p->currency, $p->reference, $p->staff->name, $p->reason, $p->branch_id ? Branch::find($p->branch_id)?->code : 'Legacy', $p->remark, $p->cash_tendered, $p->change_amount]);
                 }
             } else {
                 $write(array_map('__', ['Shipment date', 'Tracking', 'Customer', 'Destination', 'Status', 'Charge', 'Paid', 'Outstanding', 'Currency', 'Branch route']));

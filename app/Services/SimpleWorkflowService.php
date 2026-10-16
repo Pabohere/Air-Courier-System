@@ -80,7 +80,7 @@ class SimpleWorkflowService
                     throw ValidationException::withMessages(['receive_balance' => __('Confirm receipt of the outstanding balance before collection.')]);
                 }
                 validator($data, ['payment_method_id' => 'required|integer|exists:payment_methods,id'])->validate();
-                $courier->recordPayment($parcel, ['amount' => Money::decimal($parcel->balanceCents()), 'payment_method_id' => $data['payment_method_id'], 'submission_key' => $data['submission_key'], 'payment_date' => BranchAccess::todayFor($parcel->destination_branch_id), 'branch_id' => $parcel->destination_branch_id, 'reference' => $data['reference'] ?? null], $user);
+                $courier->recordPayment($parcel, ['amount' => Money::decimal($parcel->balanceCents()), 'payment_method_id' => $data['payment_method_id'], 'submission_key' => $data['submission_key'], 'payment_date' => BranchAccess::todayFor($parcel->destination_branch_id), 'branch_id' => $parcel->destination_branch_id, 'reference' => $data['reference'] ?? null, 'remark' => $data['remark'] ?? null, 'cash_tendered' => $data['cash_tendered'] ?? null], $user);
                 $parcel->refresh();
             }
             if ($parcel->status === 'Arrived at Branch') {

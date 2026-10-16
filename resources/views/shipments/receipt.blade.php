@@ -107,6 +107,10 @@
 </dd>
 </div>
 </dl>
+@foreach($shipment->payments->where('type', 'payment') as $payment)
+<p>{{ __($payment->method->name) }}: {{ $payment->amount }} {{ $payment->currency }} @if($payment->remark) · {{ $payment->remark }} @endif
+@if($payment->cash_tendered)<br>{{ __('Cash received') }}: {{ $payment->cash_tendered }} · {{ __('Change returned') }}: {{ $payment->change_amount }}@endif</p>
+@endforeach
 <p class="subtle section-gap">{{ __('Booked by') }} {{ $shipment->creator->name }} {{ __('· Printed') }} {{ now()->locale(app()->getLocale())->translatedFormat('d M Y H:i') }} ({{ config('app.timezone') }})</p><p class="preserve subtle">{{ __($company->receipt_footer ?? '') }}</p>
 </main>
 <script src="{{ asset('js/app.js') }}" defer></script>

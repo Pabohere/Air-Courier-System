@@ -173,13 +173,14 @@
 #{{ $payment->id }} · {{ __(ucfirst($payment->type)) }}<small>{{ $payment->payment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</small>@if($payment->original_payment_id)<small>{{ __('Refund of #') }}{{ $payment->original_payment_id }}</small>@endif
 </td>
 <td>
-{{ __($payment->method->name) }}<small>{{ $payment->reference }}</small>@if($payment->reason)<small class="wrap">{{ $payment->reason }}</small>@endif
+{{ __($payment->method->name) }}@if($payment->remark)<small>{{ $payment->remark }}</small>@endif<small>{{ $payment->reference }}</small>@if($payment->reason)<small class="wrap">{{ $payment->reason }}</small>@endif
 </td>
 <td>
 {{ $payment->staff->name }} · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ $payment->created_at->locale(app()->getLocale())->translatedFormat('d M, H:i') }}</small>
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($payment->signedCents()) }}
+@if($payment->cash_tendered)<small>{{ __('Cash received') }}: {{ $payment->cash_tendered }}</small><small>{{ __('Change returned') }}: {{ $payment->change_amount }}</small>@endif
 </td>
 </tr>
 @empty
@@ -255,16 +256,7 @@
 <label class="full">
 {{ __('Amount (') }}{{ $shipment->currency }})<input type="number" name="amount" min="0.01" max="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}" step="0.01" value="{{ old('amount',\App\Services\Money::decimal($shipment->balanceCents())) }}" required>
 </label>
-<label class="full">
-{{ __('Payment method') }}
-<select name="payment_method_id" required>
-@foreach($methods as $method)
-<option value="{{ $method->id }}" @selected(old('payment_method_id')==$method->
-id)>{{ __($method->name) }}
-</option>
-@endforeach
-</select>
-</label>
+@include('shipments.payment-details')
 <label class="full">
 {{ __('Payment date') }}<input name="payment_date" type="date" value="{{ old('payment_date',\App\Services\BranchAccess::todayFor()) }}" max="{{ \App\Services\BranchAccess::todayFor() }}" required>
 </label>

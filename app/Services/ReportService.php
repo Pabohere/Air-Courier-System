@@ -23,10 +23,12 @@ class ReportService
             $payments = $this->payments($from, $to, $branchId, $currency);
             $outstanding = Shipment::with(['payments', 'originBranch', 'destinationBranch'])->where('currency', $currency)->when($branchId, fn ($q) => $q->where('origin_branch_id', $branchId))->get()->filter(fn ($s) => $s->balanceCents() > 0);
             $received = $payments->where('type', 'payment')->sum(fn ($p) => Money::cents($p->amount));
+            $cashTendered = $payments->where('type', 'payment')->filter(fn ($p) => $p->method->name === 'Cash')->sum(fn ($p) => Money::cents($p->cash_tendered ?? $p->amount));
+            $change = $payments->where('type', 'payment')->sum(fn ($p) => Money::cents($p->change_amount));
             $refunds = $payments->where('type', 'refund')->sum(fn ($p) => Money::cents($p->amount));
             $methods = $payments->groupBy('payment_method_id')->map(fn ($rows) => ['name' => $rows->first()->method->name, 'received' => $rows->where('type', 'payment')->sum(fn ($p) => Money::cents($p->amount)), 'refunds' => $rows->where('type', 'refund')->sum(fn ($p) => Money::cents($p->amount)), 'net' => $rows->sum(fn ($p) => $p->signedCents()), 'version' => $rows->max('id')]);
 
-            return compact('shipments', 'payments', 'outstanding', 'received', 'refunds', 'methods') + ['charges' => $shipments->where('status', '!=', 'Cancelled')->sum(fn ($s) => Money::cents($s->price)), 'cancelled' => $shipments->where('status', 'Cancelled')->count(), 'net' => $received - $refunds];
+            return compact('shipments', 'payments', 'outstanding', 'received', 'refunds', 'methods', 'cashTendered', 'change') + ['charges' => $shipments->where('status', '!=', 'Cancelled')->sum(fn ($s) => Money::cents($s->price)), 'cancelled' => $shipments->where('status', 'Cancelled')->count(), 'net' => $received - $refunds];
         });
     }
 

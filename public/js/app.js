@@ -80,3 +80,35 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
         });
     });
 });
+
+
+document.querySelectorAll('[data-payment-details]').forEach((section) => {
+    const method = section.querySelector('[data-payment-method]');
+    const remark = section.querySelector('[data-method-remark]');
+    const cash = section.querySelector('[data-cash-received]');
+    const amount = section.closest('form').querySelector('[name="amount"]');
+    const cents = (value) => {
+        if (!/^\d+(\.\d{1,2})?$/.test(value)) return null;
+        const [whole, fraction = ''] = value.split('.');
+        return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'));
+    };
+    const update = () => {
+        const name = method.selectedOptions[0]?.dataset.method;
+        const needsRemark = ['Bank transfer', 'Pay'].includes(name);
+        const providerLabel = remark.querySelector('[data-provider-label]');
+        providerLabel.textContent = name === 'Pay' ? providerLabel.dataset.payLabel : providerLabel.dataset.bankLabel;
+        remark.hidden = !needsRemark;
+        remark.querySelector('input').disabled = !needsRemark;
+        remark.querySelector('input').required = needsRemark;
+        cash.hidden = name !== 'Cash';
+        cash.querySelector('input').disabled = name !== 'Cash';
+        const applied = cents(amount ? amount.value : section.dataset.paymentAmount);
+        const tendered = cents(cash.querySelector('input').value) ?? applied;
+        const change = applied !== null && tendered !== null && tendered >= applied ? tendered - applied : 0n;
+        cash.querySelector('output').textContent = `${change / 100n}.${String(change % 100n).padStart(2, '0')}`;
+    };
+    method.addEventListener('change', update);
+    cash.addEventListener('input', update);
+    amount?.addEventListener('input', update);
+    update();
+});

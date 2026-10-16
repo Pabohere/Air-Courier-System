@@ -2,7 +2,6 @@
 @section('title', __('New shipment'))
 @section('content')
 <div class="page-heading"><div><div class="eyebrow">{{ __('YGN ↔ SG BRANCH TRANSFER') }}</div><h1>{{ __('Book a shipment') }}</h1><p class="subtle">{{ __('Weigh the parcel, choose its branch route, and enter the agreed charge.') }}</p></div><a class="button secondary" href="{{ route('branches.index') }}">{{ __('Branch operations') }} →</a></div>
-@if($customers->isEmpty())<div class="notice error">{{ __('Add a customer before booking.') }} <a href="{{ route('customers.create') }}">{{ __('Add customer →') }}</a></div>@endif
 <form method="post" enctype="multipart/form-data" action="{{ route('shipments.store') }}">
 @csrf<input type="hidden" name="booking_key" value="{{ old('booking_key', \Illuminate\Support\Str::uuid()) }}">
 <div class="split"><div>
@@ -17,8 +16,10 @@
 </select></label>
 <p class="help full">{{ __('The receiving branch sees the same parcel and tracking number. Flight details are assigned at the dispatch desk.') }}</p>
 </div></section>
-<section class="card"><div class="card-head"><h2>{{ __('01 · Sender & recipient') }}</h2><a href="{{ route('customers.create') }}">{{ __('Add customer →') }}</a></div><div class="card-body field-grid">
-<label class="full">{{ __('Sender / customer') }}<select name="customer_id" required><option value="">{{ __('Select customer') }}</option>@foreach($customers as $customer)<option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->name }} · {{ $customer->phone }}</option>@endforeach</select></label>
+<section class="card"><div class="card-head"><h2>{{ __('01 · Sender & recipient') }}</h2></div><div class="card-body field-grid">
+<label>{{ __('Customer name') }}<input name="customer_name" value="{{ old('customer_name') }}" maxlength="150" required></label>
+<label>{{ __('Customer phone') }}<input name="customer_phone" value="{{ old('customer_phone') }}" maxlength="50" required></label>
+<label class="full">{{ __('Customer address') }}<input name="customer_address" value="{{ old('customer_address') }}" maxlength="2000"></label>
 <label>{{ __('Recipient name') }}<input name="recipient_name" value="{{ old('recipient_name') }}" maxlength="150" required></label>
 <label>{{ __('Recipient phone') }}<input name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" required></label>
 <label class="full">{{ __('Recipient address') }}<textarea name="recipient_address" required>{{ old('recipient_address') }}</textarea></label>
@@ -35,6 +36,6 @@
 <label>{{ __('Currency') }}<select name="currency" required>@foreach(['MMK','SGD'] as $code)<option value="{{ $code }}" @selected(old('currency', auth()->user()->branch?->code === 'SG' ? 'SGD' : 'MMK') === $code)>{{ $code }}</option>@endforeach</select></label>
 <label class="section-gap">{{ __('Agreed shipment charge') }}<input type="number" name="price" value="{{ old('price') }}" min="0.01" max="999999999.99" step="0.01" required></label>
 <p class="help">{{ __('The saved currency and charge cannot be changed. Payments are recorded in this same currency.') }}</p>
-<div class="form-actions"><button class="button" @disabled($customers->isEmpty())>{{ __('Confirm booking →') }}</button></div>
+<div class="form-actions"><button class="button">{{ __('Confirm booking →') }}</button></div>
 </div></section></div></div></form>
 @endsection

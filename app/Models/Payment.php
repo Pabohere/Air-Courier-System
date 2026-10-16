@@ -11,11 +11,11 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['branch_id', 'shipment_id', 'payment_method_id', 'original_payment_id', 'type', 'amount', 'currency', 'payment_date', 'reference', 'reason', 'submission_key', 'staff_id'];
+    protected $fillable = ['cash_tendered', 'change_amount', 'remark', 'branch_id', 'shipment_id', 'payment_method_id', 'original_payment_id', 'type', 'amount', 'currency', 'payment_date', 'reference', 'reason', 'submission_key', 'staff_id'];
 
     protected function casts(): array
     {
-        return ['amount' => 'decimal:2', 'payment_date' => 'date', 'created_at' => 'datetime'];
+        return ['cash_tendered' => 'decimal:2', 'change_amount' => 'decimal:2', 'amount' => 'decimal:2', 'payment_date' => 'date', 'created_at' => 'datetime'];
     }
 
     protected static function booted(): void

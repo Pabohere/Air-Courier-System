@@ -39,7 +39,7 @@ return array_replace_recursive(require __DIR__.'/../en/validation.php', [
         'storage_location' => 'သိမ်းဆည်းထားသည့် နေရာ',
         'carrier_name' => 'သယ်ယူပို့ဆောင်သူ အမည်',
         'name' => 'အမည်', 'email' => 'အီးမေးလ်', 'password' => 'စကားဝှက်', 'password_confirmation' => 'စကားဝှက်အတည်ပြုချက်',
-        'phone' => 'ဖုန်းနံပါတ်', 'address' => 'လိပ်စာ', 'notes' => 'မှတ်ချက်', 'customer_id' => 'ဖောက်သည်', 'destination_id' => 'နိုင်ငံ',
+        'phone' => 'ဖုန်းနံပါတ်', 'address' => 'လိပ်စာ', 'notes' => 'မှတ်ချက်', 'customer_id' => 'customer', 'destination_id' => 'နိုင်ငံ',
         'recipient_name' => 'လက်ခံသူအမည်', 'recipient_phone' => 'လက်ခံသူဖုန်း', 'recipient_address' => 'လက်ခံသူလိပ်စာ',
         'shipment_date' => 'ပို့ဆောင်သည့်ရက်', 'description' => 'ပစ္စည်းအကြောင်းအရာ', 'quantity' => 'အရေအတွက်', 'actual_weight' => 'အလေးချိန်',
         'amount' => 'ငွေပမာဏ', 'payment_date' => 'ငွေပေးချေသည့်ရက်', 'payment_method_id' => 'ငွေပေးချေနည်း', 'reference' => 'ရည်ညွှန်းနံပါတ်',

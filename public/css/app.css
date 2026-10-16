@@ -1015,3 +1015,5 @@ input[type="file"] { max-width: 100%; }
 .queue-section > summary { padding: 22px; cursor: pointer; font-size: 18px; font-weight: 650; }
 .queue-section > summary .badge { margin-left: 10px; }
 .queue-section .card-head:empty { display: none; }
+
+.payment-details [hidden] { display: none !important; }

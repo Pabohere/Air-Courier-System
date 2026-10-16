@@ -1,0 +1,5 @@
+<div class="field-grid full payment-details" data-payment-details data-payment-amount="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}">
+<label class="full">{{ __('Payment method') }}<select name="payment_method_id" data-payment-method required>@foreach($methods as $method)<option value="{{ $method->id }}" data-method="{{ $method->name }}" @selected(old('payment_method_id') == $method->id)>{{ __($method->name) }}</option>@endforeach</select></label>
+<label class="full" data-method-remark><span data-provider-label data-bank-label="{{ __('Bank name (remark)') }}" data-pay-label="{{ __('Pay name (remark)') }}">{{ __('Bank / Pay name (remark)') }}</span><input name="remark" value="{{ old('remark') }}" maxlength="150"></label>
+<label class="full" data-cash-received>{{ __('Cash received') }} ({{ $shipment->currency }})<input name="cash_tendered" type="number" min="0.01" max="999999999.99" step="0.01" value="{{ old('cash_tendered') }}" placeholder="{{ __('Leave blank for exact amount') }}"><span class="help">{{ __('Change returned') }}: <output data-change-returned>0.00</output> {{ $shipment->currency }}</span></label>
+</div>

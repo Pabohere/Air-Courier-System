@@ -165,10 +165,11 @@
 {{ __(ucfirst($payment->type)) }}<small>{{ __($payment->method->name) }}</small>
 </td>
 <td>
-{{ $payment->reference?:'—' }} · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ $payment->staff->name }}</small>
+{{ $payment->reference?:'—' }}@if($payment->remark)<small>{{ $payment->remark }}</small>@endif · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ $payment->staff->name }}</small>
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($payment->signedCents()) }} {{ $payment->currency }}
+@if($payment->cash_tendered)<small>{{ __('Cash received') }}: {{ $payment->cash_tendered }}</small><small>{{ __('Change returned') }}: {{ $payment->change_amount }}</small>@endif
 </td>
 </tr>
 @empty
@@ -182,6 +183,7 @@
 </table>
 </div>
 </div>
+<p class="help">{{ __('Cash received') }}: {{ \App\Services\Money::display($report['cashTendered']) }} {{ $currency }} · {{ __('Change returned') }}: {{ \App\Services\Money::display($report['change']) }} {{ $currency }}</p>
 <div class="two-columns">
 <div class="card">
 <div class="card-head">
