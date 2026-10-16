@@ -295,6 +295,22 @@ class BranchWorkflowTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'sg@courier.test', 'branch_id' => $this->sg->branch_id]);
     }
 
+    public function test_booking_accepts_past_present_and_future_dates_in_both_branches_but_rejects_invalid_dates(): void
+    {
+        foreach ([$this->ygn, $this->sg] as $user) {
+            foreach (['2025-01-01', '2026-10-15', '2027-12-31'] as $date) {
+                $data = array_replace($this->data($user), ['shipment_date' => $date]);
+                $this->actingAs($user)->post(route('shipments.store'), $data)->assertSessionHasNoErrors()->assertRedirect();
+                $this->assertDatabaseHas('shipments', ['booking_key' => $data['booking_key'], 'shipment_date' => $date.' 00:00:00']);
+            }
+            foreach (['2026-02-30', 'not-a-date', ''] as $date) {
+                $data = array_replace($this->data($user), ['shipment_date' => $date]);
+                $this->post(route('shipments.store'), $data)->assertSessionHasErrors('shipment_date');
+                $this->assertDatabaseMissing('shipments', ['booking_key' => $data['booking_key']]);
+            }
+        }
+    }
+
     public function test_singapore_booking_date_uses_singapore_calendar_near_midnight(): void
     {
         $this->travelTo(now()->setDate(2026, 10, 15)->setTime(23, 0));
