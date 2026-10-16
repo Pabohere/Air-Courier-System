@@ -21,7 +21,7 @@
 <a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
 @endforeach
 @can('admin')
-<a href="{{ route('settings.index') }}">{{ __('System settings') }}</a><a href="{{ route('settings.audit') }}">{{ __('Audit history') }}</a>
+<a href="{{ route('settings.index') }}">{{ __('System settings') }}</a>
 @endcan
 </details>
 </nav>
@@ -34,6 +34,11 @@
 <div class="breadcrumbs">
 {{ __('Workspace') }} <span>/</span> <strong>@yield('title',__('Overview'))</strong>
 </div>
+<form class="workspace-search" method="get" action="{{ route('shipments.index') }}" role="search">
+<label class="sr-only" for="workspace-search">{{ __('Search all parcels') }}</label>
+<input id="workspace-search" type="search" name="q" maxlength="100" placeholder="{{ __('Search all parcels') }}" required>
+<button class="button secondary small">{{ __('Search') }}</button>
+</form>
 <div class="user">
 <x-theme-switch />
 <x-language-switch />
@@ -46,7 +51,7 @@
 </form>
 </div>
 </header>
-<main>
+<main @if(request()->routeIs('reports.index', 'customers.show', 'dispatches.show', 'shipments.show', 'inventory.edit')) data-table-search data-search-label="{{ __('Search displayed records') }}" data-search-empty="{{ __('No matching records.') }}" data-search-clear="{{ __('Clear search') }}" @endif>
 @if(session('success'))
 <div class="notice success" role="status">
 {{ session('success') }}

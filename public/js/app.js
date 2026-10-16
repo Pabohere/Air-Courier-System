@@ -203,3 +203,43 @@ if (photoViewer) {
         if (event.key === 'ArrowLeft') { event.preventDefault(); stepPhoto(-1); }
     });
 }
+
+// Filter the displayed rows without changing report totals or form submissions.
+document.querySelectorAll('[data-table-search] .table-wrap').forEach((wrapper, index) => {
+    const rows = Array.from(wrapper.querySelectorAll('tbody > tr')).filter((row) => !row.querySelector('.empty'));
+    if (rows.length === 0) return;
+    const context = wrapper.closest('[data-table-search]');
+    const heading = wrapper.closest('.card')?.querySelector('h2')?.textContent.trim();
+    const search = document.createElement('form');
+    search.className = 'record-search';
+    search.setAttribute('role', 'search');
+    const label = document.createElement('label');
+    label.textContent = heading ? `${context.dataset.searchLabel} · ${heading}` : context.dataset.searchLabel;
+    const input = document.createElement('input');
+    input.type = 'search';
+    input.maxLength = 150;
+    input.id = `record-search-${index}`;
+    label.htmlFor = input.id;
+    label.append(input);
+    const clear = document.createElement('button');
+    clear.type = 'reset';
+    clear.className = 'button secondary small';
+    clear.textContent = context.dataset.searchClear;
+    const status = document.createElement('output');
+    status.setAttribute('aria-live', 'polite');
+    const update = () => {
+        const query = input.value.trim().normalize('NFKC').toLocaleLowerCase();
+        let count = 0;
+        rows.forEach((row) => {
+            const match = row.textContent.normalize('NFKC').toLocaleLowerCase().includes(query);
+            row.hidden = !match;
+            if (match) count++;
+        });
+        status.textContent = query ? (count ? `${count} / ${rows.length}` : context.dataset.searchEmpty) : '';
+    };
+    input.addEventListener('input', update);
+    search.addEventListener('submit', (event) => { event.preventDefault(); update(); });
+    search.addEventListener('reset', () => { input.value = ''; update(); });
+    search.append(label, clear, status);
+    wrapper.before(search);
+});

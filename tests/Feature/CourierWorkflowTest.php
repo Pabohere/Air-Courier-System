@@ -383,7 +383,7 @@ class CourierWorkflowTest extends TestCase
 
     public static function pages(): array
     {
-        return ['overview' => ['dashboard'], 'customers' => ['customers.index'], 'customer form' => ['customers.create'], 'shipments' => ['shipments.index'], 'booking form' => ['shipments.create'], 'dispatch' => ['dispatches.index'], 'reports' => ['reports.index'], 'settings' => ['settings.index'], 'audit' => ['settings.audit']];
+        return ['overview' => ['dashboard'], 'customers' => ['customers.index'], 'customer form' => ['customers.create'], 'shipments' => ['shipments.index'], 'booking form' => ['shipments.create'], 'dispatch' => ['dispatches.index'], 'reports' => ['reports.index'], 'settings' => ['settings.index']];
     }
 
     #[DataProvider('pages')]

@@ -439,6 +439,18 @@ pre { background: var(--tint); color: var(--ink); border: 1px solid var(--line);
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .sidebar, header, .card, .metric, .intro-banner, .login-shell, .photo-viewer { background: var(--card); }
 }
+/* Searches stay outside business forms and preserve the current filters. */
+.workspace-search { display:flex; align-items:center; gap:8px; flex:1; max-width:330px; min-width:180px; margin:0; }
+.workspace-search input { min-height:38px; margin:0; font-size:14px; color:var(--ink); background:var(--field); }
+.workspace-search .button { min-height:38px; }
+.record-search { display:flex; flex-wrap:wrap; align-items:end; gap:12px; padding:18px 24px; border-bottom:1px solid var(--line); }
+.record-search label { flex:1; min-width:180px; }
+.record-search output { flex-basis:100%; color:var(--muted); font-size:14px; }
+.record-search output:empty { display:none; }
+[data-table-search] tr[hidden] { display:none; }
+@media(max-width:1150px) { .workspace-search { max-width:none; } header .user { flex-wrap:wrap; } }
+@media(max-width:780px) { .workspace-search { flex-basis:100%; order:3; } .record-search { padding:16px; } }
+@media print { .workspace-search, .record-search { display:none !important; } }
 @media print {
     :root, html[data-theme="dark"] { color-scheme: light; --ink: #000; --muted: #444; --line: #ccc; }
     body { background: #fff !important; color: #000 !important; }

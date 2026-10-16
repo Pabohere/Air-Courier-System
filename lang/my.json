@@ -683,5 +683,11 @@
   "Choose branch on Home": "ပင်မတွင် ဆိုင်ခွဲရွေးရန်",
   "Admin can choose YGN or SG on Home after signing in.": "Admin သည် အကောင့်ဝင်ပြီး ပင်မတွင် YGN / SG ရွေးနိုင်ပါသည်။",
   "Remove photo": "ဓာတ်ပုံဖယ်ရန်",
-  "Recipient address (optional)": "လက်ခံသူလိပ်စာ (မဖြည့်လည်းရသည်)"
+  "Recipient address (optional)": "လက်ခံသူလိပ်စာ (မဖြည့်လည်းရသည်)",
+  "Search all parcels": "ပါဆယ်အားလုံး ရှာရန်",
+  "Search settings": "ဆက်တင်များ ရှာရန်",
+  "Staff, email, destination or payment method": "ဝန်ထမ်း၊ အီးမေးလ်၊ ပို့ဆောင်မည့်နိုင်ငံ သို့မဟုတ် ငွေပေးနည်း",
+  "Search displayed records": "ပြထားသော မှတ်တမ်းများ ရှာရန်",
+  "No matching records.": "ကိုက်ညီသော မှတ်တမ်း မရှိပါ။",
+  "All staff permissions, plus refunds, company settings, destination rates, payment methods and user management.": "ဝန်ထမ်းလုပ်ဆောင်ချက်များအပြင် ငွေပြန်အမ်းခြင်း၊ ကုမ္ပဏီဆက်တင်၊ နှုန်းထား၊ ငွေပေးနည်းနှင့် အသုံးပြုသူ စီမံခြင်း။"
 }

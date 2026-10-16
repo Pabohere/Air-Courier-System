@@ -12,17 +12,19 @@ class BranchController extends Controller
 {
     public function index(Request $request): View
     {
-        $data = $request->validate(['branch_id' => 'nullable|integer|exists:branches,id', 'tab' => 'nullable|in:outgoing,incoming,stored,collected']);
+        $data = $request->validate(['branch_id' => 'nullable|integer|exists:branches,id', 'tab' => 'nullable|in:outgoing,incoming,stored,collected', 'q' => 'nullable|string|max:100']);
         $id = $request->user()->isAdmin() ? ($data['branch_id'] ?? Branch::where('code', 'YGN')->value('id')) : $request->user()->branch_id;
         abort_unless($id, 403);
         if (! $request->user()->isAdmin() && isset($data['branch_id'])) {
             BranchAccess::authorize($request->user(), (int) $data['branch_id']);
         }
         $branch = Branch::findOrFail($id);
-        $outgoing = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('origin_branch_id', $id)->where('current_branch_id', $id)->where('in_storage', true)->whereNotIn('status', ['Collected', 'Cancelled'])->latest('id')->paginate(12, ['*'], 'outgoing')->withQueryString();
-        $incoming = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->awaitingArrival()->latest('id')->paginate(12, ['*'], 'incoming')->withQueryString();
-        $stored = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('current_branch_id', $id)->where('destination_branch_id', $id)->where('in_storage', true)->whereIn('status', ['Arrived at Branch', 'Ready for Collection', 'Exception'])->latest('id')->paginate(12, ['*'], 'stored')->withQueryString();
-        $collected = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->where('status', 'Collected')->latest('collected_at')->limit(12)->get();
+        $search = trim($data['q'] ?? '');
+        $parcels = Shipment::query()->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('tracking_number', 'like', '%'.$search.'%')->orWhere('recipient_name', 'like', '%'.$search.'%')->orWhere('recipient_phone', 'like', '%'.$search.'%')->orWhereHas('customer', fn ($customers) => $customers->where('name', 'like', '%'.$search.'%')->orWhere('phone', 'like', '%'.$search.'%'))));
+        $outgoing = (clone $parcels)->with(['originBranch', 'destinationBranch', 'dispatch'])->where('origin_branch_id', $id)->where('current_branch_id', $id)->where('in_storage', true)->whereNotIn('status', ['Collected', 'Cancelled'])->latest('id')->paginate(12, ['*'], 'outgoing')->withQueryString();
+        $incoming = (clone $parcels)->with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->awaitingArrival()->latest('id')->paginate(12, ['*'], 'incoming')->withQueryString();
+        $stored = (clone $parcels)->with(['originBranch', 'destinationBranch', 'dispatch'])->where('current_branch_id', $id)->where('destination_branch_id', $id)->where('in_storage', true)->whereIn('status', ['Arrived at Branch', 'Ready for Collection', 'Exception'])->latest('id')->paginate(12, ['*'], 'stored')->withQueryString();
+        $collected = (clone $parcels)->with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->where('status', 'Collected')->latest('collected_at')->limit(12)->get();
 
         $activeTab = $data['tab'] ?? ($outgoing->isNotEmpty() ? 'outgoing' : ($incoming->isNotEmpty() ? 'incoming' : ($stored->isNotEmpty() ? 'stored' : 'collected')));
 

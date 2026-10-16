@@ -2,7 +2,12 @@
 @section('title', __('Branch operations'))
 @section('content')
 <div class="page-heading"><div><div class="eyebrow">YGN ↔ SG</div><h1>{{ __($branch->name) }}</h1><p class="subtle">{{ __('Accept → send → receive → collect') }}</p></div><a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branch->id]) }}">{{ __('＋ New shipment') }}</a></div>
-@if(auth()->user()->isAdmin())<form class="filters" method="get"><label>{{ __('Branch') }}<select name="branch_id">@foreach($branches as $item)<option value="{{ $item->id }}" @selected($branch->id === $item->id)>{{ $item->code }} · {{ __($item->name) }}</option>@endforeach</select></label><button class="button secondary">{{ __('View branch') }}</button></form>@endif
+<form class="filters" method="get" action="{{ route('branches.index') }}" role="search">
+@if(auth()->user()->isAdmin())<label>{{ __('Branch') }}<select name="branch_id">@foreach($branches as $item)<option value="{{ $item->id }}" @selected($branch->id === $item->id)>{{ $item->code }} · {{ __($item->name) }}</option>@endforeach</select></label>@endif
+@if(request('tab'))<input type="hidden" name="tab" value="{{ request('tab') }}">@endif
+<label class="search">{{ __('Find a shipment') }}<input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="{{ __('Tracking number, sender or recipient') }}"></label><button class="button secondary">{{ __('Search') }}</button>
+@if(request()->filled('q'))<a href="{{ route('branches.index', ['branch_id' => $branch->id, 'tab' => request('tab')]) }}">{{ __('Clear search') }}</a>@endif
+</form>
 @foreach(['outgoing' => __('To send'), 'incoming' => __('To receive'), 'stored' => __('Customer collection'), 'collected' => __('Recently collected')] as $list => $heading)
 <details class="card queue-section" name="daily-queue" @if($activeTab === $list) open @endif><summary>{{ $heading }} <span class="badge">{{ $list === 'collected' ? $collected->count() : $$list->total() }}</span></summary><div class="card-head">@if($list === 'outgoing')<a class="button small secondary" href="{{ route('dispatches.index') }}">{{ __('Carrier trips') }} →</a>@endif</div>
 <div class="table-wrap"><table><thead><tr><th>{{ __('Tracking') }}</th><th>{{ __('Branch route') }}</th><th>{{ __('Recipient') }}</th><th>{{ __('Status') }}</th><th>{{ __('Flight / collection') }}</th></tr></thead><tbody>

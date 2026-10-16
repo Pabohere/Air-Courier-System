@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditLog;
 use App\Models\Branch;
 use App\Models\CompanySetting;
 use App\Models\Destination;
@@ -21,9 +20,17 @@ use Illuminate\View\View;
 
 class SettingsController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('settings.index', ['settings' => CompanySetting::firstOrFail(), 'destinations' => Destination::with('rate')->orderBy('country')->get(), 'methods' => PaymentMethod::all(), 'users' => User::orderBy('name')->get()]);
+        $data = $request->validate(['q' => 'nullable|string|max:100']);
+        $search = trim($data['q'] ?? '');
+
+        return view('settings.index', [
+            'settings' => CompanySetting::firstOrFail(),
+            'destinations' => Destination::with('rate')->when($search !== '', fn ($query) => $query->where('country', 'like', '%'.$search.'%'))->orderBy('country')->get(),
+            'methods' => PaymentMethod::query()->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'))->get(),
+            'users' => User::query()->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('name', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%')))->orderBy('name')->get(),
+        ]);
     }
 
     public function company(Request $request, CourierService $service): RedirectResponse
@@ -102,6 +109,6 @@ $/D'], 'weight_unit' => 'required|in:kg,lb']);
 
     public function audit(): View
     {
-        return view('settings.audit', ['logs' => AuditLog::with('staff')->latest('id')->paginate(30)]);
+        abort(404);
     }
 }

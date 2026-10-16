@@ -9,8 +9,9 @@
 </h1>
 <p class="subtle">{{ __('Company details, destination rates, payment methods and staff access.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('settings.audit') }}">{{ __('Audit history →') }}</a>
 </div>
+<form class="filters" method="get" action="{{ route('settings.index') }}" role="search"><label class="search">{{ __('Search settings') }}<input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="{{ __('Staff, email, destination or payment method') }}"></label><button class="button">{{ __('Search') }}</button>@if(request()->filled('q'))<a href="{{ route('settings.index') }}">{{ __('Clear search') }}</a>@endif</form>
+@if(request()->filled('q') && $destinations->isEmpty() && $methods->isEmpty() && $users->isEmpty())<p class="notice" role="status">{{ __('No matching records.') }}</p>@endif
 <div class="card">
 <div class="card-head">
 <h2>
@@ -110,7 +111,7 @@ weight_unit===$unit)>{{ $unit }}
 <h3>
 {{ __('Admin') }}
 </h3>
-<p class="subtle">{{ __('All staff permissions, plus refunds, company settings, destination rates, payment methods, user management and audit history.') }}</p><p class="help">{{ __('Financial entries cannot be edited or deleted. Use an authorized refund and replacement payment to correct a record.') }}</p>
+<p class="subtle">{{ __('All staff permissions, plus refunds, company settings, destination rates, payment methods and user management.') }}</p><p class="help">{{ __('Financial entries cannot be edited or deleted. Use an authorized refund and replacement payment to correct a record.') }}</p>
 </div>
 </div>
 </div>
