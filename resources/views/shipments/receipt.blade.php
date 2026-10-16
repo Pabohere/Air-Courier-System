@@ -7,11 +7,6 @@
 </head>
 <body>
 <main class="print-page">
-<div class="print-toolbar">
-<x-theme-switch />
-<x-language-switch />
-<a href="{{ route('shipments.show',$shipment) }}" class="button secondary">{{ __('Back') }}</a><button class="button" data-print>{{ __('Print receipt / label') }}</button>
-</div>
 <div class="print-head">
 <div class="print-company">
 <img class="print-logo" src="{{ asset('images/standard-mark.png') }}" alt="{{ __('Standard courier logo') }}" width="1305" height="1206">
@@ -111,7 +106,7 @@
 <p>{{ __($payment->method->name) }}: {{ $payment->amount }} {{ $payment->currency }} @if($payment->remark) · {{ $payment->remark }} @endif
 @if($payment->cash_tendered)<br>{{ __('Cash received') }}: {{ $payment->cash_tendered }} · {{ __('Change returned') }}: {{ $payment->change_amount }}@endif</p>
 @endforeach
-<p class="subtle section-gap">{{ __('Booked by') }} {{ $shipment->creator->name }} {{ __('· Printed') }} {{ now()->locale(app()->getLocale())->translatedFormat('d M Y H:i') }} ({{ config('app.timezone') }})</p><p class="preserve subtle">{{ __($company->receipt_footer ?? '') }}</p>
+<p class="preserve subtle">{{ __($company->receipt_footer ?? '') }}</p>
 </main>
 <script src="{{ asset('js/app.js') }}" defer></script>
 </body>
