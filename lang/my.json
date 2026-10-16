@@ -682,5 +682,6 @@
   "Pending": "မရောက်သေး",
   "Choose branch on Home": "ပင်မတွင် ဆိုင်ခွဲရွေးရန်",
   "Admin can choose YGN or SG on Home after signing in.": "Admin သည် အကောင့်ဝင်ပြီး ပင်မတွင် YGN / SG ရွေးနိုင်ပါသည်။",
-  "Remove photo": "ဓာတ်ပုံဖယ်ရန်"
+  "Remove photo": "ဓာတ်ပုံဖယ်ရန်",
+  "Recipient address (optional)": "လက်ခံသူလိပ်စာ (မဖြည့်လည်းရသည်)"
 }

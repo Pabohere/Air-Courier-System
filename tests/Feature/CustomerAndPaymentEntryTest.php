@@ -46,6 +46,28 @@ class CustomerAndPaymentEntryTest extends TestCase
         return ['amount' => '25000.00', 'payment_method_id' => PaymentMethod::where('name', $method)->firstOrFail()->id, 'submission_key' => (string) Str::uuid(), 'payment_date' => '2026-10-16'];
     }
 
+    public function test_booking_can_omit_recipient_address_in_both_directions(): void
+    {
+        foreach ([$this->ygn, $this->sg] as $staff) {
+            $this->actingAs($staff)->get(route('shipments.create'))->assertOk()
+                ->assertSee('Recipient address (optional)')
+                ->assertSee('<textarea name="recipient_address">', false);
+
+            foreach ([[], ['recipient_address' => null], ['recipient_address' => '']] as $address) {
+                $data = $this->booking($staff);
+                unset($data['recipient_address']);
+                $data = array_merge($data, $address);
+                $this->post(route('shipments.store'), $data)->assertSessionHasNoErrors()->assertRedirect();
+                $parcel = Shipment::where('booking_key', $data['booking_key'])->sole();
+                $this->assertSame('', $parcel->recipient_address);
+                $this->post(route('shipments.store'), $data)->assertSessionHasNoErrors();
+                $this->assertSame(1, Shipment::where('booking_key', $data['booking_key'])->count());
+                $this->get(route('shipments.show', $parcel))->assertOk();
+                $this->get(route('shipments.receipt', $parcel))->assertOk();
+            }
+        }
+    }
+
     public function test_walk_in_customer_is_created_with_booking_and_retries_do_not_duplicate_or_rewrite_customer(): void
     {
         $this->actingAs($this->ygn)->get(route('shipments.create'))->assertOk()->assertSee('name="customer_name"', false)->assertDontSee('name="customer_id"', false)->assertDontSee('disabled>Confirm booking', false);

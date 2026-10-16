@@ -22,7 +22,7 @@
 <label class="full">{{ __('Customer address') }}<input name="customer_address" value="{{ old('customer_address') }}" maxlength="2000"></label>
 <label>{{ __('Recipient name') }}<input name="recipient_name" value="{{ old('recipient_name') }}" maxlength="150" required></label>
 <label>{{ __('Recipient phone') }}<input name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" required></label>
-<label class="full">{{ __('Recipient address') }}<textarea name="recipient_address" required>{{ old('recipient_address') }}</textarea></label>
+<label class="full">{{ __('Recipient address (optional)') }}<textarea name="recipient_address">{{ old('recipient_address') }}</textarea></label>
 </div></section>
 <section class="card"><div class="card-head"><h2>{{ __('02 · Parcel details') }}</h2></div><div class="card-body field-grid">
 <label class="full">{{ __('Storage location') }}<input name="storage_location" value="{{ old('storage_location', 'Receiving area') }}" maxlength="100" required><span class="help">{{ __('Example: Rack A / Shelf 2. Booking receives the parcel into origin branch storage.') }}</span></label>
