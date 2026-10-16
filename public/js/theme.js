@@ -1,6 +1,6 @@
 (() => {
-    const storageKey = 'courier-theme';
-    let theme = 'light';
+    const storageKey = 'courier-theme-electric';
+    let theme = 'dark';
     try {
         const saved = localStorage.getItem(storageKey);
         if (saved === 'light' || saved === 'dark') theme = saved;
@@ -25,7 +25,7 @@
     });
     window.addEventListener('storage', (event) => {
         if (event.key === storageKey) {
-            theme = event.newValue === 'dark' ? 'dark' : 'light';
+            theme = event.newValue === 'light' ? 'light' : 'dark';
             applyTheme(theme);
         }
     });
