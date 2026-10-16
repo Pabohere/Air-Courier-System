@@ -10,6 +10,7 @@ use App\Models\Shipment;
 use App\Models\User;
 use App\Services\CourierService;
 use App\Services\ReportService;
+use Carbon\Carbon;
 use Database\Seeders\BranchDemoSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -101,6 +102,22 @@ class BranchWorkflowTest extends TestCase
         $this->assertSame($destination->id, $shipment->events()->where('status', 'Collected')->firstOrFail()->staff_id);
         $this->actingAs($origin)->get(route('shipments.show', $shipment))->assertOk()->assertSee('Actual collector');
         $this->actingAs($destination)->get(route('branches.index'))->assertOk()->assertSee($shipment->tracking_number);
+    }
+
+    public function test_numeric_tracking_format_uses_origin_local_date_and_remains_searchable_and_stable(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-15 23:00', 'Asia/Yangon'));
+        foreach ([[$this->ygn, 'YGN-SG-15/10/26-'], [$this->sg, 'SG-YGN-16/10/26-']] as [$user, $prefix]) {
+            $data = $this->data($user);
+            $parcel = $this->service->book($data, $user);
+            $tracking = $parcel->tracking_number;
+            $this->assertMatchesRegularExpression('/^'.preg_quote($prefix, '/').'[0-9]{10}$/', $tracking);
+            $this->assertSame($tracking, $this->service->book($data, $user)->tracking_number);
+            $next = $this->service->book($this->data($user), $user);
+            $this->assertNotSame($tracking, $next->tracking_number);
+            $this->actingAs($user)->get(route('shipments.index', ['q' => $tracking]))->assertOk()->assertSee($tracking)->assertDontSee($next->tracking_number);
+            $this->get(route('shipments.receipt', $parcel))->assertOk()->assertSee($tracking);
+        }
     }
 
     public function test_staff_cannot_book_from_the_other_branch(): void

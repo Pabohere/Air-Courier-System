@@ -346,9 +346,12 @@ class CourierService
             }
             $customer = Customer::findOrFail($data['customer_id']);
             $country = Destination::firstOrCreate(['country' => $destination->country], ['active' => true]);
+            do {
+                $trackingNumber = $origin->code.'-'.$destination->code.'-'.now($origin->timezone)->format('d/m/y').'-'.random_int(1000000000, 9999999999);
+            } while (Shipment::where('tracking_number', $trackingNumber)->exists());
             $shipment = Shipment::create(collect($data)->only(array_merge($fields, ['booking_key', 'shipment_date', 'actual_weight']))->all() + [
                 'destination_id' => $country->id, 'destination_country' => $destination->country,
-                'tracking_number' => $origin->code.'-'.$destination->code.'-'.now()->format('ymd').'-'.strtoupper(Str::random(10)),
+                'tracking_number' => $trackingNumber,
                 'sender' => $customer->only(['name', 'phone', 'address']), 'price' => Money::decimal(Money::cents($data['price'])),
                 'rate_snapshot' => [], 'weight_unit' => 'kg', 'status' => 'Received', 'current_branch_id' => $origin->id,
                 'created_by' => $user->id, 'updated_by' => $user->id,
