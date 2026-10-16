@@ -59,12 +59,15 @@ class SimpleWorkflowTest extends TestCase
             $this->post(route('dispatches.store'), $dispatchData)->assertSessionHasNoErrors()->assertRedirect();
             $this->assertSame('Dispatched', $parcel->fresh()->status);
             $this->assertFalse($parcel->fresh()->in_storage);
+            $this->get(route('branches.index', ['tab' => 'outgoing']))->assertOk()->assertViewHas('outgoing', fn ($rows) => ! $rows->contains('id', $parcel->id))->assertViewHas('activeTab', 'outgoing');
             $this->assertNotNull($parcel->fresh()->dispatch->handed_over_at);
             $this->assertSame(['Received', 'Processing', 'Ready for Dispatch', 'Dispatched'], $parcel->events()->pluck('status')->all());
             $this->post(route('dispatches.store'), $dispatchData)->assertSessionHasErrors('shipments');
+            $this->actingAs($destination)->get(route('branches.index', ['tab' => 'incoming']))->assertOk()->assertViewHas('incoming', fn ($rows) => $rows->contains('id', $parcel->id))->assertViewHas('activeTab', 'incoming');
             $this->actingAs($destination)->post(route('shipments.receive', $parcel), ['storage_location' => 'Collection shelf'])->assertSessionHasNoErrors();
             $this->assertSame('Ready for Collection', $parcel->fresh()->status);
             $this->assertSame('Collection shelf', $parcel->fresh()->storage_location);
+            $this->get(route('branches.index', ['tab' => 'stored']))->assertOk()->assertViewHas('stored', fn ($rows) => $rows->contains('id', $parcel->id))->assertViewHas('activeTab', 'stored');
             $this->post(route('shipments.receive', $parcel), ['storage_location' => 'Collection shelf'])->assertSessionHasNoErrors();
             $this->assertSame(1, $parcel->storageMovements()->where('type', 'Stored')->where('branch_id', $destination->branch_id)->count());
             app(CourierService::class)->recordPayment($parcel, ['amount' => '10000.00', 'payment_method_id' => PaymentMethod::firstOrFail()->id, 'submission_key' => (string) Str::uuid(), 'payment_date' => '2026-10-16'], $origin);

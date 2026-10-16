@@ -88,7 +88,7 @@ class LanguageTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
         $admin = User::factory()->admin()->create();
-        $this->actingAs($admin)->withSession(['locale' => 'my'])->get(route($route))->assertOk()->assertSee('lang="my"', false)->assertSee('ပို့ဆောင်မှုများ')->assertSee('aria-pressed="true"', false);
+        $this->actingAs($admin)->withSession(['locale' => 'my'])->get(route($route))->assertOk()->assertSee('lang="my"', false)->assertSee('ပါဆယ်မှတ်တမ်းအားလုံး')->assertSee('aria-pressed="true"', false);
     }
 
     public function test_status_labels_translate_while_submitted_values_remain_canonical(): void

@@ -12,13 +12,18 @@
 <div class="nav-caption">
 {{ __('WORKSPACE') }}
 </div>
-<nav>
-<a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}"><span>◫</span>{{ __('Overview') }}</a>
-@foreach(['branches.index'=>[__('Branch operations'),'⇆'],'inventory.index'=>[__('Parcel storage'),'▦'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
-<div class="nav-caption">
-{{ __('ADMINISTRATION') }}
-</div>
-<a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index')?'active':'' }}"><span>⚙</span>{{ __('System settings') }}</a><a href="{{ route('settings.audit') }}"><span>◷</span>{{ __('Audit history') }}</a>@endcan
+<nav aria-label="{{ __('Main menu') }}">
+@foreach(['dashboard'=>[__('Home'),'◫'],'branches.index'=>[__('Daily work'),'⇆'],'inventory.index'=>[__('Parcel storage'),'▦'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)
+<a href="{{ route($route) }}" class="{{ request()->routeIs($route === 'dashboard' ? 'dashboard*' : explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
+@endforeach
+<details class="nav-more" @if(request()->routeIs('shipments.*','customers.*','dispatches.*','settings.*')) open @endif><summary>{{ __('More') }}</summary>
+@foreach(['shipments.index'=>[__('All parcel records'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Dispatch records'),'⇄']] as $route=>$item)
+<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
+@endforeach
+@can('admin')
+<a href="{{ route('settings.index') }}">{{ __('System settings') }}</a><a href="{{ route('settings.audit') }}">{{ __('Audit history') }}</a>
+@endcan
+</details>
 </nav>
 <div class="sidebar-bottom">
 <span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->branch?->code ?? session('dashboard_branch_code', __('All branches')) }}</small>

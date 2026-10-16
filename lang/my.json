@@ -612,5 +612,16 @@
   "Confirm receipt of the outstanding balance before collection.": "Customer ကို မထုတ်ပေးမီ ကျန်ငွေလက်ခံပြီးကြောင်း အတည်ပြုပါ။",
   "At origin storage": "အပ်နှံဆိုင်မှာရှိ",
   "With carrier": "သယ်ယူသူနဲ့ ပို့နေ",
-  "At destination storage": "လက်ခံဆိုင်မှာရှိ"
+  "At destination storage": "လက်ခံဆိုင်မှာရှိ",
+  "Home": "ပင်မ",
+  "Daily work": "နေ့စဉ်လုပ်ငန်း",
+  "Main menu": "အဓိက မီနူး",
+  "More": "အခြား",
+  "All parcel records": "ပါဆယ်မှတ်တမ်းအားလုံး",
+  "To send": "ပို့ရန်",
+  "To receive": "လက်ခံရန်",
+  "To hand to customer": "ထုတ်ပေးရန်",
+  "Today’s money": "ယနေ့ ငွေစာရင်း",
+  "Open bookkeeping": "ငွေစာရင်း ဖွင့်ရန်",
+  "Storage notes": "သိုလှောင်စာရင်း မှတ်ချက်"
 }
