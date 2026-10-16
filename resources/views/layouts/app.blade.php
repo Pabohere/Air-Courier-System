@@ -4,6 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
+<x-pwa-head />
 </head>
 <body>
 <aside class="sidebar">
@@ -26,6 +27,7 @@
 </details>
 </nav>
 <div class="sidebar-bottom">
+<div class="pwa-actions"><button type="button" class="button secondary small" data-pwa-install hidden>{{ __('Install app') }}</button></div>
 <span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->isAdmin() ? session('dashboard_branch_code', 'YGN') : auth()->user()->branch?->code }}</small>
 </div>
 </aside>
@@ -77,5 +79,6 @@
 </div>
 <dialog data-photo-viewer class="photo-viewer" aria-label="{{ __('Photo preview') }}"><div class="photo-viewer-toolbar"><button type="button" class="button secondary" data-photo-previous aria-label="{{ __('Previous photo') }}">←</button><span data-photo-position></span><button type="button" class="button secondary" data-photo-next aria-label="{{ __('Next photo') }}">→</button><button type="button" class="button secondary" data-photo-close>{{ __('Close preview') }} ×</button></div><img alt=""></dialog>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+<x-pwa-controls />
 </body>
 </html>

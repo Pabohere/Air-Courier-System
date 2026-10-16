@@ -4,6 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ __('Sign in · Standard') }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
+<x-pwa-head />
 </head>
 <body class="login-body">
 <div class="login-shell" data-login-side="shared">
@@ -51,7 +52,9 @@
 <button class="button">{{ __('Sign in') }} →</button>
 </form>
 <p class="subtle">{{ __('Need access? Contact your branch administrator.') }}</p>
+<div class="pwa-actions"><button type="button" class="button secondary small" data-pwa-install hidden>{{ __('Install app') }}</button></div>
 </section>
 </div>
+<x-pwa-controls />
 </body>
 </html>

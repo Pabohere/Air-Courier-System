@@ -450,6 +450,15 @@ pre { background: var(--tint); color: var(--ink); border: 1px solid var(--line);
 [data-table-search] tr[hidden] { display:none; }
 @media(max-width:1150px) { .workspace-search { max-width:none; } header .user { flex-wrap:wrap; } }
 @media(max-width:780px) { .workspace-search { flex-basis:100%; order:3; } .record-search { padding:16px; } }
+/* Install controls use the same clear surfaces as the workspace. */
+.pwa-actions { margin:0 0 16px; }
+.pwa-actions [hidden], [data-pwa-offline][hidden] { display:none !important; }
+.pwa-help { width:min(500px,calc(100vw - 32px)); max-height:85vh; overflow:auto; padding:28px; border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); }
+.pwa-help::backdrop { background:#18233480; }
+.pwa-help p { font-size:16px; }
+.pwa-offline { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); width:min(600px,calc(100vw - 32px)); z-index:20; margin:0; box-shadow:0 4px 18px #18233420; }
+@media(max-width:780px) { .sidebar-bottom:has(.pwa-actions) { display:block; margin-top:16px; border-top:0; padding:0; } .sidebar-bottom:has(.pwa-actions) > .live-dot, .sidebar-bottom:has(.pwa-actions) > small { display:none; } .sidebar-bottom:has(.pwa-actions) { font-size:0; } .sidebar-bottom .pwa-actions { margin:0; } .login-form .pwa-actions button { width:auto; } }
+@media print { .pwa-actions, .pwa-offline, .pwa-help { display:none !important; } }
 @media print { .workspace-search, .record-search { display:none !important; } }
 @media print {
     :root, html[data-theme="dark"] { color-scheme: light; --ink: #000; --muted: #444; --line: #ccc; }

@@ -689,5 +689,11 @@
   "Staff, email, destination or payment method": "ဝန်ထမ်း၊ အီးမေးလ်၊ ပို့ဆောင်မည့်နိုင်ငံ သို့မဟုတ် ငွေပေးနည်း",
   "Search displayed records": "ပြထားသော မှတ်တမ်းများ ရှာရန်",
   "No matching records.": "ကိုက်ညီသော မှတ်တမ်း မရှိပါ။",
-  "All staff permissions, plus refunds, company settings, destination rates, payment methods and user management.": "ဝန်ထမ်းလုပ်ဆောင်ချက်များအပြင် ငွေပြန်အမ်းခြင်း၊ ကုမ္ပဏီဆက်တင်၊ နှုန်းထား၊ ငွေပေးနည်းနှင့် အသုံးပြုသူ စီမံခြင်း။"
+  "All staff permissions, plus refunds, company settings, destination rates, payment methods and user management.": "ဝန်ထမ်းလုပ်ဆောင်ချက်များအပြင် ငွေပြန်အမ်းခြင်း၊ ကုမ္ပဏီဆက်တင်၊ နှုန်းထား၊ ငွေပေးနည်းနှင့် အသုံးပြုသူ စီမံခြင်း။",
+  "Install app": "App ထည့်သွင်းရန်",
+  "Install Standard Courier": "Standard Courier ထည့်သွင်းရန်",
+  "You are offline. Reconnect before saving bookings or payments.": "အင်တာနက် ပြတ်နေပါသည်။ Booking သို့မဟုတ် ငွေပေးချေမှု မသိမ်းမီ အင်တာနက် ပြန်ချိတ်ပါ။",
+  "Android or desktop: open the browser menu and choose Install app or Add to Home screen.": "Android သို့မဟုတ် ကွန်ပျူတာတွင် browser menu မှ Install app သို့မဟုတ် Add to Home screen ကို ရွေးပါ။",
+  "iPhone or iPad: open in Safari, tap Share, then Add to Home Screen.": "iPhone သို့မဟုတ် iPad တွင် Safari ဖြင့်ဖွင့်ပြီး Share မှ Add to Home Screen ကို ရွေးပါ။",
+  "The installed app uses the same account and requires an internet connection for parcel and payment records.": "ထည့်သွင်းထားသော app တွင် အကောင့်အတူတူ သုံးနိုင်ပြီး ပါဆယ်နှင့် ငွေစာရင်းများအတွက် အင်တာနက် လိုအပ်ပါသည်။"
 }

@@ -17,6 +17,8 @@ use App\Http\Controllers\ShipmentWorkflowController;
 use App\Http\Middleware\EnsureActiveUser;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/app.webmanifest', fn () => response()->file(public_path('manifest.webmanifest'), ['Content-Type' => 'application/manifest+json', 'Cache-Control' => 'public, max-age=3600']))->name('pwa.manifest');
+
 Route::post('/language', LanguageController::class)->name('language.update');
 
 Route::middleware('guest')->group(function () {
