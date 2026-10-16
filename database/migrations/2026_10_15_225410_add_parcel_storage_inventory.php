@@ -42,6 +42,9 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true) && ! Schema::hasIndex('shipments', ['current_branch_id'])) {
+            Schema::table('shipments', fn (Blueprint $table) => $table->index('current_branch_id'));
+        }
         Schema::dropIfExists('storage_movements');
         Schema::table('shipments', function (Blueprint $table): void {
             $table->dropIndex(['current_branch_id', 'in_storage']);

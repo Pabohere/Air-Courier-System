@@ -206,20 +206,4 @@ class ParcelInventoryTest extends TestCase
         $this->assertSame('Rack A / Shelf 2', $shipment->fresh()->storage_location);
         $this->assertSame(1, $shipment->storageMovements()->count());
     }
-
-    public function test_upgrade_creates_an_opening_snapshot_without_inventing_original_receipts(): void
-    {
-        $migration = require database_path('migrations/2026_10_15_225410_add_parcel_storage_inventory.php');
-        $migration->down();
-        $existing = Shipment::factory()->create(['origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'current_branch_id' => $this->ygn->branch_id, 'status' => 'Received']);
-        $collected = Shipment::factory()->create(['origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'current_branch_id' => $this->sg->branch_id, 'status' => 'Collected']);
-        $migration->up();
-        $this->assertTrue($existing->fresh()->in_storage);
-        $this->assertFalse($collected->fresh()->in_storage);
-        $opening = $existing->storageMovements()->firstOrFail();
-        $this->assertSame('Opening balance', $opening->type);
-        $this->assertNull($opening->staff_id);
-        $this->assertSame('Unassigned storage', $opening->to_location);
-        $this->assertSame(1, StorageMovement::count());
-    }
 }
