@@ -10,16 +10,19 @@
 <p class="subtle">{{ __('Booked by') }} {{ $shipment->creator->name }} · {{ $shipment->created_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }}</p>
 </div>
 <div class="actions">
-<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span><a class="button secondary" href="{{ route('shipments.receipt',$shipment) }}" target="_blank" rel="noopener">{{ __('Print receipt / label ↗') }}</a>
+<x-parcel-stage :shipment="$shipment" /><a class="button secondary" href="{{ route('shipments.receipt',$shipment) }}" target="_blank" rel="noopener">{{ __('Print receipt / label ↗') }}</a>
 </div>
 </div>
 
 @if($shipment->origin_branch_id)
+@include('shipments.workflow')
+<details class="workflow-details"><summary>{{ __('Route and flight details') }}</summary>
 <section class="card"><div class="card-body"><x-branch-route :record="$shipment" /><p class="subtle section-gap">{{ __('Current parcel location') }}: {{ $shipment->status === 'Collected' ? __('Collected by customer') : ($shipment->current_branch_id ? __($branches->firstWhere('id', $shipment->current_branch_id)->name) : __('In transit between branches')) }}</p>
 @if($shipment->dispatch?->flight_departure_at)<p>{{ __('Flight departure') }}: {{ $shipment->dispatch->flight }} · {{ $shipment->dispatch->flight_departure_at->timezone($shipment->originBranch->timezone)->format('d M Y H:i') }} ({{ $shipment->originBranch->timezone }})</p>@endif
 @if($shipment->arrived_at)<p class="subtle">{{ __('Arrived at Branch') }}: {{ $shipment->arrived_at->timezone($shipment->destinationBranch->timezone)->format('d M Y H:i') }} ({{ $shipment->destinationBranch->timezone }})</p>@endif
 @if($shipment->collected_at)<p>{{ __('Collected by') }}: <strong>{{ $shipment->collector_name }}</strong> · {{ $shipment->collected_at->timezone($shipment->destinationBranch->timezone)->format('d M Y H:i') }} · {{ $shipment->collection_reference }}</p>@endif
 <p class="help">{{ __('Manual shipment charge. Currency is fixed for this parcel; no automatic conversion.') }}</p></div></section>
+</details>
 @endif
 <div class="metrics">
 <div class="metric">
@@ -63,6 +66,7 @@
 {{ __('Cancelled shipment has retained payments. An administrator should review whether a refund is required.') }}
 </div>
 @endif
+<details class="workflow-details"><summary>{{ __('Details, payments and history') }}</summary>
 <div class="split">
 <div>
 <div class="card">
@@ -330,5 +334,6 @@ id)>{{ __($method->name) }}
 </div>
 </div>
 @if($shipment->origin_branch_id) @include('inventory.parcel') @endif
+</details>
 @include('shipments.photos')
 @endsection

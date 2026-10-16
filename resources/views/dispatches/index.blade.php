@@ -7,7 +7,7 @@
 <h1>
 {{ __('Warehouse & dispatch') }}
 </h1>
-<p class="subtle">{{ __('Prepare manifests, assign ready parcels and record partner handover.') }}</p>
+<p class="subtle">{{ __('Choose parcels, enter the carrier and flight, then send.') }}</p>
 </div>
 <a class="button secondary" href="{{ route('shipments.index',['status'=>'Received']) }}">{{ __('View warehouse parcels →') }}</a>
 </div>
@@ -16,7 +16,7 @@
 <h2>
 {{ __('Create a dispatch') }}
 </h2>
-<span class="badge">{{ $ready->count() }} {{ __('ready & unassigned') }}</span>
+<span class="badge">{{ $ready->count() }} {{ __('parcels available') }}</span>
 </div>
 <div class="card-body">
 <form method="post" action="{{ route('dispatches.store') }}">
@@ -24,29 +24,19 @@
 <div class="two-columns">
 <div class="field-grid">
 <label class="full">{{ __('Carrier name (person carrying the parcels)') }}<input name="carrier_name" value="{{ old('carrier_name') }}" maxlength="150" required><span class="help">{{ __('Enter the person’s name separately from the airline or courier company.') }}</span></label>
-<label class="full">
-{{ __('Airline / courier partner') }}<input name="partner" value="{{ old('partner') }}" maxlength="150" required>
-</label>
-<label>
-{{ __('Dispatch date') }}<input type="date" name="dispatch_date" value="{{ old('dispatch_date',today()->toDateString()) }}" required>
-</label>
-<label>
-{{ __('Flight details') }}<input name="flight" value="{{ old('flight') }}" maxlength="100">
-</label>
-<label class="full">{{ __('Flight departure (origin branch local time)') }}<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}"><span class="help">{{ __('YGN: Asia/Yangon · SG: Asia/Singapore. Flight number and time are required for branch transfers.') }}</span></label>
-<label class="full">
-{{ __('Notes') }}<textarea name="notes">{{ old('notes') }}</textarea>
-</label>
+<label>{{ __('Flight details') }}<input name="flight" value="{{ old('flight') }}" maxlength="100" required></label>
+<label>{{ __('Flight departure (origin branch local time)') }}<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}" required></label>
+<details class="full"><summary>{{ __('Optional details') }}</summary><label>{{ __('Airline / courier partner') }}<input name="partner" value="{{ old('partner') }}" maxlength="150"></label><label>{{ __('Notes') }}<textarea name="notes" maxlength="2000">{{ old('notes') }}</textarea></label></details>
 </div>
 <div>
 <h3>
 {{ __('Select shipments') }}
 </h3>
-<p class="help">{{ __('Only parcels marked Ready for Dispatch can be assigned.') }}</p>
+<p class="help">{{ __('Select parcels still in storage. Preparation steps are handled automatically.') }}</p>
 <div class="checklist">
 @forelse($ready as $shipment)
 <label>
-<input type="checkbox" name="shipments[]" value="{{ $shipment->id }}" @checked(in_array($shipment->id,old('shipments',[])))><span class="mono">{{ $shipment->tracking_number }}</span><span><x-branch-route :record="$shipment" /> · {{ $shipment->destination_country }} · {{ $shipment->actual_weight }} {{ $shipment->weight_unit }}</span>
+<input type="checkbox" name="shipments[]" value="{{ $shipment->id }}" @checked(in_array($shipment->id,old('shipments',request('shipment') ? [request('shipment')] : [])))><span class="mono">{{ $shipment->tracking_number }}</span><span><x-branch-route :record="$shipment" /> · {{ $shipment->destination_country }} · {{ $shipment->actual_weight }} {{ $shipment->weight_unit }}</span>
 </label>
 @empty
 <div class="empty">
@@ -57,7 +47,8 @@
 </div>
 </div>
 <div class="form-actions">
-<button class="button" @disabled($ready->isEmpty())>{{ __('Create draft dispatch →') }}</button>
+<button class="button" name="quick_action" value="send" @disabled($ready->isEmpty())>{{ __('Hand over and send') }}</button><button class="button secondary" name="quick_action" value="draft" @disabled($ready->isEmpty())>{{ __('Save for later') }}</button>
+<p class="help">{{ __('Send only after physically handing parcels to the carrier. For future flights, save for later.') }}</p>
 </div>
 </form>
 </div>

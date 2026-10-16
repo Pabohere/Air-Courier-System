@@ -34,7 +34,7 @@
 {{ $shipment->destination_country }}<small><x-branch-route :record="$shipment" /></small><small>{{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}</small>
 </td>
 <td>
-<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>
+<x-parcel-stage :shipment="$shipment" />
 </td>
 <td class="right">
 <strong>{{ $shipment->price }} {{ $shipment->currency }}</strong><small>{{ \App\Services\Money::decimal($shipment->balanceCents()) }} {{ __('outstanding') }}</small>

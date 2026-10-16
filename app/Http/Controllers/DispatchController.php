@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dispatch;
 use App\Models\Shipment;
 use App\Services\CourierService;
+use App\Services\SimpleWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,15 +20,20 @@ class DispatchController extends Controller
             ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('carrier_name', 'like', '%'.$search.'%')->orWhere('reference', 'like', '%'.$search.'%')->orWhere('flight', 'like', '%'.$search.'%')->orWhere('partner', 'like', '%'.$search.'%')->orWhereHas('shipments', fn ($parcels) => $parcels->where('tracking_number', 'like', '%'.$search.'%'))))
             ->latest('id')->paginate(20)->withQueryString();
 
-        return view('dispatches.index', ['dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->where('status', 'Ready for Dispatch')->when(! $request->user()->isAdmin(), fn ($q) => $q->where('origin_branch_id', $request->user()->branch_id ?? 0))->whereNull('dispatch_id')->get()]);
+        return view('dispatches.index', ['dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch'])->where('in_storage', true)->whereColumn('current_branch_id', 'origin_branch_id')->when(! $request->user()->isAdmin(), fn ($q) => $q->where('origin_branch_id', $request->user()->branch_id ?? 0))->whereNull('dispatch_id')->get()]);
     }
 
     public function store(Request $request, CourierService $service): RedirectResponse
     {
-        $data = $request->validate(['carrier_name' => 'required|string|max:150', 'partner' => 'required|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
-        $dispatch = $service->createDispatch($data, $request->user());
+        $quick = $request->has('quick_action');
+        if ($quick) {
+            $request->merge(['dispatch_date' => substr((string) $request->input('flight_departure_at'), 0, 10)]);
+        }
+        $data = $request->validate(['quick_action' => 'nullable|in:send,draft', 'carrier_name' => 'required|string|max:150', 'partner' => ($quick ? 'nullable' : 'required').'|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
+        $data['partner'] = $data['partner'] ?? '';
+        $dispatch = $quick ? app(SimpleWorkflowService::class)->dispatch($data, $request->user(), $data['quick_action'] === 'send') : $service->createDispatch($data, $request->user());
 
-        return redirect()->route('dispatches.show', $dispatch)->with('success', __('Draft dispatch created.'));
+        return redirect()->route('dispatches.show', $dispatch)->with('success', $dispatch->handed_over_at ? __('Handover recorded. All parcels marked Dispatched.') : __('Draft dispatch created.'));
     }
 
     public function show(Dispatch $dispatch): View

@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ShipmentPhotoController;
+use App\Http\Controllers\ShipmentWorkflowController;
 use App\Http\Middleware\EnsureActiveUser;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,8 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('/shipments/{shipment}/photos', [ShipmentPhotoController::class, 'store'])->name('shipments.photos.store');
     Route::get('/shipments/{shipment}/photos/{photo}', [ShipmentPhotoController::class, 'show'])->whereUuid('photo')->name('shipments.photos.show');
+    Route::post('/shipments/{shipment}/receive', [ShipmentWorkflowController::class, 'receive'])->name('shipments.receive');
+    Route::post('/shipments/{shipment}/collect', [ShipmentWorkflowController::class, 'collect'])->name('shipments.collect');
     Route::post('/shipments/{shipment}/status', [ShipmentController::class, 'status'])->name('shipments.status');
     Route::get('/shipments/{shipment}/receipt', [ShipmentController::class, 'receipt'])->name('shipments.receipt');
     Route::post('/shipments/{shipment}/payments', [PaymentController::class, 'store'])->name('payments.store');

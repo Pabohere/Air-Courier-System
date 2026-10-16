@@ -234,7 +234,7 @@ class BranchWorkflowTest extends TestCase
     {
         $this->actingAs($this->ygn)->get(route('branches.index'))->assertOk()->assertSee('Yangon branch');
         $this->get(route('branches.index', ['branch_id' => $this->sg->branch_id]))->assertForbidden();
-        $this->withSession(['locale' => 'my'])->get(route('branches.index'))->assertOk()->assertSee('ရန်ကုန်ဆိုင်ခွဲ')->assertSee('လာထုတ်ရန် အဆင်သင့်');
+        $this->withSession(['locale' => 'my'])->get(route('branches.index'))->assertOk()->assertSee('ရန်ကုန်ဆိုင်ခွဲ')->assertSee('Customer ထုတ်ယူ');
         $this->actingAs(User::factory()->admin()->create())->get(route('branches.index', ['branch_id' => $this->sg->branch_id]))->assertOk()->assertSee('စင်ကာပူဆိုင်ခွဲ');
     }
 

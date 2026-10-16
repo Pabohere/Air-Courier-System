@@ -1001,3 +1001,11 @@ html[lang="my"] .intro-banner p { font-size:13px; }
 .parcel-photo-grid img { display: block; width: 100%; height: 160px; object-fit: contain; border-radius: 12px; background: var(--line); }
 .parcel-photo-grid span { display: block; margin-top: 8px; }
 input[type="file"] { max-width: 100%; }
+
+.simple-flow { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 24px; }
+.simple-flow span { padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; font-weight: 600; }
+.simple-flow .current { background: #1d5dab; color: #fff; border-color: #1d5dab; }
+.workflow-details { margin: 20px 0; }
+.workflow-details > summary { padding: 16px; font-weight: 650; cursor: pointer; }
+.workflow-check { display: flex; align-items: center; gap: 10px; }
+.workflow-check input { width: auto; }
