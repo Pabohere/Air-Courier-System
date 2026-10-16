@@ -1,10 +1,9 @@
 @php
     $originUser = auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->origin_branch_id;
     $destinationUser = auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->destination_branch_id;
-    $flowPhase = match ($shipment->status) { 'Collected' => 4, 'Arrived at Branch', 'Ready for Collection' => 3, 'Dispatched', 'In Transit' => 2, default => 1 };
 @endphp
 <section class="card"><div class="card-head"><h2>{{ __('Parcel workflow') }}</h2><x-branch-route :record="$shipment" /></div><div class="card-body">
-<div class="simple-flow">@foreach(['Accept parcel', 'Send with carrier', 'Receive at branch', 'Customer collection'] as $step)<span class="{{ $loop->iteration === $flowPhase ? 'current' : '' }}">{{ $loop->iteration }} · {{ __($step) }}</span>@endforeach</div>
+<x-parcel-progress :shipment="$shipment" />
 @if($originUser && in_array($shipment->status, ['Received', 'Processing', 'Ready for Dispatch']) && $shipment->in_storage)
 @if($shipment->dispatch_id)
 <a class="button" href="{{ route('dispatches.show', $shipment->dispatch) }}">{{ __('Open dispatch and send') }} →</a>

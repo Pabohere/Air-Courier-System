@@ -675,5 +675,11 @@
   "Previous photo": "ရှေ့ဓာတ်ပုံ",
   "Next photo": "နောက်ဓာတ်ပုံ",
   "Close preview": "ပိတ်ရန်",
-  "This draft changed in another window. Reload before saving to keep the latest details.": "ဤမူကြမ်းကို အခြားနေရာမှ ပြင်ထားပါသည်။ နောက်ဆုံးအချက်အလက် မပျောက်စေရန် ပြန်ဖွင့်ပြီးမှ သိမ်းပါ။"
+  "This draft changed in another window. Reload before saving to keep the latest details.": "ဤမူကြမ်းကို အခြားနေရာမှ ပြင်ထားပါသည်။ နောက်ဆုံးအချက်အလက် မပျောက်စေရန် ပြန်ဖွင့်ပြီးမှ သိမ်းပါ။",
+  "Parcel journey": "ပါဆယ်ပို့ဆောင်မှု အဆင့်များ",
+  "In transit": "ပို့ဆောင်ဆဲ",
+  "Current step": "လက်ရှိအဆင့်",
+  "Pending": "မရောက်သေး",
+  "Choose branch on Home": "ပင်မတွင် ဆိုင်ခွဲရွေးရန်",
+  "Admin can choose YGN or SG on Home after signing in.": "Admin သည် အကောင့်ဝင်ပြီး ပင်မတွင် YGN / SG ရွေးနိုင်ပါသည်။"
 }

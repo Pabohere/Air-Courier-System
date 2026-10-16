@@ -22,17 +22,24 @@ class BranchDashboardTest extends TestCase
         $this->travelTo(Carbon::parse('2026-10-15 12:00:00', 'Asia/Yangon'));
     }
 
-    public function test_admin_has_two_dashboard_pages_with_distinct_currency_and_branch_context(): void
+    public function test_admin_selects_either_branch_on_one_home_with_distinct_currency_and_context(): void
     {
         $this->actingAs(User::factory()->admin()->create());
         foreach (['ygn' => 'MMK', 'sg' => 'SGD'] as $side => $currency) {
             $branch = Branch::where('code', strtoupper($side))->firstOrFail();
-            $this->get(route('dashboard.branch', ['side' => $side]))->assertOk()
+            $this->get(route('dashboard', ['branch_id' => $branch->id]))->assertOk()
                 ->assertViewHas('branchId', $branch->id)->assertViewHas('currency', $currency)
-                ->assertSee(strtoupper($side).' dashboard')->assertSee($branch->timezone)
-                ->assertSee(route('reports.index', ['branch_id' => $branch->id, 'currency' => $currency]));
+                ->assertSee('Home')->assertSee($branch->timezone)->assertSessionHas('dashboard_branch_code', $branch->code)->assertSee('name="branch_id" value="'.$branch->id.'"', false)
+                ->assertSee(route('reports.index', ['branch_id' => $branch->id, 'currency' => $currency]))
+                ->assertSee('home-branch-picker', false)
+                ->assertSee('href="'.route('dashboard', ['branch_id' => Branch::where('code', 'YGN')->value('id')]).'"', false)
+                ->assertSee('href="'.route('dashboard', ['branch_id' => Branch::where('code', 'SG')->value('id')]).'"', false)
+                ->assertDontSee('href="'.route('dashboard.branch', ['side' => 'ygn']).'"', false)
+                ->assertDontSee('href="'.route('dashboard.branch', ['side' => 'sg']).'"', false);
+            $this->get(route('dashboard'))->assertOk()
+                ->assertViewHas('branchId', $branch->id)->assertViewHas('currency', $currency);
         }
-        $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === 'YGN');
+        $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === 'SG');
     }
 
     public function test_staff_can_only_open_their_own_side_even_with_forged_query_parameters(): void
@@ -111,7 +118,7 @@ class BranchDashboardTest extends TestCase
         $sg = Branch::where('code', 'SG')->firstOrFail();
         Shipment::factory()->create(['origin_branch_id' => $sg->id, 'destination_branch_id' => Branch::where('code', 'YGN')->value('id'), 'currency' => 'SGD', 'shipment_date' => '2026-10-16', 'price' => '23.00']);
         $this->actingAs(User::factory()->admin()->create())->withSession(['locale' => 'my'])
-            ->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()->assertSee('SG ဒက်ရှ်ဘုတ်')
+            ->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()->assertSee('ပင်မ')
             ->assertViewHas('report', fn ($report) => $report['charges'] === 2300);
     }
 

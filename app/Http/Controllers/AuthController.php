@@ -13,10 +13,9 @@ class AuthController extends Controller
 {
     public function create(Request $request): View
     {
-        $data = $request->validate(['side' => 'nullable|in:ygn,sg']);
-        $side = $data['side'] ?? $request->old('side');
+        $request->validate(['side' => 'nullable|in:ygn,sg']);
 
-        return view('auth.login', ['loginBranch' => $side ? Branch::where('code', strtoupper($side))->firstOrFail() : null]);
+        return view('auth.login');
     }
 
     public function store(Request $request): RedirectResponse
@@ -27,6 +26,7 @@ class AuthController extends Controller
             return back()->withErrors(['email' => $branch ? __('Check your email, password and selected branch.') : __('The email or password is incorrect.')])->withInput($request->only('email', 'side'));
         }
         $request->session()->regenerate();
+        $request->session()->put('dashboard_branch_code', ($branch ?? Auth::user()->branch)?->code ?? 'YGN');
 
         if ($branch) {
             $request->session()->put('dashboard_branch_code', $branch->code);

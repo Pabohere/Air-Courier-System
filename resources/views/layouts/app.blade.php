@@ -26,7 +26,7 @@
 </details>
 </nav>
 <div class="sidebar-bottom">
-<span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->branch?->code ?? session('dashboard_branch_code', __('All branches')) }}</small>
+<span class="live-dot"></span> {{ __('YGN ↔ SG shared workspace') }}<small>{{ auth()->user()->isAdmin() ? session('dashboard_branch_code', 'YGN') : auth()->user()->branch?->code }}</small>
 </div>
 </aside>
 <div class="workspace">
@@ -39,7 +39,7 @@
 <x-language-switch />
 <span class="avatar">{{ mb_substr(auth()->user()->name,0,1) }}</span>
 <div>
-{{ auth()->user()->name }}<small>{{ __(ucfirst(auth()->user()->role)) }} · {{ auth()->user()->branch?->code ?? session('dashboard_branch_code', __('All branches')) }}</small>
+{{ auth()->user()->name }}<small>{{ __(ucfirst(auth()->user()->role)) }} · {{ auth()->user()->isAdmin() ? session('dashboard_branch_code', 'YGN') : auth()->user()->branch?->code }}</small>
 </div>
 <form method="post" action="{{ route('logout') }}">
 @csrf<button class="text-button" aria-label="{{ __('Log out') }}">{{ __('Log out') }}</button>

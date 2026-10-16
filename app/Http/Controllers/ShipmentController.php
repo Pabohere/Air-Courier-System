@@ -21,7 +21,7 @@ class ShipmentController extends Controller
     {
         $request->validate(['q' => 'nullable|string|max:100', 'status' => ['nullable', Rule::in(array_keys(CourierService::TRANSITIONS))], 'branch_id' => 'nullable|integer|exists:branches,id', 'direction' => 'nullable|in:outgoing,incoming']);
         $q = $request->string('q')->toString();
-        $shipments = Shipment::with(['customer', 'payments', 'originBranch', 'destinationBranch'])->visibleTo($request->user())->when($request->branch_id, fn ($s) => $s->where($request->direction === 'incoming' ? 'destination_branch_id' : 'origin_branch_id', $request->integer('branch_id')))->when($q, fn ($s) => $s->where(fn ($w) => $w->where('tracking_number', 'like', "%$q%")->orWhere('recipient_name', 'like', "%$q%")->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%$q%"))))->when($request->status, fn ($s) => $s->where('status', $request->status))->latest('id')->paginate(20)->withQueryString();
+        $shipments = Shipment::with(['customer', 'payments', 'originBranch', 'destinationBranch', 'dispatch'])->visibleTo($request->user())->when($request->branch_id, fn ($s) => $s->where($request->direction === 'incoming' ? 'destination_branch_id' : 'origin_branch_id', $request->integer('branch_id')))->when($q, fn ($s) => $s->where(fn ($w) => $w->where('tracking_number', 'like', "%$q%")->orWhere('recipient_name', 'like', "%$q%")->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%$q%"))))->when($request->status, fn ($s) => $s->where('status', $request->status))->latest('id')->paginate(20)->withQueryString();
 
         return view('shipments.index', ['shipments' => $shipments, 'statuses' => array_keys(CourierService::TRANSITIONS)]);
     }

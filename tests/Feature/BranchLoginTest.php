@@ -18,15 +18,14 @@ class BranchLoginTest extends TestCase
         $this->seed(DatabaseSeeder::class);
     }
 
-    public function test_guest_selects_a_clearly_labelled_branch_before_entering_credentials(): void
+    public function test_shared_login_shows_credentials_and_moves_branch_selection_to_home(): void
     {
-        $this->get(route('login'))->assertOk()->assertSee('Choose your branch')->assertSee('Yangon branch')->assertSee('Singapore branch')->assertDontSee('name="password"', false);
-        foreach (['ygn', 'sg'] as $side) {
-            $this->get(route('login', ['side' => $side]))->assertOk()
-                ->assertSee('Sign in to '.strtoupper($side).' dashboard')
-                ->assertSee('name="side" value="'.$side.'"', false)->assertSee('name="password"', false);
+        foreach ([null, 'ygn', 'sg'] as $side) {
+            $this->get(route('login', array_filter(['side' => $side])))->assertOk()
+                ->assertSee('name="email"', false)->assertSee('name="password"', false)
+                ->assertSee('Admin can choose YGN or SG on Home after signing in.')
+                ->assertDontSee('login-branch-choices')->assertDontSee('name="side"', false);
         }
-        $this->withSession(['locale' => 'my'])->get(route('login', ['side' => 'sg']))->assertOk()->assertSee('SG ဒက်ရှ်ဘုတ်သို့ ဝင်ရောက်ရန်');
     }
 
     public function test_staff_login_enters_the_selected_assigned_dashboard_despite_a_stale_intended_url(): void
@@ -77,12 +76,11 @@ class BranchLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_branch_can_be_changed_after_a_failed_login(): void
+    public function test_failed_login_preserves_email_in_the_shared_form(): void
     {
         $this->withSession(['_old_input' => ['side' => 'sg', 'email' => 'sample@example.test']])
-            ->get(route('login', ['side' => 'ygn']))->assertOk()
-            ->assertViewHas('loginBranch', fn ($branch) => $branch->code === 'YGN')
-            ->assertSee('name="side" value="ygn"', false);
+            ->get(route('login'))->assertOk()->assertSee('sample@example.test')
+            ->assertDontSee('name="side"', false);
     }
 
     public function test_two_admin_workspaces_keep_independent_branch_context_on_the_same_dashboard_link(): void
