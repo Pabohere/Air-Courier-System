@@ -70,6 +70,6 @@
 {{ $company?->name }} {{ __('· Courier operations') }} <span>{{ __('Accurate records. Every parcel.') }}</span>
 </footer>
 </div>
-<script src="{{ asset('js/app.js') }}" defer></script>
+<script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </body>
 </html>

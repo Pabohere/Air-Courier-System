@@ -45,6 +45,18 @@ class ShipmentPhotoTest extends TestCase
         return array_map(fn (int $i): UploadedFile => UploadedFile::fake()->image('parcel-'.$i.'.jpg', 100 + $i, 100), range(1 + $offset, $count + $offset));
     }
 
+    public function test_booking_photos_are_optional_and_accept_zero_one_or_two_images(): void
+    {
+        $this->actingAs($this->ygn)->get(route('shipments.create'))->assertOk()->assertSee('Parcel photos (optional)')->assertSee('Photos are optional.');
+        foreach ([0, 1, 2] as $count) {
+            $data = $this->booking();
+            $files = $count === 0 ? [] : ['photos' => $this->photos($count)];
+            $this->post(route('shipments.store'), $data + $files)->assertSessionHasNoErrors()->assertRedirect();
+            $parcel = Shipment::where('booking_key', $data['booking_key'])->firstOrFail();
+            $this->assertCount($count, $parcel->photos ?? []);
+        }
+    }
+
     public function test_booking_with_five_photos_saves_private_gallery_and_replayed_uploads_do_not_duplicate_files(): void
     {
         $data = $this->booking();

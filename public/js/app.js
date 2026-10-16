@@ -57,19 +57,29 @@ if (originBranch && destinationBranch) {
 
 
 document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
-    const preview = input.closest('form').querySelector('[data-photo-preview]');
+    const form = input.closest('form');
+    const preview = form.querySelector('[data-photo-preview]');
+    const feedback = form.querySelector('[data-photo-validation]');
+    const clearWrap = form.querySelector('[data-photo-clear-wrap]');
     let urls = [];
-    input.addEventListener('change', () => {
+    const update = () => {
         urls.forEach((url) => URL.revokeObjectURL(url));
         urls = [];
         preview.replaceChildren();
         const files = Array.from(input.files);
-        const invalid = files.length > Number(input.dataset.maxPhotos) || files.some((file) => file.size > 1024 * 1024 || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type));
-        input.setCustomValidity(invalid ? input.dataset.photoError : '');
-        if (invalid) {
-            input.reportValidity();
-            return;
+        let message = '';
+        if (files.length > Number(input.dataset.maxPhotos)) {
+            message = input.dataset.photoCountError;
+        } else if (files.some((file) => file.size > 1024 * 1024)) {
+            message = input.dataset.photoSizeError;
+        } else if (files.some((file) => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type))) {
+            message = input.dataset.photoTypeError;
         }
+        input.setCustomValidity(message);
+        feedback.textContent = message;
+        feedback.classList.toggle('hide', !message);
+        clearWrap.classList.toggle('hide', files.length === 0);
+        if (message) return;
         files.forEach((file) => {
             const img = document.createElement('img');
             const url = URL.createObjectURL(file);
@@ -78,9 +88,13 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
             img.alt = file.name;
             preview.append(img);
         });
+    };
+    input.addEventListener('change', update);
+    form.querySelector('[data-photo-clear]').addEventListener('click', () => {
+        input.value = '';
+        update();
     });
 });
-
 
 document.querySelectorAll('[data-payment-details]').forEach((section) => {
     const method = section.querySelector('[data-payment-method]');

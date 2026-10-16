@@ -638,5 +638,11 @@
   "Change is available only for Cash payments.": "Cash ပေးချေမှုအတွက်သာ အကြွေပြန်အမ်းနိုင်ပါသည်။",
   "Cash received must cover the payment amount.": "ပေးလာသောငွေသည် ပေးချေမည့်ငွေထက် မနည်းရပါ။",
   "Bank name (remark)": "Bank name (မှတ်ချက်)",
-  "Pay name (remark)": "Pay name (မှတ်ချက်)"
+  "Pay name (remark)": "Pay name (မှတ်ချက်)",
+  "Parcel photos (optional)": "ပါဆယ်ဓာတ်ပုံများ (မတင်လည်းရသည်)",
+  "Photos are optional. Select 0 to :count photos, up to 1 MB each (JPG, PNG or WebP).": "ဓာတ်ပုံ မတင်လည်း ရပါသည်။ ၀ ပုံမှ :count ပုံအထိ ရွေးနိုင်ပြီး တစ်ပုံလျှင် 1 MB အထိ (JPG၊ PNG၊ WebP)။",
+  "Select at most :count photos.": "အများဆုံး ဓာတ်ပုံ :count ပုံသာ ရွေးနိုင်ပါသည်။",
+  "Each photo must be 1 MB or smaller.": "ဓာတ်ပုံတစ်ပုံချင်းစီသည် 1 MB ထက် မကြီးရပါ။",
+  "Choose JPG, PNG or WebP images only.": "JPG၊ PNG သို့မဟုတ် WebP ဓာတ်ပုံများသာ ရွေးပါ။",
+  "Remove selected photos": "ရွေးထားသောပုံများ ဖယ်ရန်"
 }
