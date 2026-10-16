@@ -1,20 +1,20 @@
-@extends('layouts.app') @section('title',__('Warehouse & dispatch')) @section('content')
+@extends('layouts.app') @section('title',__('Carrier trips')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
 {{ __('THE NEXT LEG OF THE JOURNEY') }}
 </div>
 <h1>
-{{ __('Warehouse & dispatch') }}
+{{ __('Carrier trips') }}
 </h1>
 <p class="subtle">{{ __('Choose parcels, enter the carrier and flight, then send.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('shipments.index',['status'=>'Received']) }}">{{ __('View warehouse parcels →') }}</a>
+<a class="button secondary" href="{{ route('inventory.index') }}">{{ __('Parcel storage') }} →</a>
 </div>
 <div class="card">
 <div class="card-head">
 <h2>
-{{ __('Create a dispatch') }}
+{{ __('Assign carrier and parcels') }}
 </h2>
 <span class="badge">{{ $ready->count() }} {{ __('parcels available') }}</span>
 </div>
@@ -77,7 +77,7 @@
 {{ __('Parcels') }}
 </th>
 <th>
-{{ __('Handover') }}
+{{ __('Arrival at branch') }}
 </th>
 <th>
 </th>
@@ -93,13 +93,18 @@
 <strong>{{ $dispatch->carrier_name ?: __('Carrier not recorded') }}</strong><small>{{ $dispatch->partner }}</small><small><x-branch-route :record="$dispatch" /></small>
 </td>
 <td>
-{{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}<small>{{ $dispatch->flight }}</small>
+<strong>{{ $dispatch->flight ?: '—' }}</strong><small>{{ $dispatch->flight_departure_at?->timezone($dispatch->originBranch?->timezone ?? config('app.timezone'))->format('d M Y H:i') ?? $dispatch->dispatch_date->format('d M Y') }}</small><small>{{ $dispatch->originBranch?->timezone }}</small>
 </td>
 <td>
 {{ $dispatch->shipments_count }}
 </td>
 <td>
-<span class="badge">{{ $dispatch->handed_over_at?__('Handed over'):__('Draft') }}</span>
+@if($dispatch->shipments_count > 0 && $dispatch->arrived_count === $dispatch->shipments_count)
+<span class="badge">{{ __('Arrived at :branch branch', ['branch' => $dispatch->destinationBranch?->code]) }}</span>
+@else
+<span class="badge">{{ $dispatch->handed_over_at ? __('With carrier') : __('Planned trip') }}</span>
+<small>{{ __(':arrived / :total parcels arrived at :branch', ['arrived' => $dispatch->arrived_count, 'total' => $dispatch->shipments_count, 'branch' => $dispatch->destinationBranch?->code]) }}</small>
+@endif
 </td>
 <td>
 <a href="{{ route('dispatches.show',$dispatch) }}">{{ __('View →') }}</a>

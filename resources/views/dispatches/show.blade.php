@@ -1,8 +1,8 @@
-@extends('layouts.app') @section('title',__('Dispatch details')) @section('content')
+@extends('layouts.app') @section('title',__('Carrier trip details')) @section('content')
 <div class="page-heading">
 <div>
 <div class="eyebrow">
-{{ __('DISPATCH RECORD') }}
+{{ __('Carrier trips') }}
 </div>
 <h1>
 {{ $dispatch->reference }}
@@ -55,8 +55,9 @@
 <h2>
 {{ __('Assigned parcels') }}
 </h2>
-<span class="subtle">{{ $dispatch->shipments->count() }} {{ __('shipments') }}</span>
+<span class="subtle">{{ __(':arrived / :total parcels arrived at :branch', ['arrived' => $dispatch->arrived_count, 'total' => $dispatch->shipments->count(), 'branch' => $dispatch->destinationBranch?->code]) }}</span>
 </div>
+<p class="help">{{ __('Confirm arrival only after physically receiving the parcel at your branch.') }}</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -81,18 +82,24 @@
 @forelse($dispatch->shipments as $shipment)
 <tr>
 <td>
-<a class="mono" href="{{ route('shipments.show',$shipment) }}">{{ $shipment->tracking_number }}</a>
+<a class="mono" href="{{ route('shipments.show',$shipment) }}">{{ $shipment->tracking_number }}</a><small>{{ $shipment->sender['name'] }} → {{ $shipment->recipient_name }}</small><small class="wrap">{{ \Illuminate\Support\Str::limit($shipment->description, 80) }}</small>
 </td>
 <td>
-{{ $shipment->destination_country }}
+{{ $shipment->destinationBranch?->code ?? $shipment->destination_country }}
+@if($shipment->arrived_at)<small>{{ __('Arrived at branch') }} · {{ $shipment->arrived_at->timezone($shipment->destinationBranch?->timezone ?? config('app.timezone'))->format('d M Y H:i') }}</small>@endif
 </td>
 <td>
 {{ $shipment->actual_weight }} {{ $shipment->weight_unit }} · {{ $shipment->quantity }} {{ __('pcs') }}
 </td>
 <td>
-<span class="badge" data-status="{{ $shipment->status }}">{{ __($shipment->status) }}</span>
+<x-parcel-stage :shipment="$shipment" />
 </td>
 <td>
+@if($dispatch->handed_over_at && $shipment->destination_branch_id && in_array($shipment->status, ['Dispatched', 'In Transit']) && (auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->destination_branch_id))
+<form method="post" action="{{ route('shipments.receive', $shipment) }}">@csrf<input type="hidden" name="storage_location" value="Receiving area"><button class="button small">{{ __('Receive at :branch branch', ['branch' => $shipment->destinationBranch?->code]) }}</button></form>
+@elseif($shipment->arrived_at)
+<span class="badge">{{ __('Arrived at :branch branch', ['branch' => $shipment->destinationBranch?->code]) }}</span>
+@endif
 @if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $dispatch->origin_branch_id))
 <form method="post" action="{{ route('dispatches.unassign',[$dispatch,$shipment]) }}">
 @csrf @method('DELETE')<button class="button small secondary">{{ __('Remove from draft') }}</button>

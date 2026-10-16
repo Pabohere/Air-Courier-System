@@ -13,11 +13,11 @@
 {{ __('WORKSPACE') }}
 </div>
 <nav aria-label="{{ __('Main menu') }}">
-@foreach(['dashboard'=>[__('Home'),'◫'],'branches.index'=>[__('Daily work'),'⇆'],'inventory.index'=>[__('Parcel storage'),'▦'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)
+@foreach(['dashboard'=>[__('Home'),'◫'],'inventory.index'=>[__('Parcel storage'),'▦'],'dispatches.index'=>[__('Carrier trips'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)
 <a href="{{ route($route) }}" class="{{ request()->routeIs($route === 'dashboard' ? 'dashboard*' : explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
 @endforeach
-<details class="nav-more" @if(request()->routeIs('shipments.*','customers.*','dispatches.*','settings.*')) open @endif><summary>{{ __('More') }}</summary>
-@foreach(['shipments.index'=>[__('All parcel records'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Dispatch records'),'⇄']] as $route=>$item)
+<details class="nav-more" @if(request()->routeIs('shipments.*','customers.*','branches.*','settings.*')) open @endif><summary>{{ __('More') }}</summary>
+@foreach(['shipments.index'=>[__('All parcel records'),'▣'],'customers.index'=>[__('Customers'),'♧'],'branches.index'=>[__('Daily work'),'⇆']] as $route=>$item)
 <a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
 @endforeach
 @can('admin')

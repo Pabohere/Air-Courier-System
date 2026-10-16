@@ -16,7 +16,7 @@ class DispatchController extends Controller
     {
         $request->validate(['q' => 'nullable|string|max:150']);
         $search = $request->string('q')->toString();
-        $dispatches = Dispatch::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->withCount('shipments')
+        $dispatches = Dispatch::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->withCount(['shipments', 'shipments as arrived_count' => fn ($query) => $query->whereNotNull('arrived_at')])
             ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('carrier_name', 'like', '%'.$search.'%')->orWhere('reference', 'like', '%'.$search.'%')->orWhere('flight', 'like', '%'.$search.'%')->orWhere('partner', 'like', '%'.$search.'%')->orWhereHas('shipments', fn ($parcels) => $parcels->where('tracking_number', 'like', '%'.$search.'%'))))
             ->latest('id')->paginate(20)->withQueryString();
 
@@ -39,7 +39,8 @@ class DispatchController extends Controller
     public function show(Dispatch $dispatch): View
     {
         abort_unless(Dispatch::visibleTo(auth()->user())->whereKey($dispatch->id)->exists(), 403);
-        $dispatch->load(['shipments', 'handoverStaff', 'originBranch', 'destinationBranch']);
+        $dispatch->load(['shipments.originBranch', 'shipments.destinationBranch', 'handoverStaff', 'originBranch', 'destinationBranch']);
+        $dispatch->loadCount(['shipments as arrived_count' => fn ($query) => $query->whereNotNull('arrived_at')]);
 
         return view('dispatches.show', compact('dispatch'));
     }

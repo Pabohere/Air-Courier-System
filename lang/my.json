@@ -644,5 +644,15 @@
   "Select at most :count photos.": "အများဆုံး ဓာတ်ပုံ :count ပုံသာ ရွေးနိုင်ပါသည်။",
   "Each photo must be 1 MB or smaller.": "ဓာတ်ပုံတစ်ပုံချင်းစီသည် 1 MB ထက် မကြီးရပါ။",
   "Choose JPG, PNG or WebP images only.": "JPG၊ PNG သို့မဟုတ် WebP ဓာတ်ပုံများသာ ရွေးပါ။",
-  "Remove selected photos": "ရွေးထားသောပုံများ ဖယ်ရန်"
+  "Remove selected photos": "ရွေးထားသောပုံများ ဖယ်ရန်",
+  "Carrier trips": "သယ်ယူသူ / ခရီးစဉ်",
+  "Carrier trip details": "သယ်ယူသူနှင့် ခရီးစဉ်အသေးစိတ်",
+  "Assign carrier and parcels": "သယ်ယူသူနှင့် သယ်မည့်ပါဆယ် ရွေးရန်",
+  "Arrival at branch": "ဆိုင်ခွဲရောက်ရှိမှု",
+  "Planned trip": "ပို့ရန် စီစဉ်ထား",
+  "Arrived at :branch branch": ":branch ဆိုင်ခွဲ ရောက်ပြီး",
+  "Receive at :branch branch": ":branch ဆိုင်ခွဲ လက်ခံရရှိပြီ",
+  ":arrived / :total parcels arrived at :branch": ":branch သို့ :total ပါဆယ်တွင် :arrived ပါဆယ် ရောက်ပြီး",
+  "Arrived at branch": "ဆိုင်ခွဲရောက်ချိန်",
+  "Confirm arrival only after physically receiving the parcel at your branch.": "မိမိဆိုင်ခွဲတွင် ပါဆယ်အမှန်တကယ် လက်ခံရရှိပြီးမှ ရောက်ရှိကြောင်း အတည်ပြုပါ။"
 }

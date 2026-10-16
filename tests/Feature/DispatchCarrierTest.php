@@ -54,9 +54,16 @@ class DispatchCarrierTest extends TestCase
             $this->get(route('dispatches.show', $dispatch))->assertOk()->assertSee($dispatch->carrier_name)->assertSee('TEST101')->assertSee($parcel->tracking_number)->assertSee($second->tracking_number);
             $this->get(route('dispatches.manifest', $dispatch))->assertOk()->assertSee($dispatch->carrier_name)->assertSee('TEST101')->assertSee($parcel->tracking_number);
             $this->get(route('shipments.show', $parcel))->assertOk()->assertSee($dispatch->carrier_name)->assertSee('TEST101');
+            $this->get(route('inventory.index'))->assertOk()->assertDontSee('<th>Flight / carrier</th>', false);
             $this->post(route('dispatches.handover', $dispatch))->assertSessionHasNoErrors();
             $destinationStaff = User::factory()->create(['branch_id' => $parcel->destination_branch_id]);
             $this->actingAs($destinationStaff)->get(route('branches.index'))->assertOk()->assertSee($dispatch->carrier_name)->assertSee('TEST101');
+            $this->get(route('dispatches.show', $dispatch))->assertOk()->assertSee('Receive at '.$parcel->destinationBranch->code.' branch')->assertViewHas('dispatch', fn ($row) => (int) $row->arrived_count === 0);
+            $this->post(route('shipments.receive', $parcel), ['storage_location' => 'Receiving area'])->assertSessionHasNoErrors();
+            $this->get(route('dispatches.show', $dispatch))->assertOk()->assertViewHas('dispatch', fn ($row) => (int) $row->arrived_count === 1);
+            $this->post(route('shipments.receive', $second), ['storage_location' => 'Receiving area'])->assertSessionHasNoErrors();
+            $this->get(route('dispatches.index'))->assertOk()->assertSee('Arrived at '.$parcel->destinationBranch->code.' branch');
+            $this->get(route('inventory.index'))->assertOk()->assertSee($parcel->tracking_number)->assertSee($second->tracking_number)->assertDontSee('<th>Flight / carrier</th>', false);
         }
     }
 
