@@ -14,7 +14,7 @@
 </div>
 <nav>
 <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}"><span>◫</span>{{ __('Overview') }}</a>
-@foreach(['branches.index'=>[__('Branch operations'),'⇆'],'inventory.index'=>[__('Parcel storage'),'▦'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤'],'flights.index'=>[__('Flight schedule'),'✈']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
+@foreach(['branches.index'=>[__('Branch operations'),'⇆'],'inventory.index'=>[__('Parcel storage'),'▦'],'shipments.index'=>[__('Shipments'),'▣'],'customers.index'=>[__('Customers'),'♧'],'dispatches.index'=>[__('Warehouse & dispatch'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*')?'active':'' }}"><span>{{ $item[1] }}</span>{{ __($item[0]) }}</a>@endforeach @can('admin')
 <div class="nav-caption">
 {{ __('ADMINISTRATION') }}
 </div>

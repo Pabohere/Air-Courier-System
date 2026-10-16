@@ -5,7 +5,6 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
-use App\Http\Controllers\FlightScheduleController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentController;
@@ -33,7 +32,6 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::post('/inventory/{shipment}/move', [InventoryController::class, 'move'])->name('inventory.move');
     Route::post('/inventory/{shipment}/return', [InventoryController::class, 'returnToSender'])->name('inventory.return');
     Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
-    Route::get('/flight-schedule', FlightScheduleController::class)->name('flights.index');
     Route::resource('customers', CustomerController::class)->except('destroy');
     Route::resource('shipments', ShipmentController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('/shipments/{shipment}/photos', [ShipmentPhotoController::class, 'store'])->name('shipments.photos.store');
