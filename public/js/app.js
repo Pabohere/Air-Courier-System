@@ -61,12 +61,16 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
     const preview = form.querySelector('[data-photo-preview]');
     const feedback = form.querySelector('[data-photo-validation]');
     const clearWrap = form.querySelector('[data-photo-clear-wrap]');
+    let selectedFiles = Array.from(input.files);
     let urls = [];
     const update = () => {
+        const transfer = new DataTransfer();
+        selectedFiles.forEach((file) => transfer.items.add(file));
+        input.files = transfer.files;
         urls.forEach((url) => URL.revokeObjectURL(url));
         urls = [];
         preview.replaceChildren();
-        const files = Array.from(input.files);
+        const files = selectedFiles;
         let message = '';
         if (files.length > Number(input.dataset.maxPhotos)) {
             message = input.dataset.photoCountError;
@@ -79,24 +83,58 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
         feedback.textContent = message;
         feedback.classList.toggle('hide', !message);
         clearWrap.classList.toggle('hide', files.length === 0);
-        files.forEach((file) => {
-            if (!file.type.startsWith('image/')) return;
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'photo-preview-open';
-            button.dataset.photoOpen = '';
-            const img = document.createElement('img');
-            const url = URL.createObjectURL(file);
-            urls.push(url);
-            img.src = url;
-            img.alt = file.name;
-            button.append(img);
-            preview.append(button);
+        form.querySelector('[data-photo-selected-count]').textContent = `${files.length} / ${input.dataset.maxPhotos}`;
+        files.forEach((file, index) => {
+            const item = document.createElement('div');
+            item.className = 'photo-preview-item';
+            if (file.type.startsWith('image/')) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'photo-preview-open';
+                button.dataset.photoOpen = '';
+                const img = document.createElement('img');
+                const url = URL.createObjectURL(file);
+                urls.push(url);
+                img.src = url;
+                img.alt = file.name;
+                button.append(img);
+                item.append(button);
+            }
+            const name = document.createElement('span');
+            name.className = 'photo-preview-name';
+            name.textContent = file.name;
+            name.title = file.name;
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'photo-preview-remove';
+            remove.textContent = '×';
+            remove.setAttribute('aria-label', `${input.dataset.photoRemoveLabel}: ${file.name}`);
+            remove.addEventListener('click', () => {
+                selectedFiles.splice(index, 1);
+                update();
+            });
+            item.append(name, remove);
+            preview.append(item);
         });
     };
-    input.addEventListener('change', update);
+    input.addEventListener('change', () => {
+        const fileKey = (file) => `${file.name}:${file.size}:${file.lastModified}:${file.type}`;
+        const existing = new Set(selectedFiles.map(fileKey));
+        Array.from(input.files).forEach((file) => {
+            const key = fileKey(file);
+            if (!existing.has(key)) {
+                selectedFiles.push(file);
+                existing.add(key);
+            }
+        });
+        update();
+    });
     form.querySelector('[data-photo-clear]').addEventListener('click', () => {
-        input.value = '';
+        selectedFiles = [];
+        update();
+    });
+    form.addEventListener('reset', () => {
+        selectedFiles = [];
         update();
     });
 });

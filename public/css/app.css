@@ -1114,3 +1114,11 @@ input[type="file"] { max-width: 100%; }
 .home-branch-picker a { align-items:center !important; }
 .parcel-progress-dot { background:var(--card,#fff); color:var(--ink,#24456b); }
 .parcel-progress .is-complete .parcel-progress-dot,.parcel-progress .is-current .parcel-progress-dot { background:#079cf0; color:white; }
+
+/* All selected photos stay visible, with individual removal controls. */
+.photo-selection-toolbar:not(.hide) { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.photo-preview-item { min-width:0; position:relative; }
+.photo-preview-item .photo-preview-open { display:block; width:100%; }
+.photo-preview-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:12px; }
+.photo-preview-remove { position:absolute; top:8px; right:8px; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid var(--line); border-radius:50%; background:var(--surface,#fff); color:var(--ink); box-shadow:0 2px 8px #263b4d18; font-size:22px; line-height:1; }
+.photo-preview-remove:hover { background:var(--rose-soft,#f3e6e9); color:var(--rose-ink,#903a51); }
