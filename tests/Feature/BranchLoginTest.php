@@ -98,13 +98,19 @@ class BranchLoginTest extends TestCase
         }
     }
 
-    public function test_admin_explicit_branch_tabs_do_not_change_the_login_selected_workspace(): void
+    public function test_admin_old_branch_bookmarks_open_the_same_home_and_update_the_selected_branch(): void
     {
         $admin = User::factory()->admin()->create();
         $this->actingAs($admin)->withSession(['dashboard_branch_code' => 'SG']);
-        $this->get(route('dashboard.branch', ['side' => 'ygn']))->assertOk()->assertSessionHas('dashboard_branch_code', 'SG');
-        $this->get(route('dashboard.branch', ['side' => 'sg']))->assertOk();
-        $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === 'SG');
+
+        foreach (['YGN', 'SG'] as $code) {
+            $branch = Branch::where('code', $code)->firstOrFail();
+            $this->get(route('dashboard.branch', ['side' => strtolower($code)]))
+                ->assertRedirectToRoute('dashboard', ['branch_id' => $branch->id]);
+            $this->get(route('dashboard', ['branch_id' => $branch->id]))->assertOk()
+                ->assertViewHas('branchId', $branch->id)->assertSessionHas('dashboard_branch_code', $code);
+            $this->get(route('dashboard'))->assertOk()->assertViewHas('branchId', $branch->id);
+        }
     }
 
     public function test_unknown_branch_is_rejected_before_authentication(): void

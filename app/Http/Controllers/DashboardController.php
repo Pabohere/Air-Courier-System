@@ -24,6 +24,12 @@ class DashboardController extends Controller
                 ->with('success', __('Opened your assigned branch dashboard (:branch).', ['branch' => $user->branch->code]));
         }
         BranchAccess::authorize($user, $branch->id);
+        if ($side !== null && $user->isAdmin()) {
+            return redirect()->route('dashboard', array_filter([
+                'branch_id' => $branch->id,
+                'currency' => $request->input('currency'),
+            ], fn ($value) => $value !== null));
+        }
         if ($side === null && $user->isAdmin() && $requestedBranchId) {
             $request->session()->put('dashboard_branch_code', $branch->code);
         }

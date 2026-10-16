@@ -42,6 +42,27 @@ class BranchDashboardTest extends TestCase
         $this->get(route('dashboard'))->assertOk()->assertViewHas('branch', fn ($branch) => $branch->code === 'SG');
     }
 
+    public function test_old_admin_dashboard_links_redirect_to_the_shared_home(): void
+    {
+        $this->actingAs(User::factory()->admin()->create());
+
+        foreach (['YGN' => 'MMK', 'SG' => 'SGD'] as $code => $currency) {
+            $branch = Branch::where('code', $code)->firstOrFail();
+            $other = Branch::where('code', '!=', $code)->firstOrFail();
+            $url = route('dashboard.branch', ['side' => strtolower($code), 'branch_id' => $other->id]);
+
+            $this->get($url)->assertRedirectToRoute('dashboard', ['branch_id' => $branch->id]);
+            $this->get(route('dashboard', ['branch_id' => $branch->id]))->assertOk()
+                ->assertViewHas('branchId', $branch->id)->assertViewHas('currency', $currency)
+                ->assertSessionHas('dashboard_branch_code', $code);
+
+            $this->get(route('dashboard.branch', ['side' => strtolower($code), 'currency' => 'USD']))
+                ->assertRedirectToRoute('dashboard', ['branch_id' => $branch->id, 'currency' => 'USD']);
+            $this->get(route('dashboard', ['branch_id' => $branch->id, 'currency' => 'USD']))->assertOk()
+                ->assertViewHas('branchId', $branch->id)->assertViewHas('currency', 'USD');
+        }
+    }
+
     public function test_staff_can_only_open_their_own_side_even_with_forged_query_parameters(): void
     {
         foreach (['YGN', 'SG'] as $code) {
@@ -91,11 +112,11 @@ class BranchDashboardTest extends TestCase
         Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'currency' => 'MMK', 'price' => '30000.00']);
         Payment::factory()->create(['shipment_id' => $parcel->id, 'branch_id' => $sg->id, 'currency' => 'SGD', 'amount' => '10.00']);
         Payment::factory()->create(['shipment_id' => $parcel->id, 'branch_id' => $ygn->id, 'currency' => 'SGD', 'amount' => '5.00']);
-        $this->get(route('dashboard.branch', ['side' => 'ygn', 'currency' => 'SGD', 'branch_id' => $sg->id]))->assertOk()
+        $this->get(route('dashboard', ['branch_id' => $ygn->id, 'currency' => 'SGD']))->assertOk()
             ->assertViewHas('branchId', $ygn->id)->assertViewHas('report', fn ($report) => $report['charges'] === 4000 && $report['received'] === 500 && $report['outstanding']->sum(fn ($shipment) => $shipment->balanceCents()) === 2500);
-        $this->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()
+        $this->get(route('dashboard', ['branch_id' => $sg->id]))->assertOk()
             ->assertViewHas('report', fn ($report) => $report['charges'] === 7000 && $report['received'] === 1000);
-        $this->get(route('dashboard.branch', ['side' => 'ygn']))->assertOk()
+        $this->get(route('dashboard', ['branch_id' => $ygn->id]))->assertOk()
             ->assertViewHas('report', fn ($report) => $report['charges'] === 3000000 && $report['received'] === 0);
     }
 
@@ -108,8 +129,8 @@ class BranchDashboardTest extends TestCase
         Shipment::factory()->create(['origin_branch_id' => $ygn->id, 'destination_branch_id' => $sg->id, 'in_storage' => true, 'current_branch_id' => $sg->id, 'status' => 'Ready for Collection']);
         $legacy = Shipment::factory()->create(['status' => 'Received']);
         $this->actingAs(User::factory()->admin()->create());
-        $this->get(route('dashboard.branch', ['side' => 'ygn']))->assertOk()->assertViewHas('warehouse', 1)->assertViewHas('incoming', 1)->assertViewHas('outgoing', 2)->assertViewHas('readyForCollection', 0)->assertDontSee($legacy->tracking_number);
-        $this->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()->assertViewHas('warehouse', 1)->assertViewHas('incoming', 0)->assertViewHas('outgoing', 1)->assertViewHas('readyForCollection', 1);
+        $this->get(route('dashboard', ['branch_id' => $ygn->id]))->assertOk()->assertViewHas('warehouse', 1)->assertViewHas('incoming', 1)->assertViewHas('outgoing', 2)->assertViewHas('readyForCollection', 0)->assertDontSee($legacy->tracking_number);
+        $this->get(route('dashboard', ['branch_id' => $sg->id]))->assertOk()->assertViewHas('warehouse', 1)->assertViewHas('incoming', 0)->assertViewHas('outgoing', 1)->assertViewHas('readyForCollection', 1);
     }
 
     public function test_dashboard_uses_branch_calendar_and_supports_myanmar_language(): void
@@ -118,7 +139,7 @@ class BranchDashboardTest extends TestCase
         $sg = Branch::where('code', 'SG')->firstOrFail();
         Shipment::factory()->create(['origin_branch_id' => $sg->id, 'destination_branch_id' => Branch::where('code', 'YGN')->value('id'), 'currency' => 'SGD', 'shipment_date' => '2026-10-16', 'price' => '23.00']);
         $this->actingAs(User::factory()->admin()->create())->withSession(['locale' => 'my'])
-            ->get(route('dashboard.branch', ['side' => 'sg']))->assertOk()->assertSee('ပင်မ')
+            ->get(route('dashboard', ['branch_id' => $sg->id]))->assertOk()->assertSee('ပင်မ')
             ->assertViewHas('report', fn ($report) => $report['charges'] === 2300);
     }
 
