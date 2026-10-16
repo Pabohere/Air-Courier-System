@@ -1,9 +1,10 @@
 @props(['shipment'])
 @php
     $label = $shipment->origin_branch_id ? match ($shipment->status) {
-        'Received', 'Processing', 'Ready for Dispatch' => __(':branch branch', ['branch' => $shipment->originBranch?->code]),
-        'Dispatched', 'In Transit' => 'With carrier',
-        'Arrived at Branch', 'Ready for Collection' => __(':branch branch', ['branch' => $shipment->destinationBranch?->code]),
+        'Received', 'Processing', 'Ready for Dispatch' => $shipment->dispatch?->flight_departure_at ? __('Due at :branch branch', ['branch' => $shipment->destinationBranch?->code]) : __(':branch branch', ['branch' => $shipment->originBranch?->code]),
+        'Dispatched', 'In Transit' => __('Due at :branch branch', ['branch' => $shipment->destinationBranch?->code]),
+        'Arrived at Branch', 'Ready for Collection' => __('Arrived at :branch branch', ['branch' => $shipment->destinationBranch?->code]),
+        'Collected' => __('Collected').' · '.__('Completed'),
         default => $shipment->status,
     } : $shipment->status;
 @endphp

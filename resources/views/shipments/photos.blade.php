@@ -5,7 +5,7 @@
 @endphp
 <section class="card" id="parcel-photos"><div class="card-head"><h2>{{ __('Parcel photos') }}</h2><span class="badge">{{ count($parcelPhotos) }} / 5</span></div><div class="card-body">
 @if($parcelPhotos)
-<div class="parcel-photo-grid">@foreach($parcelPhotos as $photo)<a href="{{ route('shipments.photos.show', [$shipment, $photo['id']]) }}" target="_blank" rel="noopener"><img src="{{ route('shipments.photos.show', [$shipment, $photo['id']]) }}" alt="{{ __('Parcel photo :number', ['number' => $loop->iteration]) }}" loading="lazy"><span>{{ __('Parcel photo :number', ['number' => $loop->iteration]) }}</span></a>@endforeach</div>
+<div class="parcel-photo-grid" data-saved-gallery>@foreach($parcelPhotos as $photo)<a data-photo-open href="{{ route('shipments.photos.show', [$shipment, $photo['id']]) }}" target="_blank" rel="noopener"><img src="{{ route('shipments.photos.show', [$shipment, $photo['id']]) }}" alt="{{ __('Parcel photo :number', ['number' => $loop->iteration]) }}" loading="lazy"><span>{{ __('Parcel photo :number', ['number' => $loop->iteration]) }}</span></a>@endforeach</div>
 @else
 <p class="subtle">{{ __('No parcel photos uploaded yet.') }}</p>
 @endif

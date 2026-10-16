@@ -112,7 +112,7 @@ php artisan courier:backup
 
 Creates a consistent snapshot with VACUUM INTO, verifies PRAGMA integrity_check and stores a timestamped file in private `storage/app/private/backups` with restrictive permissions. Keep daily snapshots and copy them to protected off-device storage. Protect `.env` and APP_KEY separately. Regularly restore into an isolated test installation to verify recovery.
 
-Parcel photos are private files in `storage/app/private/parcel-photos`; the database backup contains their references, not the image files. Pause uploads while taking a matching backup of that directory and the database, copy both to protected off-device storage, and restore both together with the same application configuration. Keep the photos outside the public web directory.
+Parcel photos are private files in `storage/app/private/parcel-photos`; saved draft photos are in `storage/app/private/draft-photos`. The database backup contains references to both directories, not the image files. Pause uploads while taking a matching backup of both photo directories and the database, copy both to protected off-device storage, and restore both together with the same application configuration. Keep the photos outside the public web directory.
 
 For recovery, stop the server and all workers. Preserve the damaged database and any `-wal`/`-shm` files together as a recovery set. Rename those files out of the way, then copy a verified backup to the database path configured in `.env` (default `database/database.sqlite`). Restore matching configuration/APP_KEY and file ownership, then run:
 

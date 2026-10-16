@@ -41,7 +41,7 @@ class DashboardController extends Controller
             'toSend' => (clone $parcels)->where('origin_branch_id', $branchId)->where('current_branch_id', $branchId)->where('in_storage', true)->whereNotIn('status', ['Collected', 'Cancelled'])->count(),
             'toCollect' => (clone $parcels)->where('destination_branch_id', $branchId)->where('current_branch_id', $branchId)->where('in_storage', true)->whereIn('status', ['Arrived at Branch', 'Ready for Collection', 'Exception'])->count(),
             'outgoing' => (clone $parcels)->where('origin_branch_id', $branchId)->whereNotIn('status', ['Collected', 'Cancelled', 'Delivered'])->count(),
-            'incoming' => (clone $parcels)->where('destination_branch_id', $branchId)->whereIn('status', ['Dispatched', 'In Transit'])->count(),
+            'incoming' => (clone $parcels)->where('destination_branch_id', $branchId)->awaitingArrival()->count(),
             'readyForCollection' => (clone $parcels)->where('current_branch_id', $branchId)->where('status', 'Ready for Collection')->count(),
         ]);
     }

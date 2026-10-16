@@ -8,6 +8,7 @@ use App\Models\PaymentMethod;
 use App\Models\Shipment;
 use App\Services\BranchAccess;
 use App\Services\CourierService;
+use App\Services\EntryDraftService;
 use App\Services\ShipmentPhotoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,17 +26,17 @@ class ShipmentController extends Controller
         return view('shipments.index', ['shipments' => $shipments, 'statuses' => array_keys(CourierService::TRANSITIONS)]);
     }
 
-    public function create(): View
+    public function create(Request $request, EntryDraftService $drafts): View
     {
-        return view('shipments.create', ['destinations' => Destination::with('rate')->where('active', true)->whereHas('rate')->orderBy('country')->get(), 'settings' => CompanySetting::firstOrFail()]);
+        return view('shipments.create', ['draft' => $drafts->hydrate($request, 'booking'), 'destinations' => Destination::with('rate')->where('active', true)->whereHas('rate')->orderBy('country')->get(), 'settings' => CompanySetting::firstOrFail()]);
     }
 
-    public function store(Request $request, ShipmentPhotoService $photos): RedirectResponse
+    public function store(Request $request, ShipmentPhotoService $photos, EntryDraftService $drafts): RedirectResponse
     {
         $routed = $request->has('origin_branch_id') || $request->has('destination_branch_id') || $request->user()->branch_id !== null;
         $data = $request->validate(($routed ? ['origin_branch_id' => 'required|integer|exists:branches,id', 'destination_branch_id' => 'required|integer|different:origin_branch_id|exists:branches,id', 'currency' => 'required|in:MMK,SGD', 'price' => ['required', 'regex:/^\d{1,9}(\.\d{1,2})?$/D']] : []) + ['storage_location' => 'nullable|string|max:100', 'booking_key' => 'required|uuid', 'customer_id' => 'nullable|required_without:customer_name|integer|exists:customers,id', 'customer_name' => 'required_without:customer_id|string|max:150', 'customer_phone' => 'required_without:customer_id|string|max:50', 'customer_address' => 'nullable|string|max:2000', 'destination_id' => ($routed ? 'nullable' : 'required').'|integer|exists:destinations,id', 'recipient_name' => 'required|string|max:150', 'recipient_phone' => 'required|string|max:50', 'recipient_address' => 'required|string|max:2000', 'shipment_date' => 'required|date_format:Y-m-d', 'description' => 'required|string|max:2000', 'quantity' => 'required|integer|min:1|max:10000', 'actual_weight' => ['required', 'regex:/^\d{1,5}(\.\d{1,3})?$/D']]);
         $request->validate(ShipmentPhotoService::rules());
-        $shipment = $photos->book($data, $request->file('photos', []), $request->user());
+        $shipment = $drafts->complete($request, 'booking', fn (array $savedPhotos) => $photos->book($data, array_merge($savedPhotos, $request->file('photos', [])), $request->user()));
 
         return redirect()->route('shipments.show', $shipment)->with('success', __('Shipment booked. Price is saved and locked.'));
     }

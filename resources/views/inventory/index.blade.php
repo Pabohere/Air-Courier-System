@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', __('Parcel storage'))
 @section('content')
+@include('entry-drafts', ['draftKind' => 'booking'])
 <div class="page-heading"><div><div class="eyebrow">{{ $branch->code }} · {{ __($branch->name) }}</div><h1>{{ __('Parcel storage') }}</h1><p class="subtle">{{ __('Accept → send → receive → collect') }}</p></div><a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branch->id]) }}">{{ __('＋ Create storage entry') }}</a></div>
 <form class="filters" method="get">
 @if(auth()->user()->isAdmin())<label>{{ __('Branch') }}<select name="branch_id">@foreach($branches as $item)<option value="{{ $item->id }}" @selected($branch->id === $item->id)>{{ $item->code }} · {{ __($item->name) }}</option>@endforeach</select></label>@endif

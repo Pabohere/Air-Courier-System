@@ -11,6 +11,8 @@
 </div>
 <a class="button secondary" href="{{ route('inventory.index') }}">{{ __('Parcel storage') }} →</a>
 </div>
+@include('entry-drafts', ['draftKind' => 'trip'])
+@include('dispatches.weekly')
 <div class="card">
 <div class="card-head">
 <h2>
@@ -20,7 +22,9 @@
 </div>
 <div class="card-body">
 <form method="post" action="{{ route('dispatches.store') }}">
-@csrf
+@csrf<input type="hidden" name="draft_revision" value="{{ old('draft_revision', $draft?->revision ?? 0) }}">
+<input type="hidden" name="draft_id" value="{{ old('draft_id', $draft?->key ?? \Illuminate\Support\Str::uuid()) }}">
+<label>{{ __('Origin branch') }}<select name="origin_branch_id">@foreach($branches as $origin) @if(auth()->user()->isAdmin() || auth()->user()->branch_id === $origin->id)<option value="{{ $origin->id }}" @selected(old('origin_branch_id', auth()->user()->branch_id ?? $branches->first()->id) == $origin->id)>{{ $origin->code }}</option>@endif @endforeach</select></label>
 <div class="two-columns">
 <div class="field-grid">
 <label class="full">{{ __('Carrier name (person carrying the parcels)') }}<input name="carrier_name" value="{{ old('carrier_name') }}" maxlength="150" required><span class="help">{{ __('Enter the person’s name separately from the airline or courier company.') }}</span></label>
@@ -47,7 +51,8 @@
 </div>
 </div>
 <div class="form-actions">
-<button class="button" name="quick_action" value="send" @disabled($ready->isEmpty())>{{ __('Hand over and send') }}</button><button class="button secondary" name="quick_action" value="draft" @disabled($ready->isEmpty())>{{ __('Save for later') }}</button>
+<button class="button" name="quick_action" value="send" @disabled($ready->isEmpty())>{{ __('Hand over and send') }}</button><button class="button secondary" name="quick_action" value="draft" @disabled($ready->isEmpty())>{{ __('Save flight plan') }}</button>
+<button type="submit" class="button secondary" formaction="{{ route('entry-drafts.store', ['kind' => 'trip']) }}" formnovalidate>{{ __('Save incomplete draft') }}</button>
 <p class="help">{{ __('Send only after physically handing parcels to the carrier. For future flights, save for later.') }}</p>
 </div>
 </form>
@@ -99,7 +104,9 @@
 {{ $dispatch->shipments_count }}
 </td>
 <td>
-@if($dispatch->shipments_count > 0 && $dispatch->arrived_count === $dispatch->shipments_count)
+@if($dispatch->shipments_count > 0 && $dispatch->completed_count === $dispatch->shipments_count)
+<span class="badge">{{ __('Completed') }}</span>
+@elseif($dispatch->shipments_count > 0 && $dispatch->arrived_count === $dispatch->shipments_count)
 <span class="badge">{{ __('Arrived at :branch branch', ['branch' => $dispatch->destinationBranch?->code]) }}</span>
 @else
 <span class="badge">{{ $dispatch->handed_over_at ? __('With carrier') : __('Planned trip') }}</span>

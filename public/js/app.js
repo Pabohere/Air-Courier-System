@@ -79,14 +79,19 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
         feedback.textContent = message;
         feedback.classList.toggle('hide', !message);
         clearWrap.classList.toggle('hide', files.length === 0);
-        if (message) return;
         files.forEach((file) => {
+            if (!file.type.startsWith('image/')) return;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'photo-preview-open';
+            button.dataset.photoOpen = '';
             const img = document.createElement('img');
             const url = URL.createObjectURL(file);
             urls.push(url);
             img.src = url;
             img.alt = file.name;
-            preview.append(img);
+            button.append(img);
+            preview.append(button);
         });
     };
     input.addEventListener('change', update);
@@ -126,3 +131,37 @@ document.querySelectorAll('[data-payment-details]').forEach((section) => {
     amount?.addEventListener('input', update);
     update();
 });
+
+const photoViewer = document.querySelector('[data-photo-viewer]');
+if (photoViewer) {
+    let gallery = [];
+    let current = 0;
+    const showPhoto = () => {
+        const photo = gallery[current];
+        photoViewer.querySelector('img').src = photo.src;
+        photoViewer.querySelector('img').alt = photo.alt;
+        photoViewer.querySelector('[data-photo-position]').textContent = `${current + 1} / ${gallery.length} · ${photo.alt}`;
+    };
+    const stepPhoto = (direction) => {
+        current = (current + direction + gallery.length) % gallery.length;
+        showPhoto();
+    };
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-photo-open]');
+        if (!trigger) return;
+        const container = trigger.closest('[data-photo-preview], [data-saved-gallery]');
+        if (!container) return;
+        event.preventDefault();
+        gallery = Array.from(container.querySelectorAll('img'));
+        current = gallery.indexOf(trigger.querySelector('img'));
+        showPhoto();
+        photoViewer.showModal();
+    });
+    photoViewer.querySelector('[data-photo-previous]').addEventListener('click', () => stepPhoto(-1));
+    photoViewer.querySelector('[data-photo-next]').addEventListener('click', () => stepPhoto(1));
+    photoViewer.querySelector('[data-photo-close]').addEventListener('click', () => photoViewer.close());
+    photoViewer.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') { event.preventDefault(); stepPhoto(1); }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); stepPhoto(-1); }
+    });
+}

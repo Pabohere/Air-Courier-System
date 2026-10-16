@@ -37,6 +37,14 @@ class Shipment extends Model
         }
     }
 
+    public function scopeAwaitingArrival(Builder $query): void
+    {
+        $query->where(function ($pending): void {
+            $pending->whereIn('status', ['Dispatched', 'In Transit'])
+                ->orWhere(fn ($planned) => $planned->where('status', 'Ready for Dispatch')->whereHas('dispatch', fn ($trip) => $trip->whereNotNull('flight_departure_at')));
+        });
+    }
+
     public function currentBranch(): BelongsTo
     {
         return $this->belongsTo(Branch::class, 'current_branch_id');

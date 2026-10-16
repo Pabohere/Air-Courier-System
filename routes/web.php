@@ -5,6 +5,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\EntryDraftController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PaymentController;
@@ -26,6 +27,8 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/dashboard/{side}', DashboardController::class)->whereIn('side', ['ygn', 'sg'])->name('dashboard.branch');
+    Route::post('/entry-drafts', [EntryDraftController::class, 'store'])->name('entry-drafts.store');
+    Route::get('/entry-drafts/{draft}/photos/{photo}', [EntryDraftController::class, 'photo'])->whereUuid('photo')->name('entry-drafts.photo');
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/inventory/{shipment}/edit', [InventoryController::class, 'edit'])->name('inventory.edit');
     Route::delete('/inventory/{shipment}', [InventoryController::class, 'destroy'])->name('inventory.destroy');

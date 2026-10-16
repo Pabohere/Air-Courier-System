@@ -70,6 +70,7 @@
 {{ $company?->name }} {{ __('· Courier operations') }} <span>{{ __('Accurate records. Every parcel.') }}</span>
 </footer>
 </div>
+<dialog data-photo-viewer class="photo-viewer" aria-label="{{ __('Photo preview') }}"><div class="photo-viewer-toolbar"><button type="button" class="button secondary" data-photo-previous aria-label="{{ __('Previous photo') }}">←</button><span data-photo-position></span><button type="button" class="button secondary" data-photo-next aria-label="{{ __('Next photo') }}">→</button><button type="button" class="button secondary" data-photo-close>{{ __('Close preview') }} ×</button></div><img alt=""></dialog>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </body>
 </html>

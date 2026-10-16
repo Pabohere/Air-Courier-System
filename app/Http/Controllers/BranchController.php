@@ -20,7 +20,7 @@ class BranchController extends Controller
         }
         $branch = Branch::findOrFail($id);
         $outgoing = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('origin_branch_id', $id)->where('current_branch_id', $id)->where('in_storage', true)->whereNotIn('status', ['Collected', 'Cancelled'])->latest('id')->paginate(12, ['*'], 'outgoing')->withQueryString();
-        $incoming = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->whereIn('status', ['Dispatched', 'In Transit'])->latest('id')->paginate(12, ['*'], 'incoming')->withQueryString();
+        $incoming = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->awaitingArrival()->latest('id')->paginate(12, ['*'], 'incoming')->withQueryString();
         $stored = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('current_branch_id', $id)->where('destination_branch_id', $id)->where('in_storage', true)->whereIn('status', ['Arrived at Branch', 'Ready for Collection', 'Exception'])->latest('id')->paginate(12, ['*'], 'stored')->withQueryString();
         $collected = Shipment::with(['originBranch', 'destinationBranch', 'dispatch'])->where('destination_branch_id', $id)->where('status', 'Collected')->latest('collected_at')->limit(12)->get();
 
