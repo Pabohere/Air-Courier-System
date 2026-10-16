@@ -56,7 +56,7 @@ class SimpleWorkflowTest extends TestCase
             $this->actingAs($origin)->get(route('shipments.show', $parcel))->assertOk()->assertSee('Parcel workflow')->assertSee('Send with carrier');
             $this->get(route('dispatches.index', ['shipment' => $parcel->id]))->assertOk()->assertViewHas('ready', fn ($rows) => $rows->contains('id', $parcel->id));
             $dispatchData = $this->dispatchData([$parcel]);
-            $this->post(route('dispatches.store'), $dispatchData)->assertSessionHasNoErrors()->assertRedirect();
+            $this->post(route('dispatches.store'), $dispatchData)->assertSessionHasNoErrors()->assertRedirect()->assertSessionHas('success', __('Handover recorded. All parcels marked Dispatched.'));
             $this->assertSame('Dispatched', $parcel->fresh()->status);
             $this->assertFalse($parcel->fresh()->in_storage);
             $this->get(route('branches.index', ['tab' => 'outgoing']))->assertOk()->assertViewHas('outgoing', fn ($rows) => ! $rows->contains('id', $parcel->id))->assertViewHas('activeTab', 'outgoing');
@@ -93,7 +93,7 @@ class SimpleWorkflowTest extends TestCase
         $this->assertNull($parcel->fresh()->dispatch_id);
         $this->assertSame($auditCount, AuditLog::count());
         $this->assertSame(0, Dispatch::count());
-        $this->post(route('dispatches.store'), $this->dispatchData([$parcel], 'draft', '2026-10-17'))->assertSessionHasNoErrors();
+        $this->post(route('dispatches.store'), $this->dispatchData([$parcel], 'draft', '2026-10-17'))->assertSessionHasNoErrors()->assertSessionHas('success', __('Draft dispatch created.'));
         $this->assertSame('Ready for Dispatch', $parcel->fresh()->status);
         $this->assertTrue($parcel->fresh()->in_storage);
         $this->assertNull($parcel->fresh()->dispatch->handed_over_at);

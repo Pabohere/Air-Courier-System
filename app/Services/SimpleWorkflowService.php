@@ -36,7 +36,7 @@ class SimpleWorkflowService
                 $courier->handover($dispatch, $user);
             }
 
-            return $dispatch;
+            return $dispatch->refresh();
         }, 3);
     }
 
