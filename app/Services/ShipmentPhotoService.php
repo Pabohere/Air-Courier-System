@@ -8,9 +8,7 @@ use Closure;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 use Throwable;
 
 class ShipmentPhotoService
@@ -44,12 +42,7 @@ class ShipmentPhotoService
         $staged = [];
         try {
             foreach ($files as $file) {
-                $id = (string) Str::uuid();
-                $path = $file->storeAs('parcel-photos', $id.'.'.$file->extension(), 'local');
-                if ($path === false) {
-                    throw new RuntimeException('Could not save parcel photo.');
-                }
-                $staged[] = ['id' => $id, 'path' => $path, 'sha256' => hash_file('sha256', $file->getRealPath()), 'uploaded_by' => $user->id, 'uploaded_at' => now()->toIso8601String()];
+                $staged[] = app(PhotoStorage::class)->store($file, 'parcel-photos') + ['uploaded_by' => $user->id, 'uploaded_at' => now()->toIso8601String()];
             }
             $shipment = DB::transaction(function () use ($resolveShipment, $staged, $user): Shipment {
                 $shipment = $resolveShipment();

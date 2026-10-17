@@ -7,13 +7,12 @@ use App\Models\CompanySetting;
 use App\Models\EntryDraft;
 use App\Models\Shipment;
 use App\Models\User;
+use App\Support\StoredDraftPhoto;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -61,12 +60,7 @@ class EntryDraftService
         $staged = [];
         try {
             foreach ($request->file('photos', []) as $file) {
-                $id = (string) Str::uuid();
-                $path = $file->storeAs('draft-photos', $id.'.'.$file->extension(), 'local');
-                if ($path === false) {
-                    throw new \RuntimeException('Could not save draft photo.');
-                }
-                $staged[] = ['id' => $id, 'path' => $path, 'sha256' => hash_file('sha256', $file->getRealPath())];
+                $staged[] = app(PhotoStorage::class)->store($file, 'draft-photos');
             }
 
             return DB::transaction(function () use ($request, $kind, $data, $branchId, $staged): EntryDraft {
@@ -110,7 +104,7 @@ class EntryDraftService
             }
             $files = [];
             foreach ($draft?->photos ?? [] as $photo) {
-                $files[] = new UploadedFile(Storage::disk('local')->path($photo['path']), basename($photo['path']), null, null, true);
+                $files[] = new StoredDraftPhoto(Storage::disk('local')->path($photo['path']), $photo['sha256']);
             }
             $record = $create($files);
             if ($draft) {
