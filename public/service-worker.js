@@ -1,14 +1,14 @@
 const CACHE_PREFIX = 'standard-public-';
-const CACHE_NAME = `${CACHE_PREFIX}v2`;
+const CACHE_NAME = `${CACHE_PREFIX}v3`;
 const PUBLIC_ASSETS = [
     '/offline.html',
     '/css/app.css',
     '/css/theme.css',
     '/js/app.js',
+    '/js/navigation.js',
     '/js/theme.js',
     '/js/pwa.js',
     '/js/branch-clock.js',
-    '/images/standard-mark.png',
     '/images/pwa-192.png',
     '/images/pwa-512.png',
     '/images/pwa-maskable-512.png',
@@ -20,7 +20,13 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
+    event.waitUntil((async () => {
+        await Promise.all([
+            caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key)))),
+            self.registration.navigationPreload?.enable().catch(() => {}),
+        ]);
+        await self.clients.claim();
+    })());
 });
 
 self.addEventListener('fetch', (event) => {
@@ -30,7 +36,7 @@ self.addEventListener('fetch', (event) => {
 
     // Authenticated pages, photos and financial data never enter the offline cache.
     if (request.mode === 'navigate') {
-        event.respondWith(fetch(request).catch(async () => {
+        event.respondWith((async () => (await event.preloadResponse) || fetch(request))().catch(async () => {
             const cache = await caches.open(CACHE_NAME);
             return (await cache.match('/offline.html')) || Response.error();
         }));
@@ -38,16 +44,32 @@ self.addEventListener('fetch', (event) => {
     }
     if (!PUBLIC_ASSETS.includes(url.pathname)) return;
 
-    event.respondWith((async () => {
-        const cache = await caches.open(CACHE_NAME);
-        try {
-            const response = await fetch(request);
-            if (response.ok && !response.redirected) {
-                await cache.put(url.pathname, response.clone()).catch(() => {});
-            }
-            return response;
-        } catch {
-            return (await cache.match(url.pathname)) || Response.error();
+    // Versioned assets must match exactly: never serve an older script for a new URL.
+    const versioned = url.searchParams.has('v');
+    const key = versioned ? url.pathname + url.search : url.pathname;
+    const cachePromise = caches.open(CACHE_NAME).catch(() => null);
+    const cachedPromise = cachePromise.then((cache) => cache?.match(key)).catch(() => undefined);
+    const refresh = async () => {
+        const response = await fetch(request);
+        if (response.ok && !response.redirected) {
+            const copy = response.clone();
+            event.waitUntil(cachePromise.then((cache) => cache?.put(key, copy)).catch(() => {}));
         }
-    })());
+        return response;
+    };
+    // Keep writes/revalidation alive without putting them on the rendering path.
+    const responsePromise = versioned ? (async () => {
+        const cached = await cachedPromise;
+        if (cached) return cached;
+        return refresh();
+    })() : null;
+    if (versioned) {
+        event.waitUntil(responsePromise.then(() => undefined).catch(() => {}));
+    } else {
+        const fresh = refresh();
+        event.waitUntil(fresh.then(() => undefined).catch(() => {}));
+        event.respondWith(cachedPromise.then((cached) => cached || fresh));
+        return;
+    }
+    event.respondWith(responsePromise);
 });

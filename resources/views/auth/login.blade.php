@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{{ __('Sign in · Standard') }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
-<link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/pwa-192.png') }}">
 <x-pwa-head />
 </head>
 <body class="login-body">
@@ -11,7 +11,7 @@
 <section class="login-story">
 <div>
 <div class="brand">
-<img class="brand-logo" src="{{ asset('images/standard-mark.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
+<img class="brand-logo" src="{{ asset('images/pwa-192.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
 <span class="brand-copy">Standard<small>{{ __('YANGON ↔ SINGAPORE') }}</small></span>
 </div>
 <div class="eyebrow">

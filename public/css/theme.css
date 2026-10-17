@@ -576,3 +576,14 @@ pre { background: var(--tint); color: var(--ink); border: 1px solid var(--line);
     html[lang="my"] .mobile-nav > :is(a, button) { font-size: 10px; }
 }
 @media print { .mobile-bar, .mobile-nav, .mobile-menu { display: none !important; } }
+
+/* Immediate touch feedback without the browser's persistent tap overlay. */
+:is(a, button, summary, input[type="submit"], input[type="button"]) { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+html[data-navigation-pending] { cursor: progress; }
+html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 9999; inset: 0 0 auto; height: 3px; background: var(--primary); pointer-events: none; }
+[data-navigation-busy] { opacity: .7; cursor: progress; }
+@media (hover: none) {
+    .button, .sidebar nav a, a.metric, tbody tr { transition: none; }
+    .mobile-nav > :is(a, button):active, .mobile-menu-links a:active { background: var(--blue-soft); color: var(--blue-ink); }
+    .button:active { opacity: .8; }
+}

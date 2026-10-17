@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
-<link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
+<link rel="icon" type="image/png" href="{{ asset('images/pwa-192.png') }}">
 <x-pwa-head />
 </head>
 <body>
 <aside class="sidebar">
-<a class="brand" href="{{ route('dashboard') }}"><img class="brand-logo" src="{{ asset('images/standard-mark.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
+<a class="brand" href="{{ route('dashboard') }}"><img class="brand-logo" src="{{ asset('images/pwa-192.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
 <span class="brand-copy">Standard<small>{{ __('YANGON ↔ SINGAPORE') }}</small></span></a>
 <div class="nav-caption">
 {{ __('WORKSPACE') }}
@@ -34,7 +34,7 @@
 <div class="workspace">
 <header>
 <div class="mobile-bar">
-<a class="mobile-brand" href="{{ route('dashboard') }}"><img src="{{ asset('images/standard-mark.png') }}" alt="" width="40" height="40"><span>Standard<small>YGN ↔ SG</small></span></a>
+<a class="mobile-brand" href="{{ route('dashboard') }}"><img src="{{ asset('images/pwa-192.png') }}" alt="" width="40" height="40"><span>Standard<small>YGN ↔ SG</small></span></a>
 <button type="button" class="mobile-search-toggle" data-mobile-search aria-controls="workspace-search-form" aria-expanded="false" aria-label="{{ __('Search all parcels') }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
 </div>
 <div class="breadcrumbs">
