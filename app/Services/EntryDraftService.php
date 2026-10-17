@@ -71,7 +71,7 @@ class EntryDraftService
                     $this->checkRevision($request, $draft);
                     abort_unless($draft->kind === $kind && $draft->branch_id === $branchId && ! $draft->shipment_id && ! $draft->dispatch_id, 409);
                 }
-                $photos = collect($draft?->photos ?? [])->concat($staged)->unique('sha256')->values()->all();
+                $photos = collect($draft?->photos ?? [])->concat($staged)->unique(fn (array $photo): string => $photo['source_sha256'] ?? $photo['sha256'])->values()->all();
                 if (count($photos) > 5) {
                     throw ValidationException::withMessages(['photos' => __('A parcel can have at most 5 photos. Existing photos count toward this limit.')]);
                 }
@@ -104,7 +104,7 @@ class EntryDraftService
             }
             $files = [];
             foreach ($draft?->photos ?? [] as $photo) {
-                $files[] = new StoredDraftPhoto(Storage::disk('local')->path($photo['path']), $photo['sha256']);
+                $files[] = new StoredDraftPhoto(Storage::disk('local')->path($photo['path']), $photo['source_sha256'] ?? $photo['sha256']);
             }
             $record = $create($files);
             if ($draft) {

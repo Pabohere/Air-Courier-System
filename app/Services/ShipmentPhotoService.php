@@ -52,7 +52,7 @@ class ShipmentPhotoService
                 }
                 $this->authorizeUpload($user, $locked);
                 $before = $locked->photos ?? [];
-                $photos = collect($before)->concat($staged)->unique('sha256')->values()->all();
+                $photos = collect($before)->concat($staged)->unique(fn (array $photo): string => $photo['source_sha256'] ?? $photo['sha256'])->values()->all();
                 if (count($photos) > 5) {
                     throw ValidationException::withMessages(['photos' => __('A parcel can have at most 5 photos. Existing photos count toward this limit.')]);
                 }

@@ -11,7 +11,7 @@ use RuntimeException;
 
 class PhotoStorage
 {
-    /** @return array{id: string, path: string, sha256: string, original_bytes: int, stored_bytes: int} */
+    /** @return array{id: string, path: string, sha256: string, source_sha256: string, original_bytes: int, stored_bytes: int} */
     public function store(UploadedFile $file, string $directory): array
     {
         $bytes = file_get_contents($file->getRealPath());
@@ -30,7 +30,7 @@ class PhotoStorage
             throw new RuntimeException('Could not save parcel photo.');
         }
 
-        return ['id' => $id, 'path' => $path, 'sha256' => $hash, 'original_bytes' => $originalBytes, 'stored_bytes' => strlen($bytes)];
+        return ['id' => $id, 'path' => $path, 'sha256' => hash('sha256', $bytes), 'source_sha256' => $hash, 'original_bytes' => $originalBytes, 'stored_bytes' => strlen($bytes)];
     }
 
     /** @return array{string, string} */

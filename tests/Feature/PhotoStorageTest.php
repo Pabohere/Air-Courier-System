@@ -49,9 +49,10 @@ class PhotoStorageTest extends TestCase
         $entry = app(PhotoStorage::class)->store($file, 'parcel-photos');
         $stored = Storage::disk('local')->get($entry['path']);
         $this->assertLessThan($entry['original_bytes'], strlen($stored));
-        $this->assertSame($sourceHash, $entry['sha256']);
+        $this->assertSame($sourceHash, $entry['source_sha256']);
+        $this->assertSame(hash('sha256', $stored), $entry['sha256']);
         $this->assertSame([1600, 800], array_slice(getimagesizefromstring($stored), 0, 2));
-        $this->assertSame($file->getContent(), file_get_contents($file->getRealPath()));
+        $this->assertSame($sourceHash, hash_file('sha256', $file->getRealPath()));
     }
 
     public function test_all_phone_exif_orientations_remain_correct_after_metadata_is_removed(): void
@@ -90,9 +91,10 @@ class PhotoStorageTest extends TestCase
     public function test_saved_draft_photo_is_not_recompressed_and_keeps_original_duplicate_detection(): void
     {
         $entry = app(PhotoStorage::class)->store($this->jpeg(), 'draft-photos');
-        $draft = new StoredDraftPhoto(Storage::disk('local')->path($entry['path']), $entry['sha256']);
+        $draft = new StoredDraftPhoto(Storage::disk('local')->path($entry['path']), $entry['source_sha256']);
         $saved = app(PhotoStorage::class)->store($draft, 'parcel-photos');
         $this->assertSame($entry['sha256'], $saved['sha256']);
+        $this->assertSame($entry['source_sha256'], $saved['source_sha256']);
         $this->assertSame(Storage::disk('local')->get($entry['path']), Storage::disk('local')->get($saved['path']));
     }
 
