@@ -18,24 +18,24 @@
 </div></section>
 <section class="card"><div class="card-head"><h2>{{ __('01 · Sender & recipient') }}</h2></div><div class="card-body field-grid">
 <label>{{ __('Customer name') }}<input name="customer_name" value="{{ old('customer_name') }}" maxlength="150" required></label>
-<label>{{ __('Customer phone') }}<input name="customer_phone" value="{{ old('customer_phone') }}" maxlength="50" required></label>
+<label>{{ __('Customer phone') }}<input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" maxlength="50" required></label>
 <label class="full">{{ __('Customer address') }}<input name="customer_address" value="{{ old('customer_address') }}" maxlength="2000"></label>
 <label>{{ __('Recipient name') }}<input name="recipient_name" value="{{ old('recipient_name') }}" maxlength="150" required></label>
-<label>{{ __('Recipient phone') }}<input name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" required></label>
+<label>{{ __('Recipient phone') }}<input type="tel" name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" required></label>
 <label class="full">{{ __('Recipient address (optional)') }}<textarea name="recipient_address">{{ old('recipient_address') }}</textarea></label>
 </div></section>
 <section class="card"><div class="card-head"><h2>{{ __('02 · Parcel details') }}</h2></div><div class="card-body field-grid">
 <label class="full">{{ __('Storage location') }}<input name="storage_location" value="{{ old('storage_location', 'Receiving area') }}" maxlength="100" required><span class="help">{{ __('Example: Rack A / Shelf 2. Booking receives the parcel into origin branch storage.') }}</span></label>
 <label>{{ __('Shipment date') }}<input type="date" name="shipment_date" value="{{ old('shipment_date', \App\Services\BranchAccess::todayFor()) }}" required></label>
-<label>{{ __('Quantity / pieces') }}<input type="number" name="quantity" value="{{ old('quantity', 1) }}" min="1" max="10000" required></label>
-<label>{{ __('Actual weight (kg)') }}<input type="number" name="actual_weight" value="{{ old('actual_weight') }}" min="0.001" max="99999.999" step="0.001" required></label>
+<label>{{ __('Quantity / pieces') }}<input type="number" inputmode="numeric" name="quantity" value="{{ old('quantity', 1) }}" min="1" max="10000" required></label>
+<label>{{ __('Actual weight (kg)') }}<input type="number" inputmode="decimal" name="actual_weight" value="{{ old('actual_weight') }}" min="0.001" max="99999.999" step="0.001" required></label>
 @include('entry-draft-photos')
 @include('shipments.photo-input', ['remaining' => 5 - count($draft?->photos ?? [])])
 <label class="full">{{ __('Parcel description') }}<textarea name="description" required>{{ old('description') }}</textarea></label>
 </div></section></div><div><section class="card"><div class="card-head"><h2>{{ __('03 · Shipment charges') }}</h2></div><div class="card-body">
 <p class="subtle">{{ __('Enter the agreed shipment charge manually. MMK and SGD are kept separately; no automatic currency conversion.') }}</p>
 <label>{{ __('Currency') }}<select name="currency" required>@foreach(['MMK','SGD'] as $code)<option value="{{ $code }}" @selected(old('currency', auth()->user()->branch?->code === 'SG' ? 'SGD' : 'MMK') === $code)>{{ $code }}</option>@endforeach</select></label>
-<label class="section-gap">{{ __('Agreed shipment charge') }}<input type="number" name="price" value="{{ old('price') }}" min="0.01" max="999999999.99" step="0.01" required></label>
+<label class="section-gap">{{ __('Agreed shipment charge') }}<input type="number" inputmode="decimal" name="price" value="{{ old('price') }}" min="0.01" max="999999999.99" step="0.01" required></label>
 <p class="help">{{ __('The saved currency and charge cannot be changed. Payments are recorded in this same currency.') }}</p>
 <p class="help">{{ __('Missing details? Save a draft and finish later. No charges are recorded until booking is confirmed.') }}</p><div class="form-actions"><button type="submit" class="button secondary" formaction="{{ route('entry-drafts.store', ['kind' => 'booking']) }}" formnovalidate>{{ __('Save draft') }}</button><button class="button">{{ __('Confirm booking →') }}</button></div>
 </div></section></div></div></form>

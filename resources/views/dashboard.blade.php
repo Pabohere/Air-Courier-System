@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('Home'))
 @section('content')
-<div class="page-heading" data-side="{{ strtolower($branch->code) }}"><div><h1>{{ __('Home') }}</h1><p class="subtle">{{ __($branch->name) }} · {{ $branch->timezone }} · UTC{{ $branchNow->format('P') }} · <time data-branch-clock data-timezone="{{ $branch->timezone }}" datetime="{{ $branchNow->toIso8601String() }}">{{ $branchNow->format('d M Y · H:i:s') }}</time></p></div><a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branchId]) }}">{{ __('＋ New shipment') }}</a></div>
+<div class="page-heading" data-side="{{ strtolower($branch->code) }}"><div><h1>{{ __('Home') }}</h1><p class="subtle">{{ __($branch->name) }}<span class="branch-timezone"> · {{ $branch->timezone }} · UTC{{ $branchNow->format('P') }}</span> · <time data-branch-clock data-timezone="{{ $branch->timezone }}" datetime="{{ $branchNow->toIso8601String() }}">{{ $branchNow->format('d M Y · H:i:s') }}</time></p></div><a class="button" href="{{ route('shipments.create', ['origin_branch_id' => $branchId]) }}">{{ __('＋ New shipment') }}</a></div>
 @if(auth()->user()->isAdmin())
 <nav class="home-branch-picker" aria-label="{{ __('Choose branch on Home') }}">
 @foreach($branches as $choice)

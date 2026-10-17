@@ -490,3 +490,89 @@ pre { background: var(--tint); color: var(--ink); border: 1px solid var(--line);
     .print-page .table-wrap { padding: 0; }
     .print-page th { background: #f3f3f3; color: #333; }
 }
+
+/* A compact mobile workspace, shared by browser and installed PWA. */
+.mobile-bar, .mobile-nav { display: none; }
+.mobile-menu { color: var(--ink); background: var(--card); border: 1px solid var(--line); }
+.mobile-menu:not([open]) { display: none; }
+@media screen and (max-width: 780px) {
+    html { scroll-padding-top: 90px; -webkit-text-size-adjust: 100%; }
+    body { min-height: 100vh; min-height: 100dvh; }
+    body:has(.mobile-menu[open]) { overflow: hidden; }
+    .sidebar { display: none; }
+    .workspace { margin-left: 0; padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+    .workspace > header { position: sticky; top: 0; z-index: 25; display: block; min-height: 0; padding: env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); background: var(--card); color: var(--ink); border-bottom: 1px solid var(--line); }
+    header > .breadcrumbs, header > .user { display: none; }
+    .mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 68px; }
+    .mobile-brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font-size: 21px; font-weight: 750; line-height: 1.2; }
+    .mobile-brand img { object-fit: contain; background: #fff; border-radius: 8px; }
+    .mobile-brand small { display: block; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; color: var(--muted); margin-top: 4px; }
+    .mobile-search-toggle { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--field); color: var(--ink); }
+    header .workspace-search { display: none; }
+    header[data-search-open] .workspace-search { display: flex; padding: 0 0 12px; }
+    header .workspace-search :is(input, .button) { min-height: 46px; height: 46px; }
+    .mobile-nav { position: fixed; z-index: 30; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 7px max(8px, env(safe-area-inset-right, 0px)) calc(7px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); border-top: 1px solid var(--line); background: var(--card); box-shadow: 0 -3px 16px #18233408; }
+    .mobile-nav > :is(a, button) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 50px; padding: 4px 1px; margin: 0; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 650; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    .mobile-nav > :is(a, button) > span:first-child { font-size: 23px; line-height: 1; height: 25px; }
+    .mobile-nav > a[aria-current="page"], .mobile-nav > button:focus-visible { color: var(--blue-ink); background: var(--blue-soft); }
+    .mobile-menu[open] { position: fixed; inset: auto 0 0; margin: 0 auto; width: 100%; max-width: 520px; max-height: calc(100vh - 24px); max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 16px); padding: 18px 20px calc(20px + env(safe-area-inset-bottom, 0px)); border-radius: 22px 22px 0 0; overflow-y: auto; overscroll-behavior: contain; }
+    .mobile-menu::backdrop { background: #101b32a0; }
+    .mobile-menu-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .mobile-menu-heading h2 { margin: 0; font-size: 22px; }
+    .mobile-menu-heading .button { min-width: 44px; min-height: 44px; padding: 0; font-size: 28px; }
+    .mobile-account { padding: 0 0 16px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+    .mobile-account small { display: block; color: var(--muted); margin-top: 3px; }
+    .mobile-menu-links { display: grid; padding: 10px 0; }
+    .mobile-menu-links a { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 10px 8px; border-radius: 10px; color: var(--ink); font-weight: 600; }
+    .mobile-menu-links a span:first-child { color: var(--primary); font-size: 21px; width: 25px; text-align: center; }
+    .mobile-menu-links a span:last-child { margin-left: auto; }
+    .mobile-menu-links a[aria-current="page"] { background: var(--blue-soft); color: var(--blue-ink); }
+    .mobile-preferences { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px 0; border-top: 1px solid var(--line); }
+    .mobile-preferences :is(.theme-switch, .language-switch) { margin: 0; max-width: 100%; }
+    .mobile-preferences button { min-height: 44px; padding: 8px 12px; }
+    .mobile-menu .pwa-actions { margin: 0; }
+    .mobile-menu .pwa-actions:has(button:not([hidden])) { margin-bottom: 12px; }
+    .mobile-menu .pwa-actions button, .mobile-logout { width: 100%; min-height: 46px; }
+    main { padding: 22px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+    .page-heading { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 18px; }
+    .page-heading h1 { font-size: 26px; line-height: 1.3; margin-bottom: 0; }
+    .page-heading .subtle { font-size: 14px; line-height: 1.65; margin-top: 6px; }
+    .branch-timezone { display: none; }
+    .page-heading > :is(a, .actions) { align-self: stretch; width: 100%; }
+    .page-heading > a { text-align: center; justify-content: center; }
+    .page-heading .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .page-heading .actions > * { flex: 1 1 auto; }
+    .home-branch-picker { margin-bottom: 16px; }
+    .home-branch-picker a { min-height: 48px; }
+    .home-branch-picker a span { display: none; }
+    .home-branch-picker a strong { font-size: 16px; }
+    :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea) { font-size: 16px; min-width: 0; max-width: 100%; min-height: 48px; }
+    :is(.field-grid, .split, .two-columns) > *, label { min-width: 0; }
+    .field-grid { gap: 16px; }
+    .field-grid .full { grid-column: 1 / -1; }
+    .button, .text-button { min-height: 44px; }
+    .form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .form-actions > .button { flex: 1 1 140px; min-height: 48px; text-align: center; justify-content: center; }
+    .card-head { gap: 10px; padding: 16px; flex-wrap: wrap; }
+    .card-body { padding: 16px; }
+    .card-head h2 { font-size: 17px; }
+    .filters { gap: 10px; padding: 14px; }
+    .filters label { min-width: 0; flex: 1 1 160px; }
+    .filters .search { flex-basis: 100%; }
+    .filters .button { flex: 1 1 100%; }
+    .table-wrap { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+    .branch-operational-metrics .metric { padding: 16px; min-height: 74px; }
+    .branch-operational-metrics .metric-value { font-size: 26px; }
+    .branch-operational-metrics .metric::before { top: 25px; }
+    .pwa-offline { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); z-index: 35; }
+    .pwa-help { max-height: calc(100dvh - 40px); padding: 22px; }
+    .login-body { padding-top: max(12px, env(safe-area-inset-top, 0px)); padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+    .login-story { padding: 20px; }
+    .login-story .brand { margin-bottom: 0; }
+    .login-story :is(h1, .eyebrow, p), .login-story > div:last-child:not(:first-child) { display: none; }
+    .login-form { padding: 22px 18px; }
+    .login-form h1 { font-size: 25px; }
+    html[lang="my"] .page-heading h1 { font-size: 24px; line-height: 1.6; }
+    html[lang="my"] .mobile-nav > :is(a, button) { font-size: 10px; }
+}
+@media print { .mobile-bar, .mobile-nav, .mobile-menu { display: none !important; } }

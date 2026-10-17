@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 <link rel="icon" type="image/png" href="{{ asset('images/standard-mark.png') }}">
 <x-pwa-head />
@@ -33,10 +33,14 @@
 </aside>
 <div class="workspace">
 <header>
+<div class="mobile-bar">
+<a class="mobile-brand" href="{{ route('dashboard') }}"><img src="{{ asset('images/standard-mark.png') }}" alt="" width="40" height="40"><span>Standard<small>YGN ↔ SG</small></span></a>
+<button type="button" class="mobile-search-toggle" data-mobile-search aria-controls="workspace-search-form" aria-expanded="false" aria-label="{{ __('Search all parcels') }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
+</div>
 <div class="breadcrumbs">
 {{ __('Workspace') }} <span>/</span> <strong>@yield('title',__('Overview'))</strong>
 </div>
-<form class="workspace-search" method="get" action="{{ route('shipments.index') }}" role="search">
+<form id="workspace-search-form" class="workspace-search" method="get" action="{{ route('shipments.index') }}" role="search">
 <label class="sr-only" for="workspace-search">{{ __('Search all parcels') }}</label>
 <input id="workspace-search" type="search" name="q" maxlength="100" placeholder="{{ __('Search all parcels') }}" required>
 <button class="button secondary small">{{ __('Search') }}</button>
@@ -77,6 +81,7 @@
 {{ $company?->name }} {{ __('· Courier operations') }} <span>{{ __('Accurate records. Every parcel.') }}</span>
 </footer>
 </div>
+<x-mobile-workspace />
 <dialog data-photo-viewer class="photo-viewer" aria-label="{{ __('Photo preview') }}"><div class="photo-viewer-toolbar"><button type="button" class="button secondary" data-photo-previous aria-label="{{ __('Previous photo') }}">←</button><span data-photo-position></span><button type="button" class="button secondary" data-photo-next aria-label="{{ __('Next photo') }}">→</button><button type="button" class="button secondary" data-photo-close>{{ __('Close preview') }} ×</button></div><img alt=""></dialog>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 <x-pwa-controls />

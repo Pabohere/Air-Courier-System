@@ -695,5 +695,11 @@
   "You are offline. Reconnect before saving bookings or payments.": "အင်တာနက် ပြတ်နေပါသည်။ Booking သို့မဟုတ် ငွေပေးချေမှု မသိမ်းမီ အင်တာနက် ပြန်ချိတ်ပါ။",
   "Android or desktop: open the browser menu and choose Install app or Add to Home screen.": "Android သို့မဟုတ် ကွန်ပျူတာတွင် browser menu မှ Install app သို့မဟုတ် Add to Home screen ကို ရွေးပါ။",
   "iPhone or iPad: open in Safari, tap Share, then Add to Home Screen.": "iPhone သို့မဟုတ် iPad တွင် Safari ဖြင့်ဖွင့်ပြီး Share မှ Add to Home Screen ကို ရွေးပါ။",
-  "The installed app uses the same account and requires an internet connection for parcel and payment records.": "ထည့်သွင်းထားသော app တွင် အကောင့်အတူတူ သုံးနိုင်ပြီး ပါဆယ်နှင့် ငွေစာရင်းများအတွက် အင်တာနက် လိုအပ်ပါသည်။"
+  "The installed app uses the same account and requires an internet connection for parcel and payment records.": "ထည့်သွင်းထားသော app တွင် အကောင့်အတူတူ သုံးနိုင်ပြီး ပါဆယ်နှင့် ငွေစာရင်းများအတွက် အင်တာနက် လိုအပ်ပါသည်။",
+  "Mobile navigation": "အဓိကမီနူး",
+  "Storage": "သိုလှောင်",
+  "Trips": "ခရီးစဉ်",
+  "Books": "ငွေစာရင်း",
+  "Menu": "မီနူး",
+  "Close menu": "မီနူးပိတ်ရန်"
 }
