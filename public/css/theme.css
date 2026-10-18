@@ -735,8 +735,10 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .dashboard-queues .queue-arrow { display: none; }
 }
 @media screen and (max-width: 780px) {
-    .dashboard-heading { gap: 14px; }
-    .dashboard-heading h1 { font-size: 26px; }
+    .dashboard-heading { align-items: stretch; gap: 10px; margin-bottom: 16px; }
+    .dashboard-heading > div:first-child { flex: none; width: 100%; }
+    .dashboard-heading h1 { font-size: 26px; margin: 3px 0 0; }
+    .dashboard-heading .subtle { margin: 4px 0 0; }
     .dashboard-heading .home-branch-picker { align-self: flex-start; }
     .courier-hero { min-height: 360px; padding: 24px; flex-direction: column; align-items: flex-start; justify-content: flex-start; background-position: 60% center; gap: 24px; }
     .courier-hero::before { background: linear-gradient(90deg, #1c1c17d9, #1c1c1755); }
