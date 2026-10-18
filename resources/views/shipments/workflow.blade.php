@@ -1,6 +1,6 @@
 @php
-    $originUser = auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->origin_branch_id;
-    $destinationUser = auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->destination_branch_id;
+    $originUser = \App\Services\BranchAccess::canOperate(auth()->user(), $shipment->origin_branch_id);
+    $destinationUser = \App\Services\BranchAccess::canOperate(auth()->user(), $shipment->destination_branch_id);
 @endphp
 <section class="card"><div class="card-head"><h2>{{ __('Parcel workflow') }}</h2><x-branch-route :record="$shipment" /></div><div class="card-body">
 <x-parcel-progress :shipment="$shipment" />

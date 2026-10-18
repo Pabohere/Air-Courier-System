@@ -10,7 +10,7 @@
 <p class="subtle">{{ $dispatch->partner }} · {{ $dispatch->dispatch_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</p>
 </div>
 <div class="actions">
-<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">{{ __('Print manifest ↗') }}</a>@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $dispatch->origin_branch_id))
+<a class="button secondary" target="_blank" rel="noopener" href="{{ route('dispatches.manifest',$dispatch) }}">{{ __('Print manifest ↗') }}</a>@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || \App\Services\BranchAccess::canOperate(auth()->user(), $dispatch->origin_branch_id)))
 <form method="post" action="{{ route('dispatches.handover',$dispatch) }}" data-confirm="{{ __('Confirm physical handover? All assigned shipments will be marked Dispatched.') }}">
 @csrf<button class="button">{{ __('Record handover →') }}</button>
 </form>
@@ -95,12 +95,12 @@
 <x-parcel-stage :shipment="$shipment" />
 </td>
 <td>
-@if($dispatch->handed_over_at && $shipment->destination_branch_id && in_array($shipment->status, ['Dispatched', 'In Transit']) && (auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->destination_branch_id))
+@if($dispatch->handed_over_at && $shipment->destination_branch_id && in_array($shipment->status, ['Dispatched', 'In Transit']) && (\App\Services\BranchAccess::canOperate(auth()->user(), $shipment->destination_branch_id)))
 <form method="post" action="{{ route('shipments.receive', $shipment) }}">@csrf<input type="hidden" name="storage_location" value="Receiving area"><button class="button small">{{ __('Receive at :branch branch', ['branch' => $shipment->destinationBranch?->code]) }}</button></form>
 @elseif($shipment->arrived_at)
 <span class="badge">{{ __('Arrived at :branch branch', ['branch' => $shipment->destinationBranch?->code]) }}</span>
 @endif
-@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $dispatch->origin_branch_id))
+@if(!$dispatch->handed_over_at && (!$dispatch->origin_branch_id || \App\Services\BranchAccess::canOperate(auth()->user(), $dispatch->origin_branch_id)))
 <form method="post" action="{{ route('dispatches.unassign',[$dispatch,$shipment]) }}">
 @csrf @method('DELETE')<button class="button small secondary">{{ __('Remove from draft') }}</button>
 </form>

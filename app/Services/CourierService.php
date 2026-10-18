@@ -234,7 +234,10 @@ class CourierService
             $origin = $shipments->first()->originBranch;
             $route = ['origin_branch_id' => $shipments->first()->origin_branch_id, 'destination_branch_id' => $shipments->first()->destination_branch_id];
             if ($origin) {
-                BranchAccess::authorize($user, $origin->id);
+                BranchAccess::authorizeOperation($user, $origin->id);
+                if (isset($data['origin_branch_id']) && (int) $data['origin_branch_id'] !== $origin->id) {
+                    throw ValidationException::withMessages(['origin_branch_id' => __('Selected parcels must belong to the chosen origin branch.')]);
+                }
                 if ($shipments->contains(fn ($parcel) => ! $parcel->in_storage || $parcel->current_branch_id !== $origin->id)) {
                     throw ValidationException::withMessages(['shipments' => __('All parcels must be in origin branch storage before dispatch.')]);
                 }
@@ -268,7 +271,7 @@ class CourierService
         DB::transaction(function () use ($dispatch, $user) {
             $locked = Dispatch::query()->lockForUpdate()->findOrFail($dispatch->id);
             if ($locked->origin_branch_id) {
-                BranchAccess::authorize($user, $locked->origin_branch_id);
+                BranchAccess::authorizeOperation($user, $locked->origin_branch_id);
             }
             if ($locked->handed_over_at) {
                 return;
@@ -301,7 +304,7 @@ class CourierService
         DB::transaction(function () use ($dispatch, $shipment, $user) {
             $locked = Dispatch::query()->lockForUpdate()->findOrFail($dispatch->id);
             if ($locked->origin_branch_id) {
-                BranchAccess::authorize($user, $locked->origin_branch_id);
+                BranchAccess::authorizeOperation($user, $locked->origin_branch_id);
             }
             $s = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
             if ($locked->handed_over_at || $s->dispatch_id !== $locked->id) {
@@ -389,14 +392,14 @@ class CourierService
             }
             $branch = in_array($status, ['Arrived at Branch', 'Ready for Collection', 'Collected'], true) ? $shipment->destination_branch_id : ($shipment->current_branch_id ?? $shipment->origin_branch_id);
 
-            return $user->isAdmin() || $user->branch_id === $branch;
+            return BranchAccess::canOperate($user, $branch);
         }));
     }
 
     private function authorizeStep(Shipment $shipment, string $status, User $user): void
     {
         $branch = in_array($status, ['Arrived at Branch', 'Ready for Collection', 'Collected'], true) ? $shipment->destination_branch_id : ($shipment->current_branch_id ?? $shipment->origin_branch_id);
-        BranchAccess::authorize($user, $branch);
+        BranchAccess::authorizeOperation($user, $branch);
         if (in_array($status, ['Arrived at Branch', 'Ready for Collection', 'Collected'], true) && ! $shipment->dispatch?->handed_over_at) {
             throw ValidationException::withMessages(['status' => __('A recorded dispatch handover is required.')]);
         }

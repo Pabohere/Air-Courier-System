@@ -24,7 +24,7 @@
 <form method="post" action="{{ route('dispatches.store') }}">
 @csrf<input type="hidden" name="draft_revision" value="{{ old('draft_revision', $draft?->revision ?? 0) }}">
 <input type="hidden" name="draft_id" value="{{ old('draft_id', $draft?->key ?? \Illuminate\Support\Str::uuid()) }}">
-<label>{{ __('Origin branch') }}<select name="origin_branch_id">@foreach($branches as $origin) @if(auth()->user()->isAdmin() || auth()->user()->branch_id === $origin->id)<option value="{{ $origin->id }}" @selected(old('origin_branch_id', auth()->user()->branch_id ?? $branches->first()->id) == $origin->id)>{{ $origin->code }}</option>@endif @endforeach</select></label>
+<label>{{ __('Origin branch') }}<select name="origin_branch_id">@foreach($branches as $origin) @if($operationBranchId === $origin->id)<option value="{{ $origin->id }}" @selected($operationBranchId == $origin->id)>{{ $origin->code }}</option>@endif @endforeach</select></label>
 <div class="two-columns">
 <div class="field-grid">
 <label class="full">{{ __('Carrier name (person carrying the parcels)') }}<input name="carrier_name" value="{{ old('carrier_name') }}" maxlength="150" required><span class="help">{{ __('Enter the person’s name separately from the airline or courier company.') }}</span></label>

@@ -17,9 +17,12 @@ class SimpleWorkflowService
             if ($parcels->count() !== count($data['shipments'])) {
                 throw ValidationException::withMessages(['shipments' => __('Choose parcels currently in origin storage.')]);
             }
+            if ($parcels->map(fn ($parcel) => $parcel->origin_branch_id.':'.$parcel->destination_branch_id)->unique()->count() > 1) {
+                throw ValidationException::withMessages(['shipments' => __('A dispatch must contain parcels with the same origin and destination branches.')]);
+            }
             $courier = app(CourierService::class);
             foreach ($parcels as $parcel) {
-                BranchAccess::authorize($user, $parcel->origin_branch_id);
+                BranchAccess::authorizeOperation($user, $parcel->origin_branch_id);
                 if (! $parcel->origin_branch_id || ! $parcel->in_storage || $parcel->current_branch_id !== $parcel->origin_branch_id || $parcel->dispatch_id || ! in_array($parcel->status, ['Received', 'Processing', 'Ready for Dispatch'], true)) {
                     throw ValidationException::withMessages(['shipments' => __('Choose parcels currently in origin storage.')]);
                 }
@@ -45,7 +48,7 @@ class SimpleWorkflowService
         DB::transaction(function () use ($shipment, $user, $location): void {
             $parcel = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
             abort_unless($parcel->origin_branch_id, 422);
-            BranchAccess::authorize($user, $parcel->destination_branch_id);
+            BranchAccess::authorizeOperation($user, $parcel->destination_branch_id);
             if ($parcel->status === 'Ready for Collection') {
                 return;
             }
@@ -67,7 +70,7 @@ class SimpleWorkflowService
         DB::transaction(function () use ($shipment, $data, $user): void {
             $parcel = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
             abort_unless($parcel->origin_branch_id, 422);
-            BranchAccess::authorize($user, $parcel->destination_branch_id);
+            BranchAccess::authorizeOperation($user, $parcel->destination_branch_id);
             if ($parcel->status === 'Collected') {
                 return;
             }

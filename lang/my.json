@@ -710,5 +710,7 @@
   "parcels": "ပစ္စည်း",
   "Branch workload": "ဆိုင်ခွဲ လုပ်ငန်းအခြေအနေ",
   "No parcels awaiting action.": "ဆောင်ရွက်ရန် စောင့်ဆိုင်းနေသော ပစ္စည်း မရှိပါ။",
-  "Every parcel. Every payment. All in one place.": "ပစ္စည်းတိုင်း၊ ငွေပေးချေမှုတိုင်းကို တစ်နေရာတည်းမှာ စီမံပါ။"
+  "Every parcel. Every payment. All in one place.": "ပစ္စည်းတိုင်း၊ ငွေပေးချေမှုတိုင်းကို တစ်နေရာတည်းမှာ စီမံပါ။",
+  "Switch to the responsible branch on Home before continuing.": "ဆက်လက်ဆောင်ရွက်ရန် ပင်မစာမျက်နှာတွင် သက်ဆိုင်ရာဆိုင်ခွဲကို အရင်ရွေးချယ်ပါ။",
+  "Selected parcels must belong to the chosen origin branch.": "ရွေးထားသော ပါဆယ်များသည် ရွေးချယ်ထားသည့် ပို့မည့်ဆိုင်ခွဲမှ ဖြစ်ရပါမည်။"
 }

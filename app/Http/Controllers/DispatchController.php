@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Dispatch;
 use App\Models\EntryDraft;
 use App\Models\Shipment;
+use App\Services\BranchAccess;
 use App\Services\CourierService;
 use App\Services\EntryDraftService;
 use App\Services\SimpleWorkflowService;
@@ -18,9 +19,19 @@ class DispatchController extends Controller
 {
     public function index(Request $request, EntryDraftService $drafts): View
     {
-        $request->validate(['q' => 'nullable|string|max:150', 'week' => 'nullable|date_format:Y-m-d']);
+        $request->validate(['q' => 'nullable|string|max:150', 'week' => 'nullable|date_format:Y-m-d', 'origin_branch_id' => 'nullable|integer|exists:branches,id', 'branch_id' => 'nullable|integer|exists:branches,id', 'shipment' => 'nullable|integer|exists:shipments,id']);
         $draft = $drafts->hydrate($request, 'trip');
-        $branch = $request->user()->branch ?? Branch::where('code', $request->session()->get('dashboard_branch_code', 'YGN'))->firstOrFail();
+        $operationBranchId = BranchAccess::operationBranchId($request->user());
+        $branch = Branch::find($operationBranchId) ?? Branch::where('code', 'YGN')->firstOrFail();
+        $originId = $request->input('origin_branch_id', $request->input('branch_id'));
+        if ($request->filled('shipment')) {
+            $parcel = Shipment::visibleTo($request->user())->findOrFail($request->integer('shipment'));
+            BranchAccess::authorizeOperation($request->user(), $parcel->origin_branch_id);
+        }
+        if ($originId) {
+            BranchAccess::authorizeOperation($request->user(), (int) $originId);
+        }
+        $originBranch = $branch;
         $weekStart = CarbonImmutable::parse($request->input('week', now($branch->timezone)->toDateString()), $branch->timezone)->startOfWeek();
         $weekly = Dispatch::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->withCount(['shipments', 'shipments as arrived_count' => fn ($q) => $q->whereNotNull('arrived_at'), 'shipments as completed_count' => fn ($q) => $q->where('status', 'Collected')])->where(function ($query) use ($weekStart): void {
             foreach (Branch::all() as $origin) {
@@ -33,7 +44,7 @@ class DispatchController extends Controller
             ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('carrier_name', 'like', '%'.$search.'%')->orWhere('reference', 'like', '%'.$search.'%')->orWhere('flight', 'like', '%'.$search.'%')->orWhere('partner', 'like', '%'.$search.'%')->orWhereHas('shipments', fn ($parcels) => $parcels->where('tracking_number', 'like', '%'.$search.'%'))))
             ->latest('id')->paginate(20)->withQueryString();
 
-        return view('dispatches.index', ['draft' => $draft, 'entryDrafts' => EntryDraft::openFor($request->user(), 'trip')->latest()->get(), 'weekly' => $weekly, 'weekStart' => $weekStart, 'dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch'])->where('in_storage', true)->whereColumn('current_branch_id', 'origin_branch_id')->when(! $request->user()->isAdmin(), fn ($q) => $q->where('origin_branch_id', $request->user()->branch_id ?? 0))->whereNull('dispatch_id')->get()]);
+        return view('dispatches.index', ['originBranch' => $originBranch, 'operationBranchId' => $operationBranchId, 'draft' => $draft, 'entryDrafts' => EntryDraft::openFor($request->user(), 'trip')->latest()->get(), 'weekly' => $weekly, 'weekStart' => $weekStart, 'dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch'])->where('in_storage', true)->whereColumn('current_branch_id', 'origin_branch_id')->where('origin_branch_id', $operationBranchId ?? 0)->whereNull('dispatch_id')->get()]);
     }
 
     public function store(Request $request, CourierService $service, EntryDraftService $drafts): RedirectResponse
@@ -42,7 +53,7 @@ class DispatchController extends Controller
         if ($quick) {
             $request->merge(['dispatch_date' => substr((string) $request->input('flight_departure_at'), 0, 10)]);
         }
-        $data = $request->validate(['quick_action' => 'nullable|in:send,draft', 'carrier_name' => 'required|string|max:150', 'partner' => ($quick ? 'nullable' : 'required').'|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
+        $data = $request->validate(['origin_branch_id' => 'nullable|integer|exists:branches,id', 'quick_action' => 'nullable|in:send,draft', 'carrier_name' => 'required|string|max:150', 'partner' => ($quick ? 'nullable' : 'required').'|string|max:150', 'dispatch_date' => 'required|date_format:Y-m-d', 'flight' => 'nullable|string|max:100', 'flight_departure_at' => 'nullable|date_format:Y-m-d\\TH:i', 'notes' => 'nullable|string|max:2000', 'shipments' => 'required|array|min:1|max:500', 'shipments.*' => 'required|integer|distinct|exists:shipments,id']);
         $data['partner'] = $data['partner'] ?? '';
         $dispatch = $drafts->complete($request, 'trip', fn () => $quick ? app(SimpleWorkflowService::class)->dispatch($data, $request->user(), $data['quick_action'] === 'send') : $service->createDispatch($data, $request->user()));
 
