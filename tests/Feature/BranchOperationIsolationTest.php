@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\PaymentMethod;
@@ -141,6 +142,56 @@ class BranchOperationIsolationTest extends TestCase
             $this->assertNull($parcel->fresh()->dispatch_id);
             $this->post(route('dispatches.store'), $data)->assertSessionHasNoErrors();
             $this->assertSame($origin->id, $parcel->fresh()->dispatch->origin_branch_id);
+        }
+    }
+
+    public function test_inventory_management_requires_the_physical_branch_for_admins_and_staff_in_both_directions(): void
+    {
+        $admin = User::factory()->admin()->create();
+        foreach (['SG', 'YGN'] as $code) {
+            $origin = Branch::where('code', $code)->firstOrFail();
+            $destination = Branch::where('code', '!=', $code)->firstOrFail();
+            $owner = User::factory()->create(['branch_id' => $origin->id]);
+            $other = User::factory()->create(['branch_id' => $destination->id]);
+            $parcel = $this->parcel($owner, $destination);
+            app(CourierService::class)->transition($parcel, 'Cancelled', 'UAT return', $owner);
+            $before = $parcel->fresh()->getAttributes();
+            $movements = $parcel->storageMovements()->count();
+            $audits = AuditLog::count();
+
+            foreach ([$admin, $other] as $actor) {
+                $this->actingAs($actor)->withSession(['dashboard_branch_code' => $actor->isAdmin() ? $destination->code : $origin->code]);
+                $this->get(route('shipments.show', $parcel))->assertOk()
+                    ->assertDontSee('action="'.route('inventory.move', $parcel).'"', false)
+                    ->assertDontSee('action="'.route('inventory.return', $parcel).'"', false);
+                $this->get(route('inventory.edit', $parcel))->assertForbidden();
+                $this->post(route('inventory.move', $parcel), ['storage_location' => 'Wrong shelf', 'branch_id' => $origin->id])->assertForbidden();
+                $this->delete(route('inventory.destroy', $parcel), ['reason' => 'Wrong branch'])->assertForbidden();
+                $this->post(route('inventory.restore', $parcel))->assertForbidden();
+                $this->post(route('inventory.return', $parcel), ['notes' => 'Wrong branch'])->assertForbidden();
+                $this->assertSame($before, $parcel->fresh()->getAttributes());
+                $this->assertSame($movements, $parcel->storageMovements()->count());
+                $this->assertSame($audits, AuditLog::count());
+            }
+
+            $this->actingAs($admin)->withSession(['dashboard_branch_code' => $destination->code]);
+            $this->get(route('inventory.index', ['branch_id' => $origin->id]))->assertOk()
+                ->assertSee($parcel->tracking_number)->assertDontSee('Update storage entry')->assertDontSee('Create storage entry');
+            $this->get(route('dashboard', ['branch_id' => $origin->id]))->assertOk();
+            $this->get(route('inventory.edit', $parcel))->assertOk();
+            $this->post(route('inventory.move', $parcel), ['storage_location' => 'Owner shelf'])->assertSessionHasNoErrors();
+            $this->assertSame('Owner shelf', $parcel->fresh()->storage_location);
+            $this->delete(route('inventory.destroy', $parcel), ['reason' => 'Owner archive'])->assertSessionHasNoErrors();
+            $this->assertNotNull($parcel->fresh()->inventory_archived_at);
+            $this->get(route('dashboard', ['branch_id' => $destination->id]))->assertOk();
+            $this->post(route('inventory.restore', $parcel))->assertForbidden();
+            $this->assertNotNull($parcel->fresh()->inventory_archived_at);
+            $this->get(route('dashboard', ['branch_id' => $origin->id]))->assertOk();
+            $this->post(route('inventory.restore', $parcel))->assertSessionHasNoErrors();
+            $this->assertNull($parcel->fresh()->inventory_archived_at);
+            $this->post(route('inventory.return', $parcel), ['notes' => 'Owner confirmed physical return'])->assertSessionHasNoErrors();
+            $this->assertFalse($parcel->fresh()->in_storage);
+            $this->assertNull($parcel->fresh()->current_branch_id);
         }
     }
 }

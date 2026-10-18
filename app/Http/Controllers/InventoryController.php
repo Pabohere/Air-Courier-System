@@ -35,7 +35,7 @@ class InventoryController extends Controller
 
     public function edit(Request $request, Shipment $shipment): View
     {
-        BranchAccess::authorize($request->user(), $shipment->current_branch_id);
+        BranchAccess::authorizeOperation($request->user(), $shipment->current_branch_id);
         abort_unless($shipment->in_storage && $shipment->current_branch_id !== null, 422);
         $shipment->load('currentBranch');
 

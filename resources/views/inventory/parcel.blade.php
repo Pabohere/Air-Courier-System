@@ -1,7 +1,7 @@
 <section class="card"><div class="card-head"><h2>{{ __('Parcel storage') }}</h2><span class="badge">{{ $shipment->in_storage ? __('In storage') : __('Outside storage') }}</span></div><div class="card-body">
 @if($shipment->in_storage)
 <p><strong>{{ $shipment->currentBranch?->code }} · {{ __($shipment->storage_location) }}</strong><small>{{ $shipment->stored_at?->timezone($shipment->currentBranch?->timezone ?? config('app.timezone'))->format('d M Y H:i') }}</small></p>
-@if(auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->current_branch_id)
+@if(\App\Services\BranchAccess::canOperate(auth()->user(), $shipment->current_branch_id))
 <form method="post" action="{{ route('inventory.move', $shipment) }}" class="field-grid">@csrf<label>{{ __('Storage location') }}<input name="storage_location" value="{{ old('storage_location', $shipment->storage_location) }}" maxlength="100" required></label><label>{{ __('Notes') }}<input name="notes" maxlength="2000"></label><button class="button secondary">{{ __('Move storage location') }}</button></form>
 @if($shipment->status === 'Cancelled')<form class="section-gap" method="post" action="{{ route('inventory.return', $shipment) }}" data-confirm="{{ __('Confirm the parcel has physically been returned to the sender?') }}">@csrf<label>{{ __('Return reason / received by') }}<input name="notes" maxlength="2000" required></label><button class="button secondary section-gap">{{ __('Record return to sender') }}</button></form>@endif
 @endif

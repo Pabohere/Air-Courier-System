@@ -14,7 +14,7 @@ class InventoryService
     {
         DB::transaction(function () use ($shipment, $user, $location): void {
             $locked = Shipment::query()->lockForUpdate()->findOrFail($shipment->id);
-            BranchAccess::authorize($user, $locked->current_branch_id);
+            BranchAccess::authorizeOperation($user, $locked->current_branch_id);
             if ($locked->current_branch_id === null || $locked->in_storage || ! in_array($locked->status, ['Received', 'Arrived at Branch'], true)) {
                 throw ValidationException::withMessages(['storage_location' => __('This parcel cannot be received into storage at this stage.')]);
             }
@@ -79,7 +79,7 @@ class InventoryService
 
     private function authorizeStored(Shipment $shipment, User $user): void
     {
-        BranchAccess::authorize($user, $shipment->current_branch_id);
+        BranchAccess::authorizeOperation($user, $shipment->current_branch_id);
         if (! $shipment->in_storage || $shipment->current_branch_id === null) {
             throw ValidationException::withMessages(['inventory' => __('This parcel is not currently in branch storage.')]);
         }
