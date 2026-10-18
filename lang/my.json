@@ -703,5 +703,12 @@
   "Menu": "မီနူး",
   "Close menu": "မီနူးပိတ်ရန်",
   "No outstanding balances for this view/currency.": "ဤမြင်ကွင်း/ငွေကြေးအတွက် လက်ကျန်ငွေ မရှိပါ။",
-  "Planned / Awaiting carrier handover": "အစီအစဉ်ဆွဲထားပြီး / သယ်ဆောင်သူထံ လွှဲအပ်ရန် စောင့်ဆိုင်းနေသည်"
+  "Planned / Awaiting carrier handover": "အစီအစဉ်ဆွဲထားပြီး / သယ်ဆောင်သူထံ လွှဲအပ်ရန် စောင့်ဆိုင်းနေသည်",
+  "Keep parcels": "ပစ္စည်းတိုင်းကို",
+  "in motion.": "ချောမွေ့စွာ ပို့ဆောင်ပါ။",
+  "Connected branch operations": "ချိတ်ဆက်ထားသော ဆိုင်ခွဲလုပ်ငန်းများ",
+  "parcels": "ပစ္စည်း",
+  "Branch workload": "ဆိုင်ခွဲ လုပ်ငန်းအခြေအနေ",
+  "No parcels awaiting action.": "ဆောင်ရွက်ရန် စောင့်ဆိုင်းနေသော ပစ္စည်း မရှိပါ။",
+  "Every parcel. Every payment. All in one place.": "ပစ္စည်းတိုင်း၊ ငွေပေးချေမှုတိုင်းကို တစ်နေရာတည်းမှာ စီမံပါ။"
 }
