@@ -46,7 +46,7 @@
 @empty
 <tr>
 <td colspan="6" class="empty">
-{{ __('No shipments yet. Create a booking to get started.') }}
+{{ __($emptyMessage ?? 'No shipments yet. Create a booking to get started.') }}
 </td>
 </tr>
 @endforelse

@@ -287,6 +287,6 @@
 </div>
 <a class="button small secondary" href="{{ route('reports.export',['from'=>$from,'to'=>$to,'type'=>'outstanding']+$scope) }}">{{ __('Outstanding CSV ↓') }}</a>
 </div>
-@include('shipments.table',['shipments'=>$report['outstanding']])
+@include('shipments.table',['shipments'=>$report['outstanding'], 'emptyMessage'=>'No outstanding balances for this view/currency.'])
 </div>
 @endsection

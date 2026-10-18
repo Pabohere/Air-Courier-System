@@ -701,5 +701,7 @@
   "Trips": "ခရီးစဉ်",
   "Books": "ငွေစာရင်း",
   "Menu": "မီနူး",
-  "Close menu": "မီနူးပိတ်ရန်"
+  "Close menu": "မီနူးပိတ်ရန်",
+  "No outstanding balances for this view/currency.": "ဤမြင်ကွင်း/ငွေကြေးအတွက် လက်ကျန်ငွေ မရှိပါ။",
+  "Planned / Awaiting carrier handover": "အစီအစဉ်ဆွဲထားပြီး / သယ်ဆောင်သူထံ လွှဲအပ်ရန် စောင့်ဆိုင်းနေသည်"
 }

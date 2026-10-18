@@ -36,12 +36,13 @@ class PlannedTransfersTest extends TestCase
             $this->actingAs($sender)->post(route('dispatches.store'), ['quick_action' => 'draft', 'carrier_name' => 'Weekly carrier '.$code, 'flight' => 'TEST'.$code, 'flight_departure_at' => '2026-10-18T15:00', 'shipments' => [$parcel->id]])->assertSessionHasNoErrors();
             $this->assertTrue($parcel->fresh()->in_storage);
             $this->assertNull($parcel->fresh()->arrived_at);
-            $this->actingAs($receiver)->get(route('branches.index', ['tab' => 'incoming']))->assertOk()->assertViewHas('incoming', fn ($rows) => $rows->contains('id', $parcel->id))->assertSee('Due at '.$destination->code.' branch')->assertDontSee('Arrived at '.$destination->code.' branch');
+            $this->actingAs($receiver)->get(route('branches.index', ['tab' => 'incoming']))->assertOk()->assertViewHas('incoming', fn ($rows) => $rows->contains('id', $parcel->id))->assertSee('Planned / Awaiting carrier handover')->assertDontSee('Due at '.$destination->code.' branch')->assertDontSee('Arrived at '.$destination->code.' branch');
             $this->get(route('dashboard'))->assertOk()->assertViewHas('incoming', 1);
             $this->get(route('dispatches.index'))->assertOk()->assertViewHas('weekly', fn ($rows) => $rows->contains('id', $parcel->fresh()->dispatch_id))->assertSee('Weekly carrier '.$code)->assertSee('TEST'.$code);
             $this->travelTo(Carbon::parse('2026-10-18 16:00', $origin->timezone));
             $this->actingAs($sender)->post(route('dispatches.handover', $parcel->fresh()->dispatch))->assertSessionHasNoErrors();
-            $this->actingAs($receiver)->post(route('shipments.receive', $parcel), ['storage_location' => 'Collection shelf'])->assertSessionHasNoErrors();
+            $this->actingAs($receiver)->get(route('shipments.show', $parcel))->assertOk()->assertSee('Due at '.$destination->code.' branch')->assertDontSee('Planned / Awaiting carrier handover');
+            $this->post(route('shipments.receive', $parcel), ['storage_location' => 'Collection shelf'])->assertSessionHasNoErrors();
             $this->assertNotNull($parcel->fresh()->arrived_at);
             $this->get(route('shipments.show', $parcel))->assertOk()->assertSee('Arrived at '.$destination->code.' branch')->assertDontSee('Collected · Completed');
             $this->post(route('shipments.collect', $parcel), ['collector_name' => 'Receiver', 'receive_balance' => 1, 'payment_method_id' => PaymentMethod::where('name', 'Cash')->value('id'), 'submission_key' => (string) Str::uuid()])->assertSessionHasNoErrors();

@@ -66,7 +66,7 @@
 {{ __('Cancelled shipment has retained payments. An administrator should review whether a refund is required.') }}
 </div>
 @endif
-<details class="workflow-details"><summary>{{ __('Details, payments and history') }}</summary>
+<details class="workflow-details" @if(old('_payment_form') === 'record' && $errors->any()) open @endif><summary>{{ __('Details, payments and history') }}</summary>
 <div class="split">
 <div>
 <div class="card">
@@ -247,11 +247,15 @@
 </h2>
 </div>
 <div class="card-body">
-<form method="post" action="{{ route('payments.store',$shipment) }}">
+<form method="post" action="{{ route('payments.store',$shipment) }}" data-payment-error="{{ old('_payment_form') === 'record' ? ($errors->keys()[0] ?? '') : '' }}">
+<input type="hidden" name="_payment_form" value="record">
+@if(old('_payment_form') === 'record' && $errors->any())
+<p class="notice error" role="alert">{{ $errors->first() }}</p>
+@endif
 @csrf<input type="hidden" name="submission_key" value="{{ old('submission_key',\Illuminate\Support\Str::uuid()) }}">
 <div class="field-grid">
 @if($shipment->origin_branch_id && auth()->user()->isAdmin())
-<label class="full">{{ __('Receiving payment branch') }}<select name="branch_id" required>@foreach($branches->whereIn('id', [$shipment->origin_branch_id, $shipment->destination_branch_id]) as $payBranch)<option value="{{ $payBranch->id }}" @selected(($shipment->current_branch_id ?? $shipment->origin_branch_id) === $payBranch->id)>{{ $payBranch->code }}</option>@endforeach</select></label>
+<label class="full">{{ __('Receiving payment branch') }}<select name="branch_id" required>@foreach($branches->whereIn('id', [$shipment->origin_branch_id, $shipment->destination_branch_id]) as $payBranch)<option value="{{ $payBranch->id }}" @selected(old('branch_id', $shipment->current_branch_id ?? $shipment->origin_branch_id) == $payBranch->id)>{{ $payBranch->code }}</option>@endforeach</select></label>
 @endif
 <label class="full">
 {{ __('Amount (') }}{{ $shipment->currency }})<input type="number" name="amount" min="0.01" max="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}" step="0.01" value="{{ old('amount',\App\Services\Money::decimal($shipment->balanceCents())) }}" required>

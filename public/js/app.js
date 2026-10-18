@@ -170,6 +170,14 @@ document.querySelectorAll('[data-payment-details]').forEach((section) => {
     update();
 });
 
+document.querySelectorAll('form[data-payment-error]').forEach((form) => {
+    const field = form.elements.namedItem(form.dataset.paymentError);
+    if (field && !field.disabled && field.type !== 'hidden') {
+        field.setAttribute('aria-invalid', 'true');
+        field.focus();
+    }
+});
+
 const photoViewer = document.querySelector('[data-photo-viewer]');
 if (photoViewer) {
     let gallery = [];
