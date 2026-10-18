@@ -1,21 +1,21 @@
-/* Warm neutral surfaces and sage accents shared across the workspace. */
+/* Blue brand accents with neutral, low-saturation dark surfaces. */
 :root {
     color-scheme: light;
-    --ink: #272923;
-    --muted: #6d7067;
-    --primary: #46634d;
-    --bg: #f3f2ee;
-    --line: #e2e2da;
+    --ink: #182334;
+    --muted: #5c6678;
+    --primary: #2859dc;
+    --bg: #f7f8fa;
+    --line: #e1e5ec;
     --glass: #ffffff;
-    --glass-edge: #e2e2da;
+    --glass-edge: #e1e5ec;
     --surface: #ffffff;
     --card: #ffffff;
-    --field: #fafaf7;
-    --tint: #f1f2ec;
-    --blue-soft: #e9eee4;
-    --blue-ink: #3c5943;
-    --royal-soft: #efeee8;
-    --royal-ink: #69644b;
+    --field: #fafbfe;
+    --tint: #f1f4fa;
+    --blue-soft: #edf3ff;
+    --blue-ink: #2454c6;
+    --royal-soft: #edf1f7;
+    --royal-ink: #3e5774;
     --mint-soft: #e6efe5;
     --mint-ink: #3c6646;
     --rose-soft: #f8eae6;
@@ -24,31 +24,35 @@
     --amber-ink: #7e652d;
     --shadow: 0 3px 18px rgba(36, 37, 29, .025);
     --shine: 0 0 0 transparent;
-    --yangon-blue: #46634d;
-    --yangon-polo: #81917d;
-    --changi-plum: #80745d;
-    --changi-teal: #46634d;
-    --action-bg: #344a39;
+    --yangon-blue: #2859dc;
+    --yangon-polo: #668da5;
+    --changi-plum: #3e5774;
+    --changi-teal: #2859dc;
+    --action-bg: #2859dc;
     --action-ink: #ffffff;
-    --action-hover: #273b2c;
+    --action-hover: #1f4bc7;
+    --header-bg: #2d5cff;
+    --header-ink: #ffffff;
+    --header-control: #2450df;
+    --header-line: #ffffff40;
 }
 html[data-theme="dark"] {
     color-scheme: dark;
-    --ink: #efefe9;
-    --muted: #aaa9a0;
-    --primary: #b4cba8;
-    --bg: #161715;
-    --line: #343630;
-    --glass: #20211e;
-    --glass-edge: #343630;
-    --surface: #292b26;
-    --card: #20211e;
-    --field: #252722;
-    --tint: #2b2d27;
-    --blue-soft: #303a2c;
-    --blue-ink: #c6d9b8;
-    --royal-soft: #38352a;
-    --royal-ink: #d9cfab;
+    --ink: #edf0f4;
+    --muted: #a8adb6;
+    --primary: #acc2e0;
+    --bg: #17191c;
+    --line: #34383e;
+    --glass: #212429;
+    --glass-edge: #34383e;
+    --surface: #2a2e34;
+    --card: #212429;
+    --field: #25292f;
+    --tint: #2b3037;
+    --blue-soft: #2b3748;
+    --blue-ink: #c3d5ee;
+    --royal-soft: #303844;
+    --royal-ink: #c4cfdf;
     --mint-soft: #2a392e;
     --mint-ink: #b0d2b5;
     --rose-soft: #3d2b26;
@@ -57,9 +61,13 @@ html[data-theme="dark"] {
     --amber-ink: #e0cb91;
     --shadow: 0 3px 18px rgba(0, 0, 0, .08);
     --shine: 0 0 0 transparent;
-    --action-bg: #c5d9b6;
-    --action-ink: #202a1d;
-    --action-hover: #d7e7ca;
+    --action-bg: #acc2e0;
+    --action-ink: #1b293c;
+    --action-hover: #c0d2eb;
+    --header-bg: #222c3a;
+    --header-ink: #edf0f4;
+    --header-control: #2b3748;
+    --header-line: #455063;
 }
 body {
     background: var(--bg);
@@ -153,10 +161,10 @@ h3 { font-size: 17px; }
 .sidebar-bottom small { color: var(--ink); font-weight: 700; font-size: 14px; }
 .live-dot { background: #6b9e9c; box-shadow: none; }
 .workspace { margin-left: 240px; min-width: 0; }
-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; height: auto; min-height: 80px; margin: 0; padding: 18px 36px; border: 0; border-radius: 0; gap: 18px; background: var(--bg); box-shadow: none; color: var(--ink); border-bottom: 1px solid var(--line); }
-header :is(.breadcrumbs, .breadcrumbs strong, .breadcrumbs span, .user, .user small, .text-button) { color: var(--ink); }
-header :is(.theme-switch, .language-switch) { background: var(--tint); border-color: var(--line); }
-header :is(.theme-switch, .language-switch) button { color: var(--ink); }
+header { display: grid; grid-template-columns: minmax(0, 1fr) auto; height: auto; min-height: 80px; margin: 0; padding: 18px 36px; border: 0; border-radius: 0; gap: 18px; background: var(--header-bg); box-shadow: none; color: var(--header-ink); border-bottom: 1px solid var(--header-line); }
+header :is(.breadcrumbs, .breadcrumbs strong, .breadcrumbs span, .user, .user small, .text-button) { color: var(--header-ink); }
+header :is(.theme-switch, .language-switch) { background: var(--header-control); border-color: var(--header-line); }
+header :is(.theme-switch, .language-switch) button { color: var(--header-ink); }
 header :is(.theme-switch, .language-switch) button[aria-pressed="true"] { background: var(--surface); color: var(--ink); }
 header .avatar { background: var(--blue-soft); color: var(--blue-ink); border-color: var(--line); }
 .breadcrumbs { min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
@@ -595,7 +603,7 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .button:active { opacity: .8; }
 }
 
-/* Courier workspace, inspired by the reference's quiet warehouse palette. */
+/* Reference-inspired courier layout with the blue brand palette. */
 @media screen {
     body { font-size: 14px; }
     h1 { letter-spacing: -1.1px; }
@@ -605,8 +613,8 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .sidebar .brand-copy { font-size: 21px; }
     .sidebar nav a { font-size: 13px; min-height: 44px; border-radius: 9px; font-weight: 500; }
     .sidebar nav a span { color: var(--muted); }
-    .sidebar nav a.active { background: var(--surface); color: var(--ink); border-color: var(--line); }
-    .sidebar nav a.active span { color: var(--ink); }
+    .sidebar nav a.active { background: var(--blue-soft); color: var(--blue-ink); border-color: var(--line); }
+    .sidebar nav a.active span { color: var(--blue-ink); }
     .sidebar .nav-caption { font-size: 10px; letter-spacing: 1.8px; }
     .sidebar-bottom { font-size: 11px; }
     header { padding-block: 14px; gap: 14px; }
@@ -649,8 +657,8 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .courier-hero h2 { color: #fff; font-weight: 600; font-size: clamp(34px, 4vw, 56px); letter-spacing: -2px; line-height: 1.08; margin: 0 0 14px; }
     .courier-hero p { font-size: 13px; color: #e6e1d5; margin: 0 0 24px; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-    .hero-actions .button { background: #f2efdf; border-color: #f2efdf; color: #2b3026; font-size: 12px; min-height: 42px; }
-    .hero-actions .button:hover { background: #fff; border-color: #fff; }
+    .hero-actions .button { background: var(--action-bg); border-color: var(--action-bg); color: var(--action-ink); font-size: 12px; min-height: 42px; }
+    .hero-actions .button:hover { background: var(--action-hover); border-color: var(--action-hover); color: var(--action-ink); }
     .hero-actions .button.secondary { color: #fff; background: #24251fa8; border-color: #ffffff55; backdrop-filter: blur(10px); }
     .hero-actions .button.secondary:hover { background: #24251f; }
     .hero-summary { width: 225px; align-self: flex-end; flex-shrink: 0; padding: 20px; border: 1px solid #ffffff26; border-radius: 12px; color: #f4f2e9; background: #24251de0; backdrop-filter: blur(12px); box-shadow: 0 8px 24px #00000020; }
@@ -664,7 +672,7 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .dashboard-queues .metric { display: flex; align-items: center; gap: 14px; padding: 20px; }
     .dashboard-queues .metric-label { margin: 0 0 2px; font-size: 12px; }
     .dashboard-queues .metric-value { font-size: 28px; line-height: 1.2; letter-spacing: -.7px; }
-    .queue-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; background: var(--mint-soft); color: var(--mint-ink); font-size: 24px; }
+    .queue-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; background: var(--blue-soft); color: var(--blue-ink); font-size: 24px; }
     .queue-incoming .queue-icon { background: var(--amber-soft); color: var(--amber-ink); }
     .queue-stored .queue-icon { background: var(--royal-soft); color: var(--royal-ink); }
     .queue-arrow { margin-left: auto; font-size: 17px; color: var(--muted); }
@@ -694,7 +702,7 @@ html[data-navigation-pending]::after { content: ""; position: fixed; z-index: 99
     .workload-row:last-of-type { padding-bottom: 0; }
     .workload-row strong { color: var(--ink); font-size: 13px; font-weight: 550; }
     .workload-track { grid-column: 1 / -1; height: 5px; overflow: hidden; border-radius: 4px; background: var(--tint); }
-    .workload-track > span { display: block; height: 100%; background: #91b58b; border-radius: inherit; }
+    .workload-track > span { display: block; height: 100%; background: #7c9dc5; border-radius: inherit; }
     .queue-incoming .workload-track > span { background: #c8b57c; }
     .queue-stored .workload-track > span { background: #a79c85; }
     .money-label { color: var(--muted); font-size: 12px; }
