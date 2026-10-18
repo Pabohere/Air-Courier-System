@@ -1,0 +1,99 @@
+/* Keep the shell steady while mobile content changes. */
+@media screen and (max-width: 780px) {
+    .mobile-nav {
+        --mobile-active: 0;
+        isolation: isolate;
+    }
+    .mobile-nav::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        top: 7px;
+        bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+        left: max(8px, env(safe-area-inset-left, 0px));
+        width: calc((100% - 16px) / 5);
+        border-radius: 10px;
+        background: var(--blue-soft);
+        transform: translateX(calc(var(--mobile-active) * 100%));
+        transition: transform 220ms cubic-bezier(.22, 1, .36, 1);
+        pointer-events: none;
+    }
+    .mobile-nav:has(> a:nth-child(2)[aria-current="page"]) { --mobile-active: 1; }
+    .mobile-nav:has(> a:nth-child(3)[aria-current="page"]) { --mobile-active: 2; }
+    .mobile-nav:has(> a:nth-child(4)[aria-current="page"]) { --mobile-active: 3; }
+    .mobile-nav:not(:has(> a[aria-current="page"])) { --mobile-active: 4; }
+    .mobile-nav:not(:has(> a[aria-current="page"])) > button { color: var(--blue-ink); }
+    .mobile-nav:has(> a:nth-child(1)[data-navigation-busy]) { --mobile-active: 0; }
+    .mobile-nav:has(> a:nth-child(2)[data-navigation-busy]) { --mobile-active: 1; }
+    .mobile-nav:has(> a:nth-child(3)[data-navigation-busy]) { --mobile-active: 2; }
+    .mobile-nav:has(> a:nth-child(4)[data-navigation-busy]) { --mobile-active: 3; }
+    .mobile-nav:has(> button[aria-expanded="true"]) { --mobile-active: 4; }
+    .mobile-nav > :is(a, button) {
+        transition: color 160ms ease, opacity 160ms ease;
+    }
+    .mobile-nav > a[aria-current="page"],
+    .mobile-nav > :is(a, button):active,
+    .mobile-nav > button:focus-visible {
+        background: transparent;
+    }
+    .mobile-nav > :is([data-navigation-busy], [aria-expanded="true"]) {
+        color: var(--blue-ink);
+        opacity: 1;
+    }
+    .mobile-nav > :is(a, button) > span:first-child {
+        transition: transform 160ms ease;
+    }
+    .mobile-nav > :is(a, button):active > span:first-child {
+        transform: translateY(1px) scale(.94);
+    }
+    .mobile-menu-links a {
+        transition: background-color 160ms ease, color 160ms ease;
+    }
+    .mobile-menu::backdrop {
+        animation: menu-backdrop-in 220ms ease both;
+    }
+    .mobile-menu[data-closing]::backdrop {
+        animation: menu-backdrop-out 160ms ease both;
+    }
+    .mobile-menu[data-closing] { pointer-events: none; }
+}
+@keyframes menu-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes menu-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+
+@media screen and (max-width: 780px) and (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; }
+    .workspace > main { view-transition-name: workspace-content; }
+    .workspace > header { view-transition-name: workspace-header; }
+    .mobile-nav { view-transition-name: workspace-navigation; }
+    ::view-transition-group(*) { animation-duration: 200ms; }
+    ::view-transition-old(root), ::view-transition-new(root),
+    ::view-transition-old(workspace-header), ::view-transition-new(workspace-header),
+    ::view-transition-old(workspace-navigation), ::view-transition-new(workspace-navigation) {
+        animation: none;
+    }
+    ::view-transition-old(workspace-content) {
+        animation: workspace-leave 160ms ease both;
+    }
+    ::view-transition-new(workspace-content) {
+        animation: workspace-enter 220ms cubic-bezier(.22, 1, .36, 1) both;
+    }
+    @supports not (view-transition-name: workspace-content) {
+        .workspace > main { animation: workspace-enter 180ms ease-out both; }
+    }
+}
+@keyframes workspace-enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes workspace-leave {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mobile-nav::before, .mobile-nav > :is(a, button),
+    .mobile-nav > :is(a, button) > span:first-child, .mobile-menu-links a {
+        transition: none;
+    }
+    .mobile-nav > :is(a, button):active > span:first-child { transform: none; }
+    .mobile-menu::backdrop, .mobile-menu[data-closing]::backdrop { animation: none; }
+}

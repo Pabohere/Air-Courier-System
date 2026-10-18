@@ -252,26 +252,11 @@ document.querySelectorAll('[data-table-search] .table-wrap').forEach((wrapper, i
     wrapper.before(search);
 });
 
-// Native dialogs provide focus containment, Escape and screen-reader semantics.
+// Mobile search stays independent of the menu dialog lifecycle.
 (() => {
-    const menu = document.querySelector('.mobile-menu');
     const searchToggle = document.querySelector('[data-mobile-search]');
     const header = searchToggle?.closest('header');
     const search = document.querySelector('#workspace-search');
-    let menuTrigger;
-    document.querySelectorAll('[data-mobile-menu-open]').forEach((button) => {
-        button.addEventListener('click', () => {
-            if (!menu || menu.open) return;
-            menuTrigger = button;
-            menu.showModal();
-        });
-    });
-    document.querySelector('[data-mobile-menu-close]')?.addEventListener('click', () => menu.close());
-    menu?.addEventListener('click', (event) => { if (event.target === menu) {
-        const box = menu.getBoundingClientRect();
-        if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) menu.close();
-    } });
-    menu?.addEventListener('close', () => menuTrigger?.focus());
     searchToggle?.addEventListener('click', () => {
         const opened = header.toggleAttribute('data-search-open');
         searchToggle.setAttribute('aria-expanded', String(opened));
@@ -283,8 +268,5 @@ document.querySelectorAll('[data-table-search] .table-wrap').forEach((wrapper, i
             searchToggle?.setAttribute('aria-expanded', 'false');
             searchToggle?.focus();
         }
-    });
-    window.matchMedia('(min-width: 781px)').addEventListener('change', (event) => {
-        if (event.matches && menu?.open) menu.close();
     });
 })();

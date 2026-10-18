@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/mobile-motion.css') }}?v={{ filemtime(public_path('css/mobile-motion.css')) }}">
 <link rel="icon" type="image/png" href="{{ asset('images/pwa-192.png') }}">
 <x-pwa-head />
 </head>
@@ -83,6 +84,7 @@
 </div>
 <x-mobile-workspace />
 <dialog data-photo-viewer class="photo-viewer" aria-label="{{ __('Photo preview') }}"><div class="photo-viewer-toolbar"><button type="button" class="button secondary" data-photo-previous aria-label="{{ __('Previous photo') }}">←</button><span data-photo-position></span><button type="button" class="button secondary" data-photo-next aria-label="{{ __('Next photo') }}">→</button><button type="button" class="button secondary" data-photo-close>{{ __('Close preview') }} ×</button></div><img alt=""></dialog>
+<script src="{{ asset('js/mobile-menu.js') }}?v={{ filemtime(public_path('js/mobile-menu.js')) }}" defer></script>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 <x-pwa-controls />
 </body>

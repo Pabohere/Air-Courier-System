@@ -29,12 +29,13 @@
         const url = new URL(link.href, location.href);
         if (url.origin !== location.origin || !['http:', 'https:'].includes(url.protocol) || url.hash) return;
         if (!link.matches('.mobile-nav a, .mobile-menu-links a, .sidebar nav a, .mobile-brand, .brand, a.button, a.metric, .home-branch-picker a')) return;
-        // Re-tapping the current mobile tab should not reload the entire page.
-        if (url.href === location.href && link.closest('.mobile-nav')) {
+        // Re-tapping the current mobile destination should not reload the page.
+        if (url.href === location.href && (link.closest('.mobile-nav') || link.closest('.mobile-menu-links'))) {
             event.preventDefault();
             return;
         }
-        if (link.hasAttribute('data-navigation-busy')) {
+        const mobileLink = link.closest('.mobile-nav') || link.closest('.mobile-menu-links');
+        if (link.hasAttribute('data-navigation-busy') || (mobileLink && root.hasAttribute('data-navigation-pending'))) {
             event.preventDefault();
             return;
         }

@@ -91,3 +91,12 @@ test('back navigation and a stalled request clear all pending indicators', async
     [...app.timers.values()][0]();
     assert.equal(link.hasAttribute('data-navigation-busy'), false);
 });
+
+test('a pending mobile navigation blocks taps on a different tab until it resets', async () => {
+    const app = client();
+    await app.dispatch('click', navLink());
+    const next = navLink('https://courier.test/dispatches');
+    assert.equal((await app.dispatch('click', next)).defaultPrevented, true);
+    app.lifecycle.get('pageshow')();
+    assert.equal((await app.dispatch('click', next)).defaultPrevented, false);
+});
