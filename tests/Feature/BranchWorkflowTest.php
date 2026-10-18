@@ -40,7 +40,7 @@ class BranchWorkflowTest extends TestCase
 
     private function data(User $origin, string $currency = 'MMK', string $price = '25000.00'): array
     {
-        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $origin->branch_id, 'destination_branch_id' => $origin->branch_id === $this->ygn->branch_id ? $this->sg->branch_id : $this->ygn->branch_id, 'currency' => $currency, 'price' => $price, 'recipient_name' => 'Sample collector', 'recipient_phone' => '000123', 'recipient_address' => 'Sample address', 'shipment_date' => today()->toDateString(), 'description' => 'Clothes', 'quantity' => 2, 'actual_weight' => '2.375'];
+        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $origin->branch_id, 'destination_branch_id' => $origin->branch_id === $this->ygn->branch_id ? $this->sg->branch_id : $this->ygn->branch_id, 'currency' => $currency, 'price' => $price, 'recipient_name' => 'Sample collector', 'recipient_phone' => '09000000002', 'recipient_address' => 'Sample address', 'shipment_date' => today()->toDateString(), 'description' => 'Clothes', 'quantity' => 2, 'actual_weight' => '2.375'];
     }
 
     private function ready(Shipment $shipment, User $origin): void

@@ -9,8 +9,12 @@
 </h1>
 <p class="subtle">{{ __('Choose parcels, enter the carrier and flight, then send.') }}</p>
 </div>
-<a class="button secondary" href="{{ route('inventory.index') }}">{{ __('Parcel storage') }} →</a>
+<a class="button secondary" href="{{ route('inventory.index', ['branch_id' => $originBranch->id]) }}">{{ __('Parcel storage') }} →</a>
 </div>
+<form class="filters" method="get" action="{{ route('dispatches.index') }}">
+<label>{{ __('Origin branch') }}<select name="origin_branch_id">@foreach($branches as $origin) @if($operationBranchId === $origin->id)<option value="{{ $origin->id }}" @selected($originBranch->id === $origin->id)>{{ $origin->code }}</option>@endif @endforeach</select></label>
+<button class="button secondary">{{ __('View branch') }}</button>
+</form>
 @include('entry-drafts', ['draftKind' => 'trip'])
 @include('dispatches.weekly')
 <div class="card">
@@ -24,12 +28,13 @@
 <form method="post" action="{{ route('dispatches.store') }}">
 @csrf<input type="hidden" name="draft_revision" value="{{ old('draft_revision', $draft?->revision ?? 0) }}">
 <input type="hidden" name="draft_id" value="{{ old('draft_id', $draft?->key ?? \Illuminate\Support\Str::uuid()) }}">
-<label>{{ __('Origin branch') }}<select name="origin_branch_id">@foreach($branches as $origin) @if($operationBranchId === $origin->id)<option value="{{ $origin->id }}" @selected($operationBranchId == $origin->id)>{{ $origin->code }}</option>@endif @endforeach</select></label>
+<input type="hidden" name="origin_branch_id" value="{{ $originBranch->id }}">
+<p>{{ __('Origin branch') }}: <strong>{{ $originBranch->code }}</strong> · {{ $originBranch->timezone }}</p>
 <div class="two-columns">
 <div class="field-grid">
 <label class="full">{{ __('Carrier name (person carrying the parcels)') }}<input name="carrier_name" value="{{ old('carrier_name') }}" maxlength="150" required><span class="help">{{ __('Enter the person’s name separately from the airline or courier company.') }}</span></label>
 <label>{{ __('Flight details') }}<input name="flight" value="{{ old('flight') }}" maxlength="100" required></label>
-<label>{{ __('Flight departure (origin branch local time)') }}<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}" required></label>
+<label>{{ __('Flight departure (origin branch local time)') }} ({{ $originBranch->timezone }})<input type="datetime-local" name="flight_departure_at" value="{{ old('flight_departure_at') }}" required></label>
 <details class="full"><summary>{{ __('Optional details') }}</summary><label>{{ __('Airline / courier partner') }}<input name="partner" value="{{ old('partner') }}" maxlength="150"></label><label>{{ __('Notes') }}<textarea name="notes" maxlength="2000">{{ old('notes') }}</textarea></label></details>
 </div>
 <div>
@@ -64,7 +69,7 @@
 {{ __('Dispatch records') }}
 </h2>
 </div>
-<form class="filters card-body" method="get" action="{{ route('dispatches.index') }}"><label>{{ __('Search carrier / parcel / flight') }}<input name="q" value="{{ request('q') }}" maxlength="150"></label><button class="button secondary">{{ __('Search') }}</button>@if(request()->filled('q'))<a href="{{ route('dispatches.index') }}">{{ __('Clear search') }}</a>@endif</form>
+<form class="filters card-body" method="get" action="{{ route('dispatches.index') }}"><input type="hidden" name="origin_branch_id" value="{{ $originBranch->id }}"><label>{{ __('Search carrier / parcel / flight') }}<input name="q" value="{{ request('q') }}" maxlength="150"></label><button class="button secondary">{{ __('Search') }}</button>@if(request()->filled('q'))<a href="{{ route('dispatches.index', ['origin_branch_id' => $originBranch->id]) }}">{{ __('Clear search') }}</a>@endif</form>
 <div class="table-wrap">
 <table>
 <thead>

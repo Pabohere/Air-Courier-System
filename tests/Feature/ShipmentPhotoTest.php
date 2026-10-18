@@ -37,7 +37,7 @@ class ShipmentPhotoTest extends TestCase
 
     private function booking(): array
     {
-        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'recipient_name' => 'Photo recipient', 'recipient_phone' => '000', 'recipient_address' => 'Demo address', 'description' => 'Demo clothing', 'quantity' => 2, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => now('Asia/Yangon')->toDateString(), 'storage_location' => 'Shelf A'];
+        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'recipient_name' => 'Photo recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'Demo address', 'description' => 'Demo clothing', 'quantity' => 2, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => now('Asia/Yangon')->toDateString(), 'storage_location' => 'Shelf A'];
     }
 
     private function photos(int $count, int $offset = 0): array

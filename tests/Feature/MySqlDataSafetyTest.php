@@ -56,7 +56,7 @@ class MySqlDataSafetyTest extends TestCase
 
     private function booking(): array
     {
-        return ['booking_key' => (string) Str::uuid(), 'customer_name' => 'Concurrent customer', 'customer_phone' => 'TEST-ONLY', 'customer_address' => 'Test address', 'origin_branch_id' => $this->staff->branch_id, 'destination_branch_id' => Branch::where('code', 'SG')->value('id'), 'recipient_name' => 'Recipient', 'recipient_phone' => 'TEST', 'recipient_address' => 'Test SG', 'shipment_date' => today()->toDateString(), 'description' => 'Test parcel', 'quantity' => 1, 'actual_weight' => '1.250', 'currency' => 'MMK', 'price' => '100.00', 'storage_location' => 'Test shelf'];
+        return ['booking_key' => (string) Str::uuid(), 'customer_name' => 'Concurrent customer', 'customer_phone' => '09000000001', 'customer_address' => 'Test address', 'origin_branch_id' => $this->staff->branch_id, 'destination_branch_id' => Branch::where('code', 'SG')->value('id'), 'recipient_name' => 'Recipient', 'recipient_phone' => 'TEST', 'recipient_address' => 'Test SG', 'shipment_date' => today()->toDateString(), 'description' => 'Test parcel', 'quantity' => 1, 'actual_weight' => '1.250', 'currency' => 'MMK', 'price' => '100.00', 'storage_location' => 'Test shelf'];
     }
 
     private function payment(): array

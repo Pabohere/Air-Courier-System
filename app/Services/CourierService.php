@@ -13,6 +13,7 @@ use App\Models\PaymentMethod;
 use App\Models\Shipment;
 use App\Models\ShipmentEvent;
 use App\Models\User;
+use App\Rules\PhoneNumber;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +39,7 @@ class CourierService
         if (empty($data['customer_id']) && isset($data['customer_name'])) {
             return DB::transaction(function () use ($data, $user): Shipment {
                 CompanySetting::query()->lockForUpdate()->firstOrFail();
-                $entry = validator($data, ['customer_name' => 'required|string|max:150', 'customer_phone' => 'required|string|max:50', 'customer_address' => 'nullable|string|max:2000'])->validate();
+                $entry = validator($data, ['customer_name' => 'required|string|max:150', 'customer_phone' => ['required', 'string', 'max:50', new PhoneNumber], 'customer_address' => 'nullable|string|max:2000'])->validate();
                 $existing = Shipment::where('booking_key', $data['booking_key'])->first();
                 if ($existing) {
                     abort_unless($existing->created_by === $user->id, 403);

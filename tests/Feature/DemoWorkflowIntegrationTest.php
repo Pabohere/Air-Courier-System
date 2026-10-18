@@ -97,7 +97,7 @@ class DemoWorkflowIntegrationTest extends TestCase
             $destination = Branch::where('code', '!=', $code)->firstOrFail();
             $this->flushSession();
             $this->post(route('login.store'), ['side' => strtolower($code), 'email' => strtolower($code).'@courier.test', 'password' => 'CourierDemo2026!'])->assertSessionHasNoErrors()->assertRedirect(route('dashboard'));
-            $booking = ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::where('phone', 'DEMO-WF-'.$code)->value('id'), 'origin_branch_id' => $origin->id, 'destination_branch_id' => $destination->id, 'recipient_name' => 'HTTP demo recipient', 'recipient_phone' => 'DEMO', 'recipient_address' => 'Fictional address', 'shipment_date' => '2026-10-15', 'description' => 'HTTP integration parcel', 'quantity' => 2, 'actual_weight' => '1.125', 'currency' => $currency, 'price' => '100.00', 'storage_location' => 'HTTP receiving shelf'];
+            $booking = ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::where('phone', 'DEMO-WF-'.$code)->value('id'), 'origin_branch_id' => $origin->id, 'destination_branch_id' => $destination->id, 'recipient_name' => 'HTTP demo recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'Fictional address', 'shipment_date' => '2026-10-15', 'description' => 'HTTP integration parcel', 'quantity' => 2, 'actual_weight' => '1.125', 'currency' => $currency, 'price' => '100.00', 'storage_location' => 'HTTP receiving shelf'];
             $this->post(route('shipments.store'), $booking)->assertSessionHasNoErrors();
             $this->post(route('shipments.store'), $booking)->assertSessionHasNoErrors();
             $parcel = Shipment::where('booking_key', $booking['booking_key'])->sole();

@@ -38,7 +38,7 @@ class CustomerAndPaymentEntryTest extends TestCase
     {
         $origin ??= $this->ygn;
 
-        return ['booking_key' => (string) Str::uuid(), 'customer_name' => 'Walk-in customer', 'customer_phone' => 'DEMO-001', 'customer_address' => 'Test address', 'origin_branch_id' => $origin->branch_id, 'destination_branch_id' => $origin->branch_id === $this->ygn->branch_id ? $this->sg->branch_id : $this->ygn->branch_id, 'recipient_name' => 'Test recipient', 'recipient_phone' => 'DEMO-002', 'recipient_address' => 'Test address', 'description' => 'Clothes', 'quantity' => 1, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => '2026-10-16', 'storage_location' => 'Shelf A'];
+        return ['booking_key' => (string) Str::uuid(), 'customer_name' => 'Walk-in customer', 'customer_phone' => '09000000001', 'customer_address' => 'Test address', 'origin_branch_id' => $origin->branch_id, 'destination_branch_id' => $origin->branch_id === $this->ygn->branch_id ? $this->sg->branch_id : $this->ygn->branch_id, 'recipient_name' => 'Test recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'Test address', 'description' => 'Clothes', 'quantity' => 1, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => '2026-10-16', 'storage_location' => 'Shelf A'];
     }
 
     private function payment(string $method = 'Cash'): array

@@ -7,7 +7,8 @@
 <h1 class="mono" style="font-size:24px">
 {{ $shipment->tracking_number }}
 </h1>
-<p class="subtle">{{ __('Booked by') }} {{ $shipment->creator->name }} · {{ $shipment->created_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }}</p>
+@php($displayTimezone = auth()->user()->branch?->timezone ?? $shipment->originBranch?->timezone ?? config('app.timezone'))
+<p class="subtle">{{ __('Booked by') }} {{ $shipment->creator->name }} · {{ $shipment->created_at->copy()->timezone($displayTimezone)->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }} ({{ $displayTimezone }})</p>
 </div>
 <div class="actions">
 <x-parcel-stage :shipment="$shipment" /><a class="button secondary" href="{{ route('shipments.receipt',$shipment) }}" target="_blank" rel="noopener">{{ __('Print receipt / label ↗') }}</a>
@@ -176,7 +177,7 @@
 {{ __($payment->method->name) }}@if($payment->remark)<small>{{ $payment->remark }}</small>@endif<small>{{ $payment->reference }}</small>@if($payment->reason)<small class="wrap">{{ $payment->reason }}</small>@endif
 </td>
 <td>
-{{ $payment->staff->name }} · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ $payment->created_at->locale(app()->getLocale())->translatedFormat('d M, H:i') }}</small>
+{{ $payment->staff->name }} · {{ $branches->firstWhere('id', $payment->branch_id)?->code ?? __('Legacy') }}<small>{{ \Carbon\CarbonImmutable::parse($payment->getRawOriginal('created_at'), 'UTC')->timezone($displayTimezone)->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }} ({{ $displayTimezone }})</small>
 </td>
 <td class="right">
 {{ \App\Services\Money::decimal($payment->signedCents()) }}
@@ -321,7 +322,7 @@
 <ul class="timeline">
 @foreach($shipment->events->reverse() as $event)
 <li>
-<strong>{{ __($event->status) }}</strong><p>{{ __($event->notes ?? '') }}</p><small>{{ \Carbon\Carbon::parse($event->created_at, 'UTC')->timezone(auth()->user()->branch?->timezone ?? config('app.timezone'))->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }} ({{ auth()->user()->branch?->timezone ?? config('app.timezone') }}) · {{ $event->staff->name }}</small>
+<strong>{{ __($event->status) }}</strong><p>{{ __($event->notes ?? '') }}</p><small>{{ \Carbon\CarbonImmutable::parse($event->created_at, 'UTC')->timezone($displayTimezone)->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }} ({{ $displayTimezone }}) · {{ $event->staff->name }}</small>
 </li>
 @endforeach
 </ul>

@@ -18,10 +18,10 @@
 </div></section>
 <section class="card"><div class="card-head"><h2>{{ __('01 · Sender & recipient') }}</h2></div><div class="card-body field-grid">
 <label>{{ __('Customer name') }}<input name="customer_name" value="{{ old('customer_name') }}" maxlength="150" required></label>
-<label>{{ __('Customer phone') }}<input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" maxlength="50" required></label>
+<label>{{ __('Customer phone') }}<input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" maxlength="50" pattern="\+?[0-9 \(\)\-]{7,50}" required></label>
 <label class="full">{{ __('Customer address') }}<input name="customer_address" value="{{ old('customer_address') }}" maxlength="2000"></label>
 <label>{{ __('Recipient name') }}<input name="recipient_name" value="{{ old('recipient_name') }}" maxlength="150" required></label>
-<label>{{ __('Recipient phone') }}<input type="tel" name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" required></label>
+<label>{{ __('Recipient phone') }}<input type="tel" name="recipient_phone" value="{{ old('recipient_phone') }}" maxlength="50" pattern="\+?[0-9 \(\)\-]{7,50}" required></label>
 <label class="full">{{ __('Recipient address (optional)') }}<textarea name="recipient_address">{{ old('recipient_address') }}</textarea></label>
 </div></section>
 <section class="card"><div class="card-head"><h2>{{ __('02 · Parcel details') }}</h2></div><div class="card-body field-grid">

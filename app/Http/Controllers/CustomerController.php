@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Rules\PhoneNumber;
 use App\Services\CourierService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -63,6 +64,6 @@ class CustomerController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate(['name' => 'required|string|max:150', 'phone' => 'required|string|max:50', 'address' => 'required|string|max:2000', 'notes' => 'nullable|string|max:2000']);
+        return $request->validate(['name' => 'required|string|max:150', 'phone' => ['required', 'string', 'max:50', new PhoneNumber], 'address' => 'required|string|max:2000', 'notes' => 'nullable|string|max:2000']);
     }
 }

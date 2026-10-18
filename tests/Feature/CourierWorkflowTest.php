@@ -33,7 +33,7 @@ class CourierWorkflowTest extends TestCase
         $customer = Customer::factory()->create(['created_by' => $user->id, 'updated_by' => $user->id]);
         $rate = Rate::factory()->create();
 
-        return [$user, ['booking_key' => (string) Str::uuid(), 'customer_id' => $customer->id, 'destination_id' => $rate->destination_id, 'recipient_name' => 'Test Recipient', 'recipient_phone' => '000123', 'recipient_address' => 'Recipient test address', 'shipment_date' => today()->toDateString(), 'description' => 'Documents', 'quantity' => 2, 'actual_weight' => '1.250']];
+        return [$user, ['booking_key' => (string) Str::uuid(), 'customer_id' => $customer->id, 'destination_id' => $rate->destination_id, 'recipient_name' => 'Test Recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'Recipient test address', 'shipment_date' => today()->toDateString(), 'description' => 'Documents', 'quantity' => 2, 'actual_weight' => '1.250']];
     }
 
     private function booked(): array
@@ -443,7 +443,7 @@ class CourierWorkflowTest extends TestCase
         [$user,$shipment] = $this->booked();
         $editor = User::factory()->create();
         $customer = $shipment->customer;
-        $this->actingAs($editor)->put(route('customers.update', $customer), ['name' => 'Updated Customer', 'phone' => '123456', 'address' => 'Updated Address'])->assertRedirectToRoute('customers.show', $customer);
+        $this->actingAs($editor)->put(route('customers.update', $customer), ['name' => 'Updated Customer', 'phone' => '09000000001', 'address' => 'Updated Address'])->assertRedirectToRoute('customers.show', $customer);
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'created_by' => $user->id, 'updated_by' => $editor->id, 'name' => 'Updated Customer']);
         $this->assertDatabaseHas('audit_logs', ['action' => 'customer.updated', 'staff_id' => $editor->id]);
     }

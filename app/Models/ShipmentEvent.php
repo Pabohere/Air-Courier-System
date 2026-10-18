@@ -14,6 +14,10 @@ class ShipmentEvent extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (self $event): void {
+            $event->created_at ??= now('UTC')->format('Y-m-d H:i:s');
+        });
+
         static::updating(fn () => throw new \LogicException('Historical records are append-only.'));
         static::deleting(fn () => throw new \LogicException('Historical records cannot be deleted.'));
     }

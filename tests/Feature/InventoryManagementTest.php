@@ -31,7 +31,7 @@ class InventoryManagementTest extends TestCase
 
     private function booking(User $user): array
     {
-        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $user->branch_id, 'destination_branch_id' => Branch::where('id', '!=', $user->branch_id)->firstOrFail()->id, 'recipient_name' => 'Storage recipient', 'recipient_phone' => '000', 'recipient_address' => 'Demo address', 'description' => 'Clothes', 'quantity' => 2, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => now($user->branch->timezone)->toDateString(), 'storage_location' => 'Shelf A'];
+        return ['booking_key' => (string) Str::uuid(), 'customer_id' => Customer::factory()->create()->id, 'origin_branch_id' => $user->branch_id, 'destination_branch_id' => Branch::where('id', '!=', $user->branch_id)->firstOrFail()->id, 'recipient_name' => 'Storage recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'Demo address', 'description' => 'Clothes', 'quantity' => 2, 'actual_weight' => '2.500', 'currency' => 'MMK', 'price' => '25000.00', 'shipment_date' => now($user->branch->timezone)->toDateString(), 'storage_location' => 'Shelf A'];
     }
 
     public function test_create_update_delete_and_restore_preserve_physical_stock_and_financial_history_in_both_branches(): void

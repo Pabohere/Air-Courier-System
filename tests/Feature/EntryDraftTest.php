@@ -59,7 +59,7 @@ class EntryDraftTest extends TestCase
         $this->assertCount(2, $draft->photos);
         $this->get(route('entry-drafts.photo', [$draft, $draft->photos[0]['id']]))->assertOk();
         $this->get(route('shipments.create', ['draft' => $key]))->assertOk()->assertSee('Draft sender')->assertSee('data-saved-gallery', false);
-        $data = ['draft_id' => $key, 'booking_key' => $bookingKey, 'customer_name' => 'Draft sender', 'customer_phone' => 'TEST', 'origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'recipient_name' => 'Recipient', 'recipient_phone' => 'TEST', 'recipient_address' => 'SG', 'description' => 'Clothes', 'quantity' => 1, 'actual_weight' => '1.250', 'currency' => 'MMK', 'price' => '100.00', 'shipment_date' => '2026-10-16'];
+        $data = ['draft_id' => $key, 'booking_key' => $bookingKey, 'customer_name' => 'Draft sender', 'customer_phone' => '09000000001', 'origin_branch_id' => $this->ygn->branch_id, 'destination_branch_id' => $this->sg->branch_id, 'recipient_name' => 'Recipient', 'recipient_phone' => '09000000002', 'recipient_address' => 'SG', 'description' => 'Clothes', 'quantity' => 1, 'actual_weight' => '1.250', 'currency' => 'MMK', 'price' => '100.00', 'shipment_date' => '2026-10-16'];
         $this->post(route('shipments.store'), $data)->assertSessionHasNoErrors();
         $parcel = Shipment::where('booking_key', $bookingKey)->sole();
         $this->assertSame($parcel->id, $draft->fresh()->shipment_id);

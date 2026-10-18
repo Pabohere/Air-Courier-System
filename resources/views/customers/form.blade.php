@@ -19,7 +19,7 @@
 {{ __('Customer name') }}<input name="name" value="{{ old('name',$customer->name) }}" maxlength="150" required>
 </label>
 <label>
-{{ __('Phone number') }}<input name="phone" value="{{ old('phone',$customer->phone) }}" maxlength="50" required>
+{{ __('Phone number') }}<input type="tel" name="phone" value="{{ old('phone',$customer->phone) }}" maxlength="50" pattern="\+?[0-9 \(\)\-]{7,50}" required>
 </label>
 <label class="full">
 {{ __('Address') }}<textarea name="address" required>{{ old('address',$customer->address) }}</textarea>
