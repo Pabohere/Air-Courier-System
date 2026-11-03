@@ -14,7 +14,7 @@ function client() {
     const root = element();
     const timers = new Map();
     vm.runInNewContext(source, {
-        document: { documentElement: root, addEventListener: (name, fn) => handlers.set(name, fn) },
+        document: { querySelector: () => null, documentElement: root, addEventListener: (name, fn) => handlers.set(name, fn) },
         window: { addEventListener: (name, fn) => lifecycle.set(name, fn) },
         location: { href: 'https://courier.test/', origin: 'https://courier.test' }, URL, queueMicrotask,
         setTimeout: (fn) => { const id = timers.size + 1; timers.set(id, fn); return id; }, clearTimeout: (id) => timers.delete(id),
@@ -92,11 +92,39 @@ test('back navigation and a stalled request clear all pending indicators', async
     assert.equal(link.hasAttribute('data-navigation-busy'), false);
 });
 
-test('a pending mobile navigation blocks taps on a different tab until it resets', async () => {
+test('the latest different destination supersedes pending navigation', async () => {
     const app = client();
-    await app.dispatch('click', navLink());
+    const first = navLink();
+    await app.dispatch('click', first);
     const next = navLink('https://courier.test/dispatches');
-    assert.equal((await app.dispatch('click', next)).defaultPrevented, true);
+    assert.equal((await app.dispatch('click', next)).defaultPrevented, false);
+    assert.equal(first.hasAttribute('data-navigation-busy'), false);
+    assert.equal(next.getAttribute('aria-busy'), 'true');
+    assert.equal((await app.dispatch('click', navLink(next.href))).defaultPrevented, true);
     app.lifecycle.get('pageshow')();
     assert.equal((await app.dispatch('click', next)).defaultPrevented, false);
+});
+
+test('a cancelled newer selection leaves the original destination pending', async () => {
+    const app = client();
+    const first = navLink();
+    await app.dispatch('click', first);
+    const next = navLink('https://courier.test/dispatches');
+    await app.dispatch('click', next, {}, (event) => event.preventDefault());
+    assert.equal(first.getAttribute('aria-busy'), 'true');
+    assert.equal(next.hasAttribute('data-navigation-busy'), false);
+    assert.equal((await app.dispatch('click', navLink(first.href))).defaultPrevented, true);
+});
+
+test('returning to the current destination can supersede a pending different tab', async () => {
+    const app = client();
+    const first = navLink();
+    await app.dispatch('click', first);
+    const home = navLink('https://courier.test/');
+    assert.equal((await app.dispatch('click', home)).defaultPrevented, false);
+    assert.equal(first.hasAttribute('data-navigation-busy'), false);
+    assert.equal(home.getAttribute('aria-busy'), 'true');
+    app.lifecycle.get('pageshow')();
+    assert.equal(home.hasAttribute('data-navigation-busy'), false);
+    assert.equal((await app.dispatch('click', home)).defaultPrevented, true);
 });
