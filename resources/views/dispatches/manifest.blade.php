@@ -31,7 +31,9 @@
 </div>
 <div class="section-gap"><x-branch-route :record="$dispatch" /></div>
 @if($dispatch->flight_departure_at)<p class="subtle">{{ __('Flight departure') }}: {{ $dispatch->flight_departure_at->timezone($dispatch->originBranch->timezone)->format('d M Y H:i') }} ({{ $dispatch->originBranch->timezone }})</p>@endif
+<x-flight-schedule :departure="$dispatch->flight_departure_at" :timezone="$dispatch->originBranch?->timezone" />
 <dl class="summary-list">
+<div><dt>{{ __('Actual carrier handover') }}</dt><dd>{{ $dispatch->handed_over_at ? $dispatch->handed_over_at->copy()->timezone($dispatch->originBranch?->timezone ?? config('app.timezone'))->locale(app()->getLocale())->translatedFormat('d M Y · H:i') : __('Not handed over yet') }} · {{ $dispatch->originBranch?->timezone ?? config('app.timezone') }}</dd></div>
 <div><dt>{{ __('Carrier name (person carrying the parcels)') }}</dt><dd>{{ $dispatch->carrier_name ?: __('Carrier not recorded') }}</dd></div>
 <div>
 <dt>
@@ -101,6 +103,9 @@
 </table>
 </div>
 <p class="subtle section-gap">{{ $dispatch->shipments->count() }} {{ __('shipments ·') }} {{ $dispatch->shipments->sum('quantity') }} {{ __('pieces · Total weight') }} {{ $dispatch->shipments->reduce(fn($total,$shipment)=>bcadd($total,$shipment->actual_weight,3),'0.000') }} {{ $dispatch->shipments->first()?->weight_unit }}</p><p class="preserve subtle">{{ $dispatch->notes }}</p>
+<section class="section-gap"><h2>{{ __('Full parcel details for this flight') }}</h2>
+@foreach($dispatch->shipments as $shipment)<x-parcel-summary :shipment="$shipment" printable />@endforeach
+</section>
 <div class="two-columns section-gap">
 <p>{{ __('Handed over by: __________________') }}<br><small>{{ __('Date / time: __________________') }}</small></p><p>{{ __('Received by: __________________') }}<br><small>{{ __('Partner signature: __________________') }}</small></p>
 </div>

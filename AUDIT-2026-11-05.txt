@@ -1,0 +1,153 @@
+AIR COURIER SYSTEM — PRE-REDESIGN AUDIT
+Date: 5 November 2026 (Asia/Yangon)
+
+SCOPE AND ISOLATION
+Project: /Users/leon-/Air Courier System/Air-Courier-System
+This is the folder identified from the active VS Code window, not either of the copies in Documents/ChatGPT/Air Courier System.
+Source branch: demo; starting commit: c540cf2 (Fix rapid mobile navigation and measured liquid tab indicator).
+Working branch created: codex/ux-simplification-audit.
+The checkout was clean before the audit. No application source, migration, financial service, dependency or configuration changes were made during this audit. Tests generated their normal ignored runtime artifacts. This report is the only intended tracked-file addition.
+
+Status: codebase and local schema audit completed; redesign implementation has not started. Browser/device acceptance and MySQL verification remain outstanding. This is not a claim of a complete redesigned application or a security certification.
+
+1. ARCHITECTURE AND COVERAGE
+Installed runtime inspected: PHP 8.4.1; Laravel 13.36.0; PHPUnit 12.5.39; Pint 1.32.1.
+Laravel controllers, Eloquent models and domain services render Blade pages. Public CSS and vanilla JavaScript are served directly; the production interface does not require a Vite build. package.json contains Vite 8/Tailwind 4 tooling, but adding a frontend framework is unnecessary.
+Reviewed routes/web.php, bootstrap/app.php, controllers, services, models, migrations, middleware, shared layouts/components, operational and administrative views, translations, public scripts/styles, test configuration, existing tests, CI, README and backup/deployment tooling.
+No external courier/airline API, payment gateway or messaging integration was found in application routes/services. bin/deploy-production.py integrates with GitHub Actions for deployment gating; it was inspected, not executed against a production service.
+
+2. DATABASE AND RELATIONSHIPS
+Inspected database/database.sqlite through a read-only SQLite connection with query_only enabled. PRAGMA quick_check returned ok; foreign_key_check returned zero violations. All repository migrations are recorded as applied in that local file. This does not establish the state of a remote or production database.
+Main entities:
+- users: admin/staff role, active state, optional branch assignment.
+- branches: code/name/country/timezone.
+- customers: contact details and creator/editor references; phone is indexed, not unique.
+- destinations and rates: one rate per destination for legacy rated bookings.
+- shipments: customer, destination, optional dispatch; origin/destination/current branches; immutable booking key and tracking number; sender/rate snapshots; price/currency/unit; parcel status and storage/collection/photo metadata.
+- dispatches: reference, carrier, partner, flight/local departure, route and handover staff/time.
+- payments: shipment, method, optional original payment for refunds, receiving branch, amount/currency/date, unique submission key, cash/change/remark, employee.
+- reconciliations: branch/currency/date/method snapshots, expected/actual totals, ledger version, staff/notes.
+- shipment_events, storage_movements and audit_logs: historical records linked to staff and parcel/entity.
+- entry_drafts: branch-scoped incomplete booking/trip payloads, revision protection, private photos, optional completed shipment/dispatch.
+Foreign keys generally restrict deletion of referenced business history. Payment, reconciliation, shipment-event, storage-movement and audit models reject ordinary Eloquent updates/deletes; direct database administration is outside those model safeguards.
+Local sample size is small: 3 customers, 3 shipments, 3 dispatches, 3 payment entries, 9 storage movements and no open entry drafts. It cannot prove performance at operational scale.
+
+3. EXISTING CAPABILITIES TO PRESERVE
+Authentication: session login, hashed passwords, login throttle, CSRF, session regeneration, active-user checks and password/session invalidation. No public registration.
+Permissions: only admin and staff exist in schema, validation and User::isAdmin. Staff currently have customers, parcels, storage, trips, payments, reports/exports and reconciliation. Admin additionally has settings, users/rates/methods and refunds. Preserve backend checks; hiding navigation is not authorization.
+Branch operations: BranchAccess, visibleTo scopes and service checks govern readable records and responsible operation branches. Admins select the operating branch on Home. Do not erase that explicit context in a simplified interface.
+Booking: walk-in customer creation and parcel storage receipt are transactional; customer reuse currently requires matching name, phone and address. Server generates tracking and saves sender, currency and charge snapshots. Booking-key replay rejects changed details and other employees.
+Search: parcel tracking, sender/recipient name and phone; customer name/phone; trip carrier/flight/reference/parcel; storage location and parcel/customer names. Preserve server-side search rather than substituting a filter over only the displayed page.
+Photos: private storage, authenticated access, type/size/dimension limits, up to five photos, duplicate fingerprints, optional image optimization/orientation handling and cleanup on failure. Preserve saved draft photos.
+Drafts: save/reopen incomplete bookings and trips, branch checks, revision conflict handling and completion links. Back/Next must retain fields, photos, booking/draft keys and revision.
+Dispatch: eligible stored origin parcels only; one route per dispatch; flight and origin-timezone departure; draft plans, unassignment before handover, manifest printing and physical handover. Quick dispatch advances preparation stages using existing services.
+Destination receipt: arrival, storage receipt/location and Ready for Collection are coordinated transactionally.
+Collection: correct destination operation branch, stored parcel, eligible status, collector name and settled balance. Optional outstanding payment and collection occur in one transaction. Repeat completed collection returns without creating a second handover.
+Storage: receipt/move/release histories; archive/restore does not remove physical stock or parcel/payment history; cancelled parcels require physical return recording to release storage.
+Records: receipt/label and manifest printing, payment history, status history, branch queues, collected records and customer history.
+Reports: charge/receipt/refund/net/outstanding totals, CSV exports with BOM/formula protection, reconciliation snapshots and stale-ledger detection.
+Settings: company/receipt details, legacy rates, payment methods, staff assignment/deactivation and last-active-admin protection.
+PWA/mobile: install controls, offline explanation, safe-area navigation, reduced-motion support and public-asset caching. Authenticated pages, photos and ledger data are deliberately not cached for offline operations.
+
+4. FINANCIAL AND STATUS INVARIANTS
+Sources: app/Services/CourierService.php, SimpleWorkflowService.php, Money.php, PaymentDetails.php, ReportService.php, BranchAccess.php; app/Models/Shipment.php and Payment.php.
+- New branch bookings use a positive manually agreed charge in MMK or SGD and kg. Do not replace this with legacy automatic destination-rate pricing.
+- Legacy pricing is max(minimum, base + upward-rounded-to-cent(weight * per_weight)) + additional charge. Quantity is descriptive and does not multiply that total-weight charge.
+- Individual money inputs use integer minor-unit arithmetic and decimal database fields; BCMath handles fractional weights. Do not introduce floating-point financial calculations.
+- Saved price/currency and sender/rate snapshots are preserved; correction uses existing cancellation/rebooking/refund workflows, not editing past ledger entries.
+- Payment must be positive and no larger than the current balance; inactive methods and cancelled parcels cannot receive new payments. Payment replay validates transaction details and receiving branch.
+- Cash tendered and change are distinct from the applied payment. Bank transfer and Pay currently require a provider remark; change is Cash-only.
+- Refunds are admin-only, linked to an original payment, bounded by its unrefunded amount, and retain its method and receiving branch.
+- Charges and outstanding belong to the origin branch; receipts/refunds belong to the payment branch. Currencies are reported separately; no conversion or branch remittance accounting exists.
+- Outstanding is a current all-dates balance, including cancelled bookings awaiting review. Booked charges exclude cancelled parcels. Neither is profit or revenue recognition.
+- Reconciliation uses net receipts by branch/currency/date/method, supports negative actuals, requires variance notes and retains a ledger version. Do not replace stored snapshots with live mutable summaries.
+- Operational writes use transactions and row locks. Retain duplicate/replay protection, transaction boundaries and deterministic lock order.
+- Branch flow: Received -> Processing -> Ready for Dispatch -> physical handover/Dispatched -> optional In Transit -> Arrived at Branch -> Ready for Collection -> Collected. Legacy Booked/Delivered paths remain supported.
+- Assigned draft parcels must be unassigned before returning to warehouse stages/cancellation. Handed-over dispatches cannot be undone in the interface. Exceptions/cancellations need reasons; destination arrival/collection require recorded handover.
+
+5. VERIFIED UX GAPS AND DEFECTS
+Priority here is redesign order, not a claim of measured user-study severity.
+
+HIGH: Booking is one long multi-section form rather than a guided task. It exposes branch choices, sender/recipient, storage/date/photos, weights and financial fields together. No dedicated review step exists.
+Evidence: resources/views/shipments/create.blade.php.
+Action: add customer -> recipient/destination -> parcel -> review steps over the same validated server submission, retaining drafts and existing services.
+
+HIGH: Home mixes promotional copy, recent records, workload, queue counts and financial information. The four requested task actions are not presented together; financial reporting is visible to both existing roles.
+Evidence: resources/views/dashboard.blade.php; DashboardController invokes ReportService::summary, which loads all outstanding shipments/payments for the selected scope.
+Action: task-first Home with four real workflow entries and small operational counts; keep full financial records reachable under More. Stop loading full financial summaries if the simplified Home does not display them.
+
+HIGH: Later CSS overrides shrink the interface below the requested reading sizes. In public/css/theme.css the later screen block sets body 14px, button 13px, labels 14px, help 12px, table cells 13px and badges 11px. Base component rules also allow small controls.
+Evidence: public/css/theme.css, especially the screen block beginning around line 611; public/css/app.css; Burmese/mobile overrides.
+Action: consolidate the cascade into shared readable typography/spacing tokens; verify computed sizes in both languages and at mobile widths. Do not only change the first body rule, because later rules override it.
+
+HIGH: The quick-send form can physically dispatch in the same submission used for trip preparation without a separate selection review/confirmation. Customer collection similarly lacks the requested explicit confirmation. Backend eligibility and payment checks exist and must remain.
+Evidence: resources/views/dispatches/index.blade.php; resources/views/shipments/workflow.blade.php. In contrast dispatches/show.blade.php already has data-confirm for handover and shipments/show.blade.php has it for refunds.
+Action: clear review with parcel/recipient/flight details and explicit confirmation; reuse existing transaction endpoints. Preserve JavaScript navigation.js duplicate-submit guard and server replay/locking behavior.
+
+MEDIUM: No phone-based existing-customer picker is exposed on booking. Backend accepts customer_id, but the form only has customer_name/phone/address. Matching all three exact strings can create duplicate customers when contact formatting/address differs.
+Evidence: ShipmentController::store; CourierService::book; shipments/create.blade.php; customers.phone non-unique index.
+Action: search and explicitly choose a matching customer; handle multiple people sharing a phone. Do not silently merge customers or make phone globally unique.
+
+MEDIUM: Navigation leads with Parcel storage, Carrier trips, Bookkeeping; mobile uses Storage, Trips, Books. Receive/Send/Find are not persistent primary task labels. Arrow-only row links remain visually ambiguous even when accessible labels exist.
+Evidence: layouts/app.blade.php, components/mobile-workspace.blade.php, shipments/table.blade.php.
+Action: shared task labels for Home, Receive a Parcel, Send Parcels, Find a Parcel, More; preserve all secondary destinations and admin-only gates.
+
+MEDIUM: Missing Myanmar literal translation keys: Sign in, Close, Date / time. These occur on the active login, PWA help and storage-history templates.
+Evidence: lang/my.json compared with literal __() calls in app and resources/views; auth/login.blade.php, components/pwa-controls.blade.php, inventory/index.blade.php and inventory/parcel.blade.php.
+Action: translate these and add coverage for new workflow strings. Static key coverage does not certify natural Burmese wording, dynamic keys or font availability on Android/iOS.
+
+MEDIUM: Language is stored in session and a 180-day browser cookie, not on the employee account. Shared browsers can carry the previous employee's language; cross-device per-employee persistence is absent.
+Evidence: LanguageController, SetLocale, User fillable/schema.
+Action: retain existing persistence during presentation changes. If cross-device employee preferences are required, propose an additive migration separately after this audit; no migration is needed for the first interface changes.
+
+MEDIUM: /audit is a registered admin-only route with an existing template, but SettingsController::audit unconditionally aborts with 404. History continues to be written; the administrative audit viewer is unavailable.
+Evidence: routes/web.php; SettingsController::audit; resources/views/settings/audit.blade.php.
+Action: establish whether the viewer was intentionally disabled, then restore only with the existing admin gate and protected pagination/redaction as appropriate. Do not remove stored audit history.
+
+MEDIUM: Company currency validation contains a literal newline in the regex between {3} and $. A normal three-letter value therefore cannot match that expression, potentially blocking all company-details saves. The existing lock test expects a currency error and does not prove a valid company save succeeds.
+Evidence: app/Http/Controllers/SettingsController.php lines 38-39; tests/Feature/CourierWorkflowTest.php settings-company assertions.
+Action: isolated validation regression test and correction before redesigning settings; retain the separate first-booking currency/unit lock. No correction was made during this audit.
+
+REVIEW: CustomerController::show loads customer shipment history without Shipment::visibleTo, while direct parcel pages do enforce canRead. Customer records are otherwise globally shared. This is an existing policy inconsistency to clarify for unrelated-branch and future-branch data, not permission to change current access rules.
+Evidence: CustomerController::index/show/edit/update, resources/views/customers/show.blade.php and ShipmentController::show.
+
+REVIEW: PaymentDetails and client display behavior depend on exact configurable names Cash, Bank transfer and Pay. Renaming them can change required remarks/change behavior. Presentational translations must preserve canonical names; replacing them with typed capabilities requires its own business/schema design.
+
+6. SCOPE MISMATCHES REQUIRING EXPLICIT BUSINESS DESIGN
+The brief's Cashier/Warehouse/Operations/Accountant roles do not exist. They can guide task presentation, but must not be invented as new authorized roles or inferred from employees' names. Actual role expansion requires a separately specified permission matrix, backend enforcement and migration plan.
+No expense ledger, profit calculation, payroll, FX conversion or inter-branch remittance module exists. Do not create fake expense/income pages or describe net receipts as profit.
+The current application is designed around the YGN/SG pair. A generic branch management screen or automatically guessed destination for additional branches would expand business scope.
+Clarify whether any outstanding balance may be deferred at collection; the current implemented rule is full settlement. Until changed through verified business requirements, preserve it.
+Clarify shared-phone/customer identity policy and whether /audit was intentionally disabled.
+
+7. BASELINE VERIFICATION — ACTUAL RESULTS
+Command: APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= ./bin/php artisan test --compact
+Result: 240 total, 234 passed, 6 skipped, 2,283 assertions, approximately 9.2 seconds. The six skipped tests require isolated MySQL and include concurrency/recovery scenarios. TestCase validates the test database before migrations and refuses business database files.
+Existing passing coverage includes booking and snapshots, customer/payment entry, phone validation, fees, partial/full/invalid/replayed payments, refund bounds, cash/change/provider details, branch isolation in both directions, dispatch/receipt/collection, inventory archive/return, private photos, drafts/conflicts, reports/CSV/reconciliation, authentication/roles, translations and PWA rendering.
+Command: ./bin/php artisan route:list --except-vendor --json
+Result: route inspection succeeded. A listed route is not proof every action succeeds; /audit is the explicit exception above.
+Command: python3 -B -m unittest discover -s tests/deployment -p 'test_*.py'
+Result: 13 passed. The two DEPLOY FAILED log entries are simulated failure-path cases inside passing tests, not actual production deployment attempts.
+Command attempted: node --test tests/*.test.mjs
+Result: not run; node is unavailable on this shell PATH. No dependencies were installed. Existing JS tests cover navigation/menu/PWA and must be run with Node before release.
+Read-only local SQLite checks: quick_check ok; zero foreign-key violations; no unapplied repository migrations.
+Static translation comparison: 541 literal keys discovered; 3 missing from Myanmar JSON as listed above. Dynamic keys/native-language quality are not fully assessed by that check.
+Not performed: new real-data bookings/payments, browser visual QA, screen reader/contrast measurements, physical Android/iPhone/tablet testing, novice-employee usability study, isolated MySQL suite or restore drill, production checks, deployment. Do not treat server-side page-render assertions as device acceptance.
+
+8. IMPLEMENTATION ORDER AFTER THIS AUDIT
+A. Keep this branch isolated. Preserve current schema, ledger and services. Fix the confirmed company-validation defect with a focused regression test; resolve audit-viewer intent.
+B. Consolidate shared accessible tokens/components and the navigation across desktop/mobile, keeping legacy records and every secondary operation reachable. No dependency or schema change is needed.
+C. Replace Home with real task entry points and a concise operational summary. Use existing permissions and branch context; avoid duplicating financial queries for hidden widgets.
+D. Add progressive booking steps and review, customer search/selection, clear field errors and persistent success/receipt actions. Reuse the existing booking/draft/photo endpoints and keys.
+E. Add task-specific find/payment/collection/send views and review states around existing services, preserving server amounts, currencies, eligibility, transactions and replay protection.
+F. Simplify storage/customer/report/settings presentation. Keep large financial tables/export and full audit trails available behind clearly labeled secondary actions.
+G. Complete both-language coverage and verify responsive layouts, keyboard/focus, large text, empty/loading/errors and no-JavaScript fallbacks where relevant.
+H. Run regression suites in SQLite and isolated MySQL; JS tests with Node; end-to-end both-direction branch workflows; desktop/tablet/iPhone/Android viewports; then acceptance with representative employees. Record actual results and remaining limitations.
+
+Database/financial gate: the audit is complete enough to begin presentation work, but this is not approval to redesign the schema or accounting rules. No database migration is currently justified for navigation, readable controls, Home or guided forms. Any later structural/accounting proposal must state the existing behavior, intended change, data-preservation/backfill/rollback plan and dedicated verification before being implemented.
+
+9. RELEASE AND RECOVERY REQUIREMENTS
+This audit has no migration, dependency install, build or production deployment requirement.
+For the eventual implementation release: use the existing reviewed demo-to-prod process, check CI on the exact release commit, test with an isolated database first, and make a verified database backup plus matching private parcel/draft-photo backups and protected configuration/APP_KEY before rollout.
+Expose only public/; use production/debug-off HTTPS settings. Existing public assets are directly served; review service-worker asset versions when changing cached assets. Compile/check Blade views and run the relevant suites.
+Do not seed demo accounts into production, run migrate:fresh, infer routes for legacy parcels, or run a down migration that deletes business history. Preserve the previous release for code rollback; any future schema change needs its own safe compatibility/recovery procedure.

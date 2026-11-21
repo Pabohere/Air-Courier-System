@@ -57,7 +57,7 @@ class BranchOperationIsolationTest extends TestCase
             $dispatch = $parcel->fresh()->dispatch;
 
             $this->actingAs($admin)->withSession(['dashboard_branch_code' => $destination->code]);
-            $this->get(route('shipments.show', $parcel))->assertOk()->assertDontSee('Open dispatch and send');
+            $this->get(route('shipments.show', $parcel))->assertOk()->assertDontSee('Open flight plan');
             $this->get(route('dispatches.show', $dispatch))->assertOk()->assertDontSee('Record handover')->assertDontSee('Remove from draft');
             $eventCount = $parcel->events()->count();
             $movementCount = $parcel->storageMovements()->count();
@@ -69,7 +69,7 @@ class BranchOperationIsolationTest extends TestCase
             $this->assertSame($movementCount, $parcel->storageMovements()->count());
 
             $this->get(route('dashboard', ['branch_id' => $origin->id]))->assertOk();
-            $this->get(route('shipments.show', $parcel))->assertOk()->assertSee('Open dispatch and send');
+            $this->get(route('shipments.show', $parcel))->assertOk()->assertSee('Open flight plan');
             $this->post(route('dispatches.handover', $dispatch))->assertSessionHasNoErrors();
             $this->assertSame('Dispatched', $parcel->fresh()->status);
             $this->get(route('dispatches.show', $dispatch))->assertOk()->assertDontSee('Receive at '.$destination->code.' branch');
@@ -104,7 +104,7 @@ class BranchOperationIsolationTest extends TestCase
             $parcel = $this->parcel($sender, $destination);
             foreach ([$admin, $receiver] as $actor) {
                 $this->actingAs($actor)->withSession(['dashboard_branch_code' => $actor->isAdmin() ? $destination->code : $origin->code]);
-                $this->get(route('shipments.show', $parcel))->assertOk()->assertDontSee('Send with carrier');
+                $this->get(route('shipments.show', $parcel))->assertOk()->assertDontSee('Plan a flight for this parcel');
                 $this->get(route('dispatches.index', ['origin_branch_id' => $origin->id, 'shipment' => $parcel->id]))->assertForbidden();
                 $this->get(route('dispatches.index'))->assertOk()->assertViewHas('ready', fn ($rows) => ! $rows->contains('id', $parcel->id));
                 foreach (['send', 'draft'] as $action) {

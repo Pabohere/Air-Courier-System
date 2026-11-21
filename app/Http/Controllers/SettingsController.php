@@ -35,8 +35,7 @@ class SettingsController extends Controller
 
     public function company(Request $request, CourierService $service): RedirectResponse
     {
-        $data = $request->validate(['name' => 'required|string|max:150', 'phone' => 'nullable|string|max:50', 'address' => 'nullable|string|max:2000', 'receipt_footer' => 'nullable|string|max:2000', 'currency' => ['required', 'regex:/^[A-Z]{3}
-$/D'], 'weight_unit' => 'required|in:kg,lb']);
+        $data = $request->validate(['name' => 'required|string|max:150', 'phone' => 'nullable|string|max:50', 'address' => 'nullable|string|max:2000', 'receipt_footer' => 'nullable|string|max:2000', 'currency' => ['required', 'regex:/^[A-Z]{3}$/D'], 'weight_unit' => 'required|in:kg,lb']);
         DB::transaction(function () use ($data, $request, $service) {
             $settings = CompanySetting::query()->lockForUpdate()->firstOrFail();
             if (Shipment::exists() && ($settings->currency !== $data['currency'] || $settings->weight_unit !== $data['weight_unit'])) {

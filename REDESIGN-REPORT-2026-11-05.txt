@@ -1,0 +1,88 @@
+AIR COURIER SYSTEM — REDESIGN CHANGE AND TEST REPORT
+5 November 2026 · Asia/Yangon
+
+Project: /Users/leon-/Air Courier System/Air-Courier-System
+Branch: codex/ux-simplification-audit
+Open the updated local application: http://127.0.0.1:8010
+
+IMPLEMENTED
+- Task-first Home: Receive a Parcel, Send Parcels, Give Parcel to Customer, Receive Money, plus Find a Parcel and small branch workload counts.
+- Matching task navigation on desktop/mobile; storage, bookkeeping, customer records, daily work and admin settings remain under More. The operating branch and existing admin/staff access are retained.
+- Readable shared typography: 18px body/form text, 16px standard secondary/table/navigation text, large action buttons, larger touch targets, clear focus and skip navigation. Mobile navigation keeps its history, current-tab indicator and reduced-motion behavior.
+- Four-step parcel registration: customer, recipient, parcel/charges, review/save. Back retains entered fields and selected photos within the page. Save Draft remains available at every step.
+- Explicit existing-customer selection by name/phone, with bounded authenticated JSON search. Customer ID survives draft saving/completion. Customers sharing a phone remain separate; no automatic merging or uniqueness rule was introduced.
+- Three-step sending workflow with flight/carrier details, eligible stored parcels, selection review and explicit physical-handover confirmation. Secondary saved plans and dispatch history are collapsed. Existing flight-plan and incomplete-draft operations remain available.
+- Task-specific collection search shows eligible destination stock at the operating branch. Payment search retains the existing searchable records and opens a focused payment page with total, prior payments, balance and one payment form before secondary history.
+- Explicit review dialogs for payment, collection and advanced status changes; refunds retain confirmation with parcel/currency context. Values are submitted through existing backend routes. Browser confirmation remains a fallback where modal dialogs are unavailable.
+- Persistent booking success with parcel number, receipt printing, Receive Another Parcel and Return Home actions.
+- Guided forms reopen the step containing a server-rejected field, highlight it accessibly and preserve ordinary entered values. Browser-local validation also blocks incomplete steps.
+- Central English/Myanmar translations for new labels and messages; completed the three missing audit keys and improved operational Burmese wording. Static literal-key comparison found no missing Myanmar keys in app/views.
+- Fixed the company-currency regex newline bug. Valid company edits work while the existing currency/unit lock after booking remains enforced.
+- Updated the public service-worker cache version and allowlist for the new workflow script. Authenticated records/photos/payment pages remain outside offline caching.
+
+BACKEND CHANGES
+CustomerController: returns a minimal, limited JSON lookup result when the existing customer index is requested as JSON; authentication/active-session middleware is unchanged. No notes, audit metadata or employee identifiers are exposed by this response; private/no-store headers are sent.
+ShipmentController: adds an optional validated collection/payment task parameter, narrows collection results to eligible destination stock, and supplies the selected operation branch for booking defaults.
+DashboardController: avoids loading financial reports for staff and removes the unused recent-record query. Admin financial summaries and report links remain in a collapsed section.
+EntryDraftService: validates/preserves the selected existing customer ID in draft payloads.
+SettingsController: fixes only the malformed three-letter-currency validation expression.
+An authenticated POST route, dispatches.flight-time, permits audited flight-time editing by the responsible branch. An authenticated read-only GET route, dispatches.records at /flight-records, provides flight history using the existing record-visibility scope. No dependencies, role grants or architectural framework were added.
+
+PRESERVATION
+No database migrations or database-structure edits.
+Money, PaymentDetails, ReportService, InventoryService, SimpleWorkflowService and financial models retain their calculation and integrity rules. CourierService removes the old flight-date handover gate and adds an audited flight-time metadata edit. routes/web.php adds the authenticated flight-time edit route.
+Prices, currency rules, exact financial arithmetic, row locks/transactions, payment/booking idempotency, refund bounds, branch authorization, private photos and append-only histories are retained.
+Original local database counts after QA match the audit: 3 customers, 3 shipments, 3 dispatches, 3 payment entries and 9 storage movements. Read-only SQLite quick_check: ok.
+Browser test mutations used /tmp/courier-redesign-qa-20261105.sqlite on port 8018, with fictional seeded accounts and parcels. No QA bookings or payments were made in the application's database/database.sqlite.
+
+VERIFICATION
+Full Laravel regression run: 257 tests, 251 passed, 6 skipped, 2,500 assertions. The six skipped cases require an isolated MySQL database.
+After the final error-recovery improvement: all 40 affected booking/customer/language/workspace tests passed, with 284 assertions.
+JavaScript unit tests: 26 passed, covering navigation/menu, duplicate submission and PWA public-cache/private-data behavior.
+Chrome guided-workflow acceptance passed: selected customer, booking review/back, actual parcel persistence and generated number, partial cash payment/change, review cancellation/correction, outgoing handover, destination receipt, remaining-balance collection, incomplete drafts and server validation recovery without loss of ordinary fields.
+Chrome responsive checks passed for representative desktop/tablet/phone widths: 1440, 1024, 768, 390 and 375px. English and Myanmar checked; no page-level horizontal overflow or uncaught page errors in the tested routes.
+Chrome mobile navigation acceptance passed: deep links, refresh, history, menu, indicator geometry, reduced motion, rapid navigation replacement and current-tab re-tap.
+Python deployment/backup test suite: 13 passed. Logged DEPLOY FAILED lines were intentional mocked failure-path checks, not real deployments.
+Pint passed; Blade view compilation passed; git diff --check passed.
+
+REUSABLE TESTS
+PHP: ./bin/php artisan test --compact
+JS: node --test tests/*.test.mjs
+Browser workflow: tests/guided-workflow.browser.mjs
+Run it only against a disposable, BranchDemoSeeder-seeded local database, with UAT_DISPOSABLE_DATABASE=1 and UAT_BASE_URL pointing to that local preview. PLAYWRIGHT_MODULE may point to an existing Playwright installation. It intentionally refuses non-local hosts and missing disposable-data acknowledgement.
+The older tests/mobile-navigation.browser.mjs accepts UAT_BASE_URL, UAT_EMAIL and UAT_PASSWORD for a dedicated fictional QA admin.
+Laravel artisan serve must use --no-reload when environment variables override the QA database; otherwise its child process reloads .env and discards most inherited overrides.
+
+REMAINING LIMITATIONS / ACCEPTANCE
+This delivery implements the core operational redesign and shared styling; it is not a certification that every administrative workflow meets the full long-term brief.
+The application still has only its existing admin/staff roles. Cashier/warehouse/operations/accountant permissions were not invented. Existing report, storage, customer and administration functionality remains available with shared readable controls; more detailed per-job task profiles need a real permission specification.
+/audit remains intentionally untouched: its existing controller returns 404. Audit records continue to be preserved; the reason for disabling the viewer needs confirmation before restoration.
+Cross-device per-employee language storage is not added; existing session/browser-cookie persistence remains in place.
+Unsaved file inputs cannot be restored after a server-rejected HTTP submission. The form now explicitly asks the employee to reselect new photos; photos already saved in a draft remain available. In-page Back/Next retains selected files.
+The original DemoSeeder cannot safely be layered over this particular BranchDemoSeeder fixture without encountering an unrated destination. The attempted seed rolled back its transaction; QA admin creation used the existing courier:admin command instead. This is an existing fixture-composition issue, not a change to pricing rules.
+Physical Android/iPhone hardware, Safari rendering, screen-reader acceptance, measured full contrast conformance, MySQL concurrency/restore tests and usability sessions with representative novice employees remain outstanding. Viewport testing is not physical-device testing.
+No production deployment, expense/profit accounting, currency conversion, branch expansion or financial-rule change was performed.
+
+LOCAL USE AND DEPLOYMENT
+The existing VS Code project's server on http://127.0.0.1:8010 serves the changed source. Refresh the page after signing in; if an installed PWA shows old assets, reload once after its service-worker update. There is no Vite build or new dependency installation required for this change.
+Review the branch diff and run the listed checks before promoting through the existing demo/prod release process. Keep this work isolated from the source demo branch until review; changes are currently uncommitted for inspection.
+Before any production release, take a verified database backup and matching private parcel-photo/draft-photo backups plus protected configuration/APP_KEY. Deploy the reviewed code, use the existing production/debug-off HTTPS settings, compile Blade views and verify branch workflows with branch representatives. No migration command is required for this redesign.
+For rollback, restore the previous code release and clear/recompile Blade views; ensure clients refresh public assets. This change requires no schema rollback and no alteration of financial entries.
+
+
+FLIGHT RECORDS AND MANUAL PROCESSING — CURRENT BEHAVIOR
+Flight date/time is stored metadata only. There are no countdowns, automatic time-based parcel transitions, or handover restrictions based on the recorded departure date/time.
+Staff explicitly save a flight plan, confirm actual carrier handover, receive parcels at the destination and confirm customer collection. Existing branch authorization, parcel eligibility, transaction boundaries, duplicate protection and balance-settlement rules remain enforced.
+On a flight record, the responsible origin branch can open Edit recorded flight time and save a past or future date/time. Authorized admins can edit a legacy record with no branch route. The input uses the origin branch timezone. The date and time metadata are kept consistent; handover timestamps, parcel states and payment records are preserved.
+Metadata edits use a transaction, locked dispatch row, server validation, an audit entry retaining before/after values and a stale-form check to prevent overwriting a concurrent time edit. Editing is supported before and after handover.
+The flight page and printable manifest retain full parcel data; selection uses readable item/customer/weight/photo cards. Currency and weight-unit totals stay separate. The booking date label reads Parcel received date for branch bookings.
+Verified: 246 Laravel tests passed, 6 MySQL-only tests skipped, 26 JavaScript tests passed. Focused tests cover early manual handover for future flights, idempotency, both origin timezones, edits after handover, unchanged parcel/payment data, audit records, invalid dates, stale submissions and unauthorized branches. Chrome acceptance passed for manual time editing and future-date handover plus full parcel/manifest/private-photo/bilingual mobile views, on the isolated QA database at port 8018.
+No schema migration or production-data update is required. The changed app is served by the existing VS Code project at http://127.0.0.1:8010. Refresh an open page to load the updated controls; installed PWA cache version is v7.
+
+
+FLIGHT HISTORY VIEW
+Open http://127.0.0.1:8010/flight-records, use More -> Flight records, or the Flight records button on Send Parcels.
+Each recorded trip shows its recorded date/time, flight number, carrier, route, actual handover date/time and staff recorder, parcel count and identifiable parcel previews. Planned trips are explicitly labeled not handed over; actual carriage is based on the recorded handover, never the flight clock. Flight date filters use the stored local flight date, with actual handover shown separately.
+Search supports flight/carrier/reference, parcel number/description, historical sender name and recipient name. Optional date range and handover-status filters, clear/reset, pagination, full-flight links and print-manifest links are available.
+Previews are bounded to three parcels per trip with an explicit partial-list message; View flight and all parcels opens the full existing record and every assigned parcel. This avoids loading all parcels from every flight into one history page. Records remain scoped to the employee's existing readable branches. No database, financial or processing rule changed for this history feature.
+Verification: five new PHP history tests passed; full suite 257 total / 251 passed / 6 MySQL-only skips / 2,500 assertions. Existing 26 JS tests passed. Chrome history checks passed for exact parcel/carrier/flight lookup, planned vs handed-over filtering, complete-flight links, Burmese mobile layout and navigation. Physical-device and isolated MySQL acceptance remain outstanding.

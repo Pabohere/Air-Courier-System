@@ -43,7 +43,7 @@ class EntryDraftService
 
     public function save(Request $request, string $kind): EntryDraft
     {
-        $rules = ['draft_id' => 'required|uuid', 'draft_revision' => 'nullable|integer|min:0', 'origin_branch_id' => 'nullable|integer|exists:branches,id', 'destination_branch_id' => 'nullable|integer|exists:branches,id', 'photos' => 'nullable|array|max:5', 'shipments' => 'nullable|array|max:500', 'shipments.*' => 'integer|distinct|exists:shipments,id'];
+        $rules = ['customer_id' => 'nullable|integer|exists:customers,id', 'draft_id' => 'required|uuid', 'draft_revision' => 'nullable|integer|min:0', 'origin_branch_id' => 'nullable|integer|exists:branches,id', 'destination_branch_id' => 'nullable|integer|exists:branches,id', 'photos' => 'nullable|array|max:5', 'shipments' => 'nullable|array|max:500', 'shipments.*' => 'integer|distinct|exists:shipments,id'];
         $fields = $kind === 'booking' ? ['booking_key', 'customer_name', 'customer_phone', 'customer_address', 'recipient_name', 'recipient_phone', 'recipient_address', 'storage_location', 'shipment_date', 'quantity', 'actual_weight', 'description', 'currency', 'price'] : ['carrier_name', 'partner', 'flight', 'flight_departure_at', 'notes'];
         foreach ($fields as $field) {
             $rules[$field] = 'nullable|string|max:2000';

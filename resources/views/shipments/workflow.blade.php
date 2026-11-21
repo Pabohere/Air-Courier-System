@@ -4,16 +4,18 @@
 @endphp
 <section class="card"><div class="card-head"><h2>{{ __('Parcel workflow') }}</h2><x-branch-route :record="$shipment" /></div><div class="card-body">
 <x-parcel-progress :shipment="$shipment" />
+@if($shipment->dispatch?->flight_departure_at && !in_array($shipment->status, ['Arrived at Branch', 'Ready for Collection', 'Collected'], true))<x-flight-schedule :departure="$shipment->dispatch->flight_departure_at" :timezone="$shipment->originBranch?->timezone" compact />@endif
+<div class="recipient-check"><strong>{{ $shipment->recipient_name }}</strong><span>{{ $shipment->recipient_phone }}</span><span>{{ $shipment->description }}</span></div>
 @if($originUser && in_array($shipment->status, ['Received', 'Processing', 'Ready for Dispatch']) && $shipment->in_storage)
 @if($shipment->dispatch_id)
-<a class="button" href="{{ route('dispatches.show', $shipment->dispatch) }}">{{ __('Open dispatch and send') }} →</a>
+<a class="button" href="{{ route('dispatches.show', $shipment->dispatch) }}">{{ __('Open flight plan') }} →</a>
 @else
-<a class="button" href="{{ route('dispatches.index', ['shipment' => $shipment->id]) }}">{{ __('Send with carrier') }} →</a>
+<a class="button" href="{{ route('dispatches.index', ['shipment' => $shipment->id]) }}">{{ __('Plan a flight for this parcel') }} →</a>
 @endif
 @elseif($destinationUser && in_array($shipment->status, ['Dispatched', 'In Transit']))
 <form class="field-grid" method="post" action="{{ route('shipments.receive', $shipment) }}">@csrf<label>{{ __('Storage location') }}<input name="storage_location" value="{{ old('storage_location', 'Receiving area') }}" maxlength="100" required></label><div class="full"><button class="button">{{ __('Receive at branch') }}</button></div></form>
 @elseif($destinationUser && in_array($shipment->status, ['Arrived at Branch', 'Ready for Collection']))
-<form class="field-grid" method="post" action="{{ route('shipments.collect', $shipment) }}">@csrf<input type="hidden" name="submission_key" value="{{ old('submission_key', \Illuminate\Support\Str::uuid()) }}"><label>{{ __('Collector name') }}<input name="collector_name" value="{{ old('collector_name', $shipment->recipient_name) }}" maxlength="150" required></label>
+<form class="field-grid" method="post" action="{{ route('shipments.collect', $shipment) }}" data-confirm="{{ __('Are you sure you are giving this parcel to the correct customer?') }}" data-review-confirm data-review-context="{{ $shipment->tracking_number }} · {{ $shipment->recipient_name }} · {{ __('Outstanding') }}: {{ \App\Services\Money::decimal($shipment->balanceCents()) }} {{ $shipment->currency }}">@csrf<input type="hidden" name="submission_key" value="{{ old('submission_key', \Illuminate\Support\Str::uuid()) }}"><label>{{ __('Collector name') }}<input name="collector_name" value="{{ old('collector_name', $shipment->recipient_name) }}" maxlength="150" required></label>
 @if($shipment->balanceCents() > 0)
 @include('shipments.payment-details')
 <label class="full workflow-check"><input type="checkbox" name="receive_balance" value="1" required @checked(old('receive_balance'))> {{ __('I received the remaining :amount :currency.', ['amount' => \App\Services\Money::decimal($shipment->balanceCents()), 'currency' => $shipment->currency]) }}</label>

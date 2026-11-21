@@ -29,7 +29,7 @@ class ParcelProgressTest extends TestCase
                 $this->assertStringContainsString('data-phase="'.$phase.'"', $html);
                 preg_match_all('/class="parcel-progress-label">(.*?)<\/span>/s', $html, $matches);
                 $labels = array_map('trim', $matches[1]);
-                $this->assertSame([$origin, 'In transit', $destination, 'Customer collection'], $labels);
+                $this->assertSame([$origin, 'With carrier', $destination, 'Customer collection'], $labels);
                 $this->assertSame($status === 'Collected' ? 4 : $phase, substr_count($html, 'class="is-complete"'));
             }
         }
@@ -73,8 +73,9 @@ class ParcelProgressTest extends TestCase
                 ->assertSee('data-parcel-progress', false)
                 ->assertSee('data-tracking="'.$parcel->tracking_number.'"', false);
 
+            $this->get(route('dashboard', ['branch_id' => $origin->id]))->assertOk()->assertSee('Receive a Parcel')->assertDontSee('data-parcel-progress', false);
+
             foreach ([
-                route('dashboard', ['branch_id' => $origin->id]),
                 route('shipments.index'),
                 route('branches.index', ['branch_id' => $origin->id, 'tab' => 'outgoing']),
                 route('inventory.index', ['branch_id' => $origin->id]),

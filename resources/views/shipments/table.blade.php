@@ -27,7 +27,7 @@
 @forelse($shipments as $shipment)
 <tr>
 <td>
-<a class="mono" href="{{ route('shipments.show',$shipment) }}">{{ $shipment->tracking_number }}</a><small>{{ $shipment->shipment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</small>
+<a class="mono" href="{{ route('shipments.show', ['shipment' => $shipment->id, 'task' => request('task')]) }}">{{ $shipment->tracking_number }}</a><small>{{ $shipment->shipment_date->locale(app()->getLocale())->translatedFormat('d M Y') }}</small>
 @if($compact ?? false)<small><x-branch-route :record="$shipment" /></small>@endif
 </td>
 <td>
@@ -45,7 +45,7 @@
 <strong>{{ $shipment->price }} {{ $shipment->currency }}</strong><small>{{ \App\Services\Money::decimal($shipment->balanceCents()) }} {{ __('outstanding') }}</small>
 </td>
 <td>
-<a href="{{ route('shipments.show',$shipment) }}" aria-label="{{ __('View') }} {{ $shipment->tracking_number }}">↗</a>
+<a href="{{ route('shipments.show', ['shipment' => $shipment->id, 'task' => request('task')]) }}" aria-label="{{ __('View') }} {{ $shipment->tracking_number }}">{{ __('View') }} →</a>
 </td>
 </tr>
 @empty

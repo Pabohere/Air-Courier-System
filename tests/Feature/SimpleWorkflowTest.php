@@ -53,7 +53,7 @@ class SimpleWorkflowTest extends TestCase
     {
         foreach ([[$this->ygn, $this->sg], [$this->sg, $this->ygn]] as [$origin, $destination]) {
             $parcel = $this->book($origin, $destination);
-            $this->actingAs($origin)->get(route('shipments.show', $parcel))->assertOk()->assertSee('Parcel workflow')->assertSee('Send with carrier');
+            $this->actingAs($origin)->get(route('shipments.show', $parcel))->assertOk()->assertSee('Parcel workflow')->assertSee('Plan a flight for this parcel');
             $this->get(route('dispatches.index', ['shipment' => $parcel->id]))->assertOk()->assertViewHas('ready', fn ($rows) => $rows->contains('id', $parcel->id));
             $dispatchData = $this->dispatchData([$parcel]);
             $this->post(route('dispatches.store'), $dispatchData)->assertSessionHasNoErrors()->assertRedirect()->assertSessionHas('success', __('Handover recorded. All parcels marked Dispatched.'));
@@ -84,11 +84,11 @@ class SimpleWorkflowTest extends TestCase
         $this->assertSame(2, Dispatch::count());
     }
 
-    public function test_invalid_bulk_dispatch_rolls_back_automatic_preparation_and_future_flights_can_be_saved_as_drafts(): void
+    public function test_invalid_bulk_dispatch_rolls_back_preparation_and_recorded_flight_dates_do_not_block_handover(): void
     {
         $parcel = $this->book($this->ygn, $this->sg);
         $auditCount = AuditLog::count();
-        $this->actingAs($this->ygn)->post(route('dispatches.store'), $this->dispatchData([$parcel], 'send', '2026-10-17'))->assertSessionHasErrors('dispatch');
+        $this->actingAs($this->ygn)->post(route('dispatches.store'), array_replace($this->dispatchData([$parcel], 'send', '2026-10-17'), ['flight' => '']))->assertSessionHasErrors('flight');
         $this->assertSame('Received', $parcel->fresh()->status);
         $this->assertNull($parcel->fresh()->dispatch_id);
         $this->assertSame($auditCount, AuditLog::count());
@@ -97,7 +97,9 @@ class SimpleWorkflowTest extends TestCase
         $this->assertSame('Ready for Dispatch', $parcel->fresh()->status);
         $this->assertTrue($parcel->fresh()->in_storage);
         $this->assertNull($parcel->fresh()->dispatch->handed_over_at);
-        $this->post(route('dispatches.handover', $parcel->fresh()->dispatch))->assertSessionHasErrors('dispatch');
+        $this->post(route('dispatches.handover', $parcel->fresh()->dispatch))->assertSessionHasNoErrors();
+        $this->assertSame('Dispatched', $parcel->fresh()->status);
+        $this->assertFalse($parcel->fresh()->in_storage);
     }
 
     public function test_wrong_branch_and_invalid_collection_never_record_payment_or_release_stock(): void

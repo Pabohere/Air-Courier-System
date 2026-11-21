@@ -1,11 +1,12 @@
 const CACHE_PREFIX = 'standard-public-';
-const CACHE_NAME = `${CACHE_PREFIX}v4`;
+const CACHE_NAME = `${CACHE_PREFIX}v8`;
 const PUBLIC_ASSETS = [
     '/offline.html',
     '/css/app.css',
     '/css/theme.css',
     '/css/mobile-motion.css',
     '/js/app.js',
+    '/js/guided-workflow.js',
     '/js/navigation.js',
     '/js/mobile-menu.js',
     '/js/theme.js',

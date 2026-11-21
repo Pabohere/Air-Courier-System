@@ -8,7 +8,7 @@
         default => $shipment->collected_at ? 3 : ($shipment->arrived_at ? 2 : ($shipment->dispatch?->handed_over_at ? 1 : 0)),
     };
     $finished = $shipment->status === 'Collected';
-    $steps = [$shipment->originBranch->code, __('In transit'), $shipment->destinationBranch->code, __('Customer collection')];
+    $steps = [$shipment->originBranch->code, __('With carrier'), $shipment->destinationBranch->code, __('Customer collection')];
 @endphp
 <ol class="parcel-progress {{ $compact ? 'parcel-progress-compact' : '' }}" aria-label="{{ __('Parcel journey') }}" data-parcel-progress data-phase="{{ $phase }}" data-tracking="{{ $shipment->tracking_number }}">
 @foreach($steps as $index => $step)

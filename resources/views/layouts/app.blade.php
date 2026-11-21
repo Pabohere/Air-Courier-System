@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ app()->getLocale() }}" data-cancel-label="{{ __('Back and check') }}" data-confirm-label="{{ __('Confirm') }}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title',__('Overview')) · {{ $company?->name ?? 'Standard' }}</title><script src="{{ asset('js/theme.js') }}?v={{ filemtime(public_path('js/theme.js')) }}"></script><link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
@@ -8,6 +8,7 @@
 <x-pwa-head />
 </head>
 <body>
+<a class="skip-link" href="#main-content">{{ __('Skip to main content') }}</a>
 <aside class="sidebar">
 <a class="brand" href="{{ route('dashboard') }}"><img class="brand-logo" src="{{ asset('images/pwa-192.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
 <span class="brand-copy">Standard<small>{{ __('YANGON ↔ SINGAPORE') }}</small></span></a>
@@ -15,13 +16,9 @@
 {{ __('WORKSPACE') }}
 </div>
 <nav aria-label="{{ __('Main menu') }}">
-@foreach(['dashboard'=>[__('Home'),'◫'],'inventory.index'=>[__('Parcel storage'),'▦'],'dispatches.index'=>[__('Carrier trips'),'⇄'],'reports.index'=>[__('Bookkeeping'),'▤']] as $route=>$item)
-<a href="{{ route($route) }}" class="{{ request()->routeIs($route === 'dashboard' ? 'dashboard*' : explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
-@endforeach
-<details class="nav-more" @if(request()->routeIs('shipments.*','customers.*','branches.*','settings.*')) open @endif><summary>{{ __('More') }}</summary>
-@foreach(['shipments.index'=>[__('All parcel records'),'▣'],'customers.index'=>[__('Customers'),'♧'],'branches.index'=>[__('Daily work'),'⇆']] as $route=>$item)
-<a href="{{ route($route) }}" class="{{ request()->routeIs(explode('.',$route)[0].'*') ? 'active' : '' }}"><span>{{ $item[1] }}</span>{{ $item[0] }}</a>
-@endforeach
+<x-task-links />
+<details class="nav-more" @if(request()->routeIs('inventory.*','reports.*','customers.*','branches.*','settings.*','dispatches.records')) open @endif><summary>{{ __('More') }}</summary>
+<x-task-links secondary />
 @can('admin')
 <a href="{{ route('settings.index') }}">{{ __('System settings') }}</a>
 @endcan
@@ -58,14 +55,14 @@
 </form>
 </div>
 </header>
-<main @if(request()->routeIs('reports.index', 'customers.show', 'dispatches.show', 'shipments.show', 'inventory.edit')) data-table-search data-search-label="{{ __('Search displayed records') }}" data-search-empty="{{ __('No matching records.') }}" data-search-clear="{{ __('Clear search') }}" @endif>
+<main id="main-content" tabindex="-1" @if(request()->routeIs('reports.index', 'customers.show', 'dispatches.show', 'shipments.show', 'inventory.edit')) data-table-search data-search-label="{{ __('Search displayed records') }}" data-search-empty="{{ __('No matching records.') }}" data-search-clear="{{ __('Clear search') }}" @endif>
 @if(session('success'))
 <div class="notice success" role="status">
 {{ session('success') }}
 </div>
 @endif
 @if($errors->any())
-<div class="notice error" role="alert">
+<div id="form-errors" class="notice error" role="alert" tabindex="-1">
 <strong>{{ __('Please check the following') }}</strong>
 <ul>
 @foreach($errors->all() as $error)
@@ -76,6 +73,9 @@
 </ul>
 </div>
 @endif
+@unless(request()->routeIs('dashboard*'))
+<a class="back-home" href="{{ route('dashboard') }}">← {{ __('Return Home') }}</a>
+@endunless
 @yield('content')
 </main>
 <footer>
@@ -86,6 +86,7 @@
 <dialog data-photo-viewer class="photo-viewer" aria-label="{{ __('Photo preview') }}"><div class="photo-viewer-toolbar"><button type="button" class="button secondary" data-photo-previous aria-label="{{ __('Previous photo') }}">←</button><span data-photo-position></span><button type="button" class="button secondary" data-photo-next aria-label="{{ __('Next photo') }}">→</button><button type="button" class="button secondary" data-photo-close>{{ __('Close preview') }} ×</button></div><img alt=""></dialog>
 <script src="{{ asset('js/mobile-menu.js') }}?v={{ filemtime(public_path('js/mobile-menu.js')) }}" defer></script>
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+<script src="{{ asset('js/guided-workflow.js') }}?v={{ filemtime(public_path('js/guided-workflow.js')) }}" defer></script>
 <x-pwa-controls />
 </body>
 </html>

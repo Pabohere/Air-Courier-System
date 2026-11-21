@@ -48,7 +48,9 @@ Route::middleware(['auth', EnsureActiveUser::class, 'auth.session'])->group(func
     Route::get('/shipments/{shipment}/receipt', [ShipmentController::class, 'receipt'])->name('shipments.receipt');
     Route::post('/shipments/{shipment}/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::post('/shipments/{shipment}/refunds', [PaymentController::class, 'refund'])->middleware('can:admin')->name('payments.refund');
+    Route::get('/flight-records', [DispatchController::class, 'records'])->name('dispatches.records');
     Route::resource('dispatches', DispatchController::class)->only(['index', 'store', 'show']);
+    Route::post('/dispatches/{dispatch}/flight-time', [DispatchController::class, 'updateFlightTime'])->name('dispatches.flight-time');
     Route::post('/dispatches/{dispatch}/handover', [DispatchController::class, 'handover'])->name('dispatches.handover');
     Route::delete('/dispatches/{dispatch}/shipments/{shipment}', [DispatchController::class, 'unassign'])->name('dispatches.unassign');
     Route::get('/dispatches/{dispatch}/manifest', [DispatchController::class, 'manifest'])->name('dispatches.manifest');

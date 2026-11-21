@@ -44,7 +44,40 @@ class DispatchController extends Controller
             ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match->where('carrier_name', 'like', '%'.$search.'%')->orWhere('reference', 'like', '%'.$search.'%')->orWhere('flight', 'like', '%'.$search.'%')->orWhere('partner', 'like', '%'.$search.'%')->orWhereHas('shipments', fn ($parcels) => $parcels->where('tracking_number', 'like', '%'.$search.'%'))))
             ->latest('id')->paginate(20)->withQueryString();
 
-        return view('dispatches.index', ['originBranch' => $originBranch, 'operationBranchId' => $operationBranchId, 'draft' => $draft, 'entryDrafts' => EntryDraft::openFor($request->user(), 'trip')->latest()->get(), 'weekly' => $weekly, 'weekStart' => $weekStart, 'dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch'])->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch'])->where('in_storage', true)->whereColumn('current_branch_id', 'origin_branch_id')->where('origin_branch_id', $operationBranchId ?? 0)->whereNull('dispatch_id')->get()]);
+        return view('dispatches.index', ['originBranch' => $originBranch, 'operationBranchId' => $operationBranchId, 'draft' => $draft, 'entryDrafts' => EntryDraft::openFor($request->user(), 'trip')->latest()->get(), 'weekly' => $weekly, 'weekStart' => $weekStart, 'dispatches' => $dispatches, 'ready' => Shipment::visibleTo($request->user())->with(['originBranch', 'destinationBranch', 'currentBranch', 'payments'])->whereIn('status', ['Received', 'Processing', 'Ready for Dispatch'])->where('in_storage', true)->whereColumn('current_branch_id', 'origin_branch_id')->where('origin_branch_id', $operationBranchId ?? 0)->whereNull('dispatch_id')->get()]);
+    }
+
+    public function records(Request $request): View
+    {
+        $data = $request->validate([
+            'q' => 'nullable|string|max:150',
+            'from' => 'nullable|date_format:Y-m-d',
+            'to' => 'nullable|date_format:Y-m-d'.($request->filled('from') ? '|after_or_equal:from' : ''),
+            'status' => 'nullable|in:all,handed_over,planned',
+        ]);
+        $search = trim($data['q'] ?? '');
+        $status = $data['status'] ?? 'all';
+        $dispatches = Dispatch::visibleTo($request->user())
+            ->with(['originBranch', 'destinationBranch', 'handoverStaff', 'shipments' => fn ($parcels) => $parcels->orderBy('id')->limit(3)])
+            ->withCount('shipments')
+            ->when($data['from'] ?? null, fn ($query, $from) => $query->whereDate('dispatch_date', '>=', $from))
+            ->when($data['to'] ?? null, fn ($query, $to) => $query->whereDate('dispatch_date', '<=', $to))
+            ->when($status === 'handed_over', fn ($query) => $query->whereNotNull('handed_over_at'))
+            ->when($status === 'planned', fn ($query) => $query->whereNull('handed_over_at'))
+            ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match
+                ->where('carrier_name', 'like', '%'.$search.'%')
+                ->orWhere('flight', 'like', '%'.$search.'%')
+                ->orWhere('reference', 'like', '%'.$search.'%')
+                ->orWhere('partner', 'like', '%'.$search.'%')
+                ->orWhereHas('shipments', fn ($parcels) => $parcels
+                    ->where('tracking_number', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%')
+                    ->orWhere('sender->name', 'like', '%'.$search.'%')
+                    ->orWhere('recipient_name', 'like', '%'.$search.'%'))))
+            ->orderByDesc('dispatch_date')->orderByDesc('id')
+            ->paginate(12)->withQueryString();
+
+        return view('dispatches.records', compact('dispatches', 'search', 'status'));
     }
 
     public function store(Request $request, CourierService $service, EntryDraftService $drafts): RedirectResponse
@@ -63,10 +96,21 @@ class DispatchController extends Controller
     public function show(Dispatch $dispatch): View
     {
         abort_unless(Dispatch::visibleTo(auth()->user())->whereKey($dispatch->id)->exists(), 403);
-        $dispatch->load(['shipments.originBranch', 'shipments.destinationBranch', 'handoverStaff', 'originBranch', 'destinationBranch']);
+        $dispatch->load(['shipments.originBranch', 'shipments.destinationBranch', 'shipments.currentBranch', 'shipments.payments', 'handoverStaff', 'originBranch', 'destinationBranch']);
         $dispatch->loadCount(['shipments as arrived_count' => fn ($query) => $query->whereNotNull('arrived_at')]);
 
         return view('dispatches.show', compact('dispatch'));
+    }
+
+    public function updateFlightTime(Request $request, Dispatch $dispatch, CourierService $service): RedirectResponse
+    {
+        $data = $request->validate([
+            'flight_departure_at' => 'required|date_format:Y-m-d\\TH:i',
+            'original_flight_departure_at' => 'present|nullable|string|max:50',
+        ]);
+        $service->updateFlightTime($dispatch, $data, $request->user());
+
+        return redirect()->route('dispatches.show', $dispatch)->with('success', __('Flight time saved. Parcel progress is unchanged.'));
     }
 
     public function handover(Request $request, Dispatch $dispatch, CourierService $service): RedirectResponse
@@ -86,7 +130,7 @@ class DispatchController extends Controller
     public function manifest(Dispatch $dispatch): View
     {
         abort_unless(Dispatch::visibleTo(auth()->user())->whereKey($dispatch->id)->exists(), 403);
-        $dispatch->load(['shipments', 'originBranch', 'destinationBranch']);
+        $dispatch->load(['shipments.payments', 'shipments.originBranch', 'shipments.destinationBranch', 'shipments.currentBranch', 'originBranch', 'destinationBranch', 'handoverStaff']);
 
         return view('dispatches.manifest', compact('dispatch'));
     }

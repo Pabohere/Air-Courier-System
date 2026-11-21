@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Rules\PhoneNumber;
 use App\Services\CourierService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +13,17 @@ use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
         $request->validate(['q' => 'nullable|string|max:100']);
         $q = $request->string('q')->toString();
+        if ($request->expectsJson()) {
+            $customers = $q === '' ? collect() : Customer::query()
+                ->where(fn ($query) => $query->where('phone', 'like', '%'.$q.'%')->orWhere('name', 'like', '%'.$q.'%'))
+                ->orderBy('name')->limit(10)->get(['id', 'name', 'phone', 'address']);
+
+            return response()->json(['customers' => $customers])->header('Cache-Control', 'private, no-store');
+        }
         $customers = Customer::query()->when($q, fn ($query) => $query->where(fn ($w) => $w->where('name', 'like', "%$q%")->orWhere('phone', 'like', "%$q%")))->withCount('shipments')->latest()->paginate(20)->withQueryString();
 
         return view('customers.index', compact('customers', 'q'));

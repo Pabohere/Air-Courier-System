@@ -30,7 +30,7 @@ try {
     await page.locator('[name=email]').fill(process.env.UAT_EMAIL);
     await page.locator('[name=password]').fill(process.env.UAT_PASSWORD);
     await Promise.all([page.waitForURL((url) => url.pathname === '/'), page.locator('form:has([name=password]) button').click()]);
-    const routes = [['/', 0], ['/dashboard/sg', 0], ['/inventory', 1], ['/dispatches', 2], ['/reports', 3], ['/shipments', 4], ['/shipments/create', 4], ['/customers', 4], ['/customers/create', 4], ['/branches', 4], ['/settings', 4]];
+    const routes = [['/', 0], ['/dashboard/sg', 0], ['/flight-records', 4], ['/inventory', 4], ['/dispatches', 2], ['/reports', 4], ['/shipments', 3], ['/shipments/create', 1], ['/customers', 4], ['/customers/create', 4], ['/branches', 4], ['/settings', 4]];
     for (const [path, index] of routes) {
         assert.equal((await page.goto(path)).status(), 200, path);
         await verify(index);
@@ -38,10 +38,10 @@ try {
         await verify(index);
     }
     for (const [listing, pattern, index] of [
-        ['/shipments', /\/shipments\/\d+$/, 4],
+        ['/shipments', /\/shipments\/\d+$/, 3],
         ['/customers', /\/customers\/\d+$/, 4],
         ['/dispatches', /\/dispatches\/\d+$/, 2],
-        ['/inventory', /\/inventory\/\d+\/edit$/, 1],
+        ['/inventory', /\/inventory\/\d+\/edit$/, 4],
     ]) {
         await page.goto(listing);
         const links = await page.locator('main a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
@@ -54,7 +54,7 @@ try {
     }
     await page.goto('/');
     await page.locator('.mobile-nav > a').nth(1).click();
-    await page.waitForURL('**/inventory');
+    await page.waitForURL('**/shipments/create');
     await verify(1);
     await page.goBack();
     await verify(0);
@@ -81,7 +81,7 @@ try {
     // Hold native document requests so a newer click can replace a slow first navigation.
     await page.goto('/');
     console.log('Checking rapid native navigation');
-    await page.route('**/inventory', async (route) => {
+    await page.route('**/shipments/create', async (route) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         await route.abort().catch(() => {});
     });
@@ -91,7 +91,7 @@ try {
     });
     await page.waitForURL('**/dispatches', { timeout: 10000 });
     await verify(2);
-    await page.unroute('**/inventory');
+    await page.unroute('**/shipments/create');
     let documentRequests = 0;
     page.on('request', (request) => { if (request.isNavigationRequest()) documentRequests++; });
     await page.locator('.mobile-nav > a').nth(2).click();

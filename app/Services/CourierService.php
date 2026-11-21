@@ -267,6 +267,35 @@ class CourierService
         }, 3);
     }
 
+    public function updateFlightTime(Dispatch $dispatch, array $data, User $user): void
+    {
+        validator($data, [
+            'flight_departure_at' => 'required|date_format:Y-m-d\\TH:i',
+            'original_flight_departure_at' => 'present|nullable|string|max:50',
+        ])->validate();
+
+        DB::transaction(function () use ($dispatch, $data, $user): void {
+            $locked = Dispatch::query()->lockForUpdate()->findOrFail($dispatch->id);
+            if ($locked->origin_branch_id) {
+                BranchAccess::authorizeOperation($user, $locked->origin_branch_id);
+            } else {
+                abort_unless($user->active && $user->isAdmin(), 403);
+            }
+            if (($locked->flight_departure_at?->toIso8601String() ?? '') !== ($data['original_flight_departure_at'] ?? '')) {
+                throw ValidationException::withMessages(['flight_departure_at' => __('This flight time changed in another window. Reload the page before editing it.')]);
+            }
+            $timezone = $locked->originBranch?->timezone ?? config('app.timezone');
+            $departure = Carbon::createFromFormat('!Y-m-d\\TH:i', $data['flight_departure_at'], $timezone);
+            $storedDeparture = $departure->copy()->setTimezone(config('app.timezone'));
+            if ($locked->flight_departure_at?->equalTo($storedDeparture) && $locked->dispatch_date->toDateString() === $departure->toDateString()) {
+                return;
+            }
+            $before = $locked->toArray();
+            $locked->update(['dispatch_date' => $departure->toDateString(), 'flight_departure_at' => $storedDeparture]);
+            $this->audit($user, 'dispatch.flight_time_updated', $locked, $before);
+        }, 3);
+    }
+
     public function handover(Dispatch $dispatch, User $user): void
     {
         DB::transaction(function () use ($dispatch, $user) {
@@ -276,9 +305,6 @@ class CourierService
             }
             if ($locked->handed_over_at) {
                 return;
-            }
-            if ($locked->dispatch_date->toDateString() > now($locked->originBranch?->timezone ?? config('app.timezone'))->toDateString()) {
-                throw ValidationException::withMessages(['dispatch' => __('Cannot hand over a future-dated dispatch.')]);
             }
             $shipments = $locked->shipments()->orderBy('id')->lockForUpdate()->get();
             if ($shipments->isEmpty() || $shipments->contains(fn ($s) => $s->status !== 'Ready for Dispatch')) {

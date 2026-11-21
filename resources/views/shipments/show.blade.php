@@ -15,10 +15,21 @@
 </div>
 </div>
 
+@if(session('success') === __('Shipment booked. Price is saved and locked.'))
+<section class="notice success booking-complete" role="status"><h2>{{ __('Parcel successfully registered!') }}</h2><p>{{ __('Parcel Number') }}: <strong>{{ $shipment->tracking_number }}</strong></p><div class="actions"><a class="button" href="{{ route('shipments.receipt', $shipment) }}" target="_blank" rel="noopener">{{ __('Print receipt / label ↗') }}</a><a class="button secondary" href="{{ route('shipments.create') }}">＋ {{ __('Receive Another Parcel') }}</a><a class="button secondary" href="{{ route('dashboard') }}">{{ __('Return Home') }}</a></div></section>
+@endif
+@if(request('task') === 'payment')
+<section class="card"><div class="card-head"><h2>{{ __('Receive Money') }}</h2></div><div class="card-body"><div class="recipient-check"><strong>{{ $shipment->sender['name'] }}</strong><span>{{ $shipment->recipient_name }} · {{ $shipment->recipient_phone }}</span></div><dl class="summary-list"><div><dt>{{ __('Shipment charge') }}</dt><dd>{{ $shipment->price }} {{ $shipment->currency }}</dd></div><div><dt>{{ __('Paid, less refunds') }}</dt><dd>{{ \App\Services\Money::decimal($shipment->paidCents()) }} {{ $shipment->currency }}</dd></div><div><dt>{{ __('Outstanding') }}</dt><dd><strong>{{ \App\Services\Money::decimal($shipment->balanceCents()) }} {{ $shipment->currency }}</strong></dd></div></dl>
+@if($shipment->balanceCents() === 0)<p class="notice success">{{ __('This parcel has no outstanding balance.') }}</p>@endif
+</div></section>
+@include('shipments.payment-form')
+@endif
 @if($shipment->origin_branch_id)
+@unless(request('task') === 'payment')
 @include('shipments.workflow')
+@endunless
 <details class="workflow-details"><summary>{{ __('Route and flight details') }}</summary>
-<section class="card"><div class="card-body"><x-branch-route :record="$shipment" /><p class="subtle section-gap">{{ __('Current parcel location') }}: {{ $shipment->status === 'Collected' ? __('Collected by customer') : ($shipment->current_branch_id ? __($branches->firstWhere('id', $shipment->current_branch_id)->name) : __('In transit between branches')) }}</p>
+<section class="card"><div class="card-body"><x-branch-route :record="$shipment" /><p class="subtle section-gap">{{ __('Current parcel location') }}: {{ $shipment->status === 'Collected' ? __('Collected by customer') : ($shipment->current_branch_id ? __($branches->firstWhere('id', $shipment->current_branch_id)->name) : __('With carrier')) }}</p>
 @if($shipment->dispatch?->flight_departure_at)<p>{{ __('Flight departure') }}: {{ $shipment->dispatch->flight }} · {{ $shipment->dispatch->flight_departure_at->timezone($shipment->originBranch->timezone)->format('d M Y H:i') }} ({{ $shipment->originBranch->timezone }})</p>@endif
 @if($shipment->arrived_at)<p class="subtle">{{ __('Arrived at Branch') }}: {{ $shipment->arrived_at->timezone($shipment->destinationBranch->timezone)->format('d M Y H:i') }} ({{ $shipment->destinationBranch->timezone }})</p>@endif
 @if($shipment->collected_at)<p>{{ __('Collected by') }}: <strong>{{ $shipment->collector_name }}</strong> · {{ $shipment->collected_at->timezone($shipment->destinationBranch->timezone)->format('d M Y H:i') }} · {{ $shipment->collection_reference }}</p>@endif
@@ -67,7 +78,7 @@
 {{ __('Cancelled shipment has retained payments. An administrator should review whether a refund is required.') }}
 </div>
 @endif
-<details class="workflow-details" @if(old('_payment_form') === 'record' && $errors->any()) open @endif><summary>{{ __('Details, payments and history') }}</summary>
+<details class="workflow-details" @if(request('task') !== 'payment' && old('_payment_form') === 'record' && $errors->any()) open @endif><summary>{{ __('Details, payments and history') }}</summary>
 <div class="split">
 <div>
 <div class="card">
@@ -204,7 +215,7 @@
 </div>
 <div class="card-body">
 <p class="subtle">{{ __('Refund the original entry, then record a replacement payment if needed. Both entries remain in the ledger.') }}</p>
-<form method="post" action="{{ route('payments.refund',$shipment) }}" data-confirm="{{ __('Record this refund? The original payment will remain in the ledger.') }}">
+<form method="post" action="{{ route('payments.refund',$shipment) }}" data-review-confirm data-review-context="{{ $shipment->tracking_number }} · {{ $shipment->currency }}" data-confirm="{{ __('Record this refund? The original payment will remain in the ledger.') }}">
 @csrf<input type="hidden" name="submission_key" value="{{ \Illuminate\Support\Str::uuid() }}">
 <div class="field-grid">
 <label>
@@ -240,42 +251,9 @@
 @endcan
 </div>
 <div>
-@if($shipment->balanceCents()>0&&$shipment->status!=='Cancelled' && (!$shipment->origin_branch_id || auth()->user()->isAdmin() || auth()->user()->branch_id === $shipment->origin_branch_id || (auth()->user()->branch_id === $shipment->destination_branch_id && $shipment->arrived_at)))
-<div class="card">
-<div class="card-head">
-<h2>
-{{ __('Record a payment') }}
-</h2>
-</div>
-<div class="card-body">
-<form method="post" action="{{ route('payments.store',$shipment) }}" data-payment-error="{{ old('_payment_form') === 'record' ? ($errors->keys()[0] ?? '') : '' }}">
-<input type="hidden" name="_payment_form" value="record">
-@if(old('_payment_form') === 'record' && $errors->any())
-<p class="notice error" role="alert">{{ $errors->first() }}</p>
-@endif
-@csrf<input type="hidden" name="submission_key" value="{{ old('submission_key',\Illuminate\Support\Str::uuid()) }}">
-<div class="field-grid">
-@if($shipment->origin_branch_id && auth()->user()->isAdmin())
-<label class="full">{{ __('Receiving payment branch') }}<select name="branch_id" required>@foreach($branches->whereIn('id', [$shipment->origin_branch_id, $shipment->destination_branch_id]) as $payBranch)<option value="{{ $payBranch->id }}" @selected(old('branch_id', $shipment->current_branch_id ?? $shipment->origin_branch_id) == $payBranch->id)>{{ $payBranch->code }}</option>@endforeach</select></label>
-@endif
-<label class="full">
-{{ __('Amount (') }}{{ $shipment->currency }})<input type="number" name="amount" min="0.01" max="{{ \App\Services\Money::decimal($shipment->balanceCents()) }}" step="0.01" value="{{ old('amount',\App\Services\Money::decimal($shipment->balanceCents())) }}" required>
-</label>
-@include('shipments.payment-details')
-<label class="full">
-{{ __('Payment date') }}<input name="payment_date" type="date" value="{{ old('payment_date',\App\Services\BranchAccess::todayFor()) }}" max="{{ \App\Services\BranchAccess::todayFor() }}" required>
-</label>
-<label class="full">
-{{ __('Reference number') }}<input name="reference" value="{{ old('reference') }}" maxlength="150">
-</label>
-</div>
-<div class="form-actions">
-<button class="button">{{ __('Save payment') }}</button>
-</div>
-</form>
-</div>
-</div>
-@endif
+@unless(request('task') === 'payment')
+@include('shipments.payment-form')
+@endunless
 @if(count($transitions))
 <div class="card">
 <div class="card-head">
@@ -284,7 +262,7 @@
 </h2>
 </div>
 <div class="card-body">
-<form method="post" action="{{ route('shipments.status',$shipment) }}">
+<form method="post" action="{{ route('shipments.status',$shipment) }}" data-review-confirm data-confirm="{{ __('Confirm this parcel status change? Check the parcel and reason.') }}" data-review-context="{{ $shipment->tracking_number }} · {{ $shipment->recipient_name }}">
 @csrf
 <label>
 {{ __('Next status') }}

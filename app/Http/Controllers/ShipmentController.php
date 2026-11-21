@@ -20,16 +20,16 @@ class ShipmentController extends Controller
 {
     public function index(Request $request): View
     {
-        $request->validate(['q' => 'nullable|string|max:100', 'status' => ['nullable', Rule::in(array_keys(CourierService::TRANSITIONS))], 'branch_id' => 'nullable|integer|exists:branches,id', 'direction' => 'nullable|in:outgoing,incoming']);
+        $request->validate(['q' => 'nullable|string|max:100', 'status' => ['nullable', Rule::in(array_keys(CourierService::TRANSITIONS))], 'branch_id' => 'nullable|integer|exists:branches,id', 'direction' => 'nullable|in:outgoing,incoming', 'task' => 'nullable|in:payment,collection']);
         $q = $request->string('q')->toString();
-        $shipments = Shipment::with(['customer', 'payments', 'originBranch', 'destinationBranch', 'dispatch'])->visibleTo($request->user())->when($request->branch_id, fn ($s) => $s->where($request->direction === 'incoming' ? 'destination_branch_id' : 'origin_branch_id', $request->integer('branch_id')))->when($q, fn ($s) => $s->where(fn ($w) => $w->where('tracking_number', 'like', "%$q%")->orWhere('recipient_name', 'like', "%$q%")->orWhere('recipient_phone', 'like', "%$q%")->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%$q%")->orWhere('phone', 'like', "%$q%"))))->when($request->status, fn ($s) => $s->where('status', $request->status))->latest('id')->paginate(20)->withQueryString();
+        $shipments = Shipment::with(['customer', 'payments', 'originBranch', 'destinationBranch', 'dispatch'])->visibleTo($request->user())->when($request->task === 'collection', fn ($s) => $s->where('current_branch_id', BranchAccess::operationBranchId($request->user()) ?? 0)->where('destination_branch_id', BranchAccess::operationBranchId($request->user()) ?? 0)->where('in_storage', true)->whereIn('status', ['Arrived at Branch', 'Ready for Collection']))->when($request->branch_id, fn ($s) => $s->where($request->direction === 'incoming' ? 'destination_branch_id' : 'origin_branch_id', $request->integer('branch_id')))->when($q, fn ($s) => $s->where(fn ($w) => $w->where('tracking_number', 'like', "%$q%")->orWhere('recipient_name', 'like', "%$q%")->orWhere('recipient_phone', 'like', "%$q%")->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%$q%")->orWhere('phone', 'like', "%$q%"))))->when($request->status, fn ($s) => $s->where('status', $request->status))->latest('id')->paginate(20)->withQueryString();
 
         return view('shipments.index', ['shipments' => $shipments, 'statuses' => array_keys(CourierService::TRANSITIONS)]);
     }
 
     public function create(Request $request, EntryDraftService $drafts): View
     {
-        return view('shipments.create', ['draft' => $drafts->hydrate($request, 'booking'), 'destinations' => Destination::with('rate')->where('active', true)->whereHas('rate')->orderBy('country')->get(), 'settings' => CompanySetting::firstOrFail()]);
+        return view('shipments.create', ['draft' => $drafts->hydrate($request, 'booking'), 'destinations' => Destination::with('rate')->where('active', true)->whereHas('rate')->orderBy('country')->get(), 'settings' => CompanySetting::firstOrFail(), 'operationBranchId' => BranchAccess::operationBranchId($request->user())]);
     }
 
     public function store(Request $request, ShipmentPhotoService $photos, EntryDraftService $drafts): RedirectResponse

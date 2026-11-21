@@ -51,7 +51,7 @@ class CustomerAndPaymentEntryTest extends TestCase
         foreach ([$this->ygn, $this->sg] as $staff) {
             $this->actingAs($staff)->get(route('shipments.create'))->assertOk()
                 ->assertSee('Recipient address (optional)')
-                ->assertSee('<textarea name="recipient_address">', false);
+                ->assertSee('<textarea name="recipient_address"', false);
 
             foreach ([[], ['recipient_address' => null], ['recipient_address' => '']] as $address) {
                 $data = $this->booking($staff);
@@ -70,7 +70,7 @@ class CustomerAndPaymentEntryTest extends TestCase
 
     public function test_walk_in_customer_is_created_with_booking_and_retries_do_not_duplicate_or_rewrite_customer(): void
     {
-        $this->actingAs($this->ygn)->get(route('shipments.create'))->assertOk()->assertSee('name="customer_name"', false)->assertDontSee('name="customer_id"', false)->assertDontSee('disabled>Confirm booking', false);
+        $this->actingAs($this->ygn)->get(route('shipments.create'))->assertOk()->assertSee('name="customer_name"', false)->assertSee('name="customer_id"', false)->assertDontSee('disabled>Confirm booking', false);
         $data = $this->booking();
         $this->post(route('shipments.store'), $data)->assertSessionHasNoErrors();
         $this->post(route('shipments.store'), $data)->assertSessionHasNoErrors();
