@@ -66,10 +66,53 @@ try {
     assert.equal(await page.locator('.mobile-nav > button').getAttribute('data-mobile-selected'), '');
     await page.keyboard.press('Escape');
     await verify(1);
-    for (const width of [498, 740, 1024, 390]) {
+    for (const width of [320, 498, 740, 820, 1024, 1100]) {
         await page.setViewportSize({ width, height: 844 });
-        if (width <= 780) await verify(1);
+        await verify(1);
+        assert.equal(await page.locator('.sidebar').isVisible(), false);
+        const bar = await page.locator('.mobile-nav').boundingBox();
+        assert.ok(Math.abs(bar.y + bar.height - 844) < 1, 'Tab bar stays at the bottom');
     }
+    await page.locator('[data-mobile-menu-open]').click();
+    await page.setViewportSize({ width: 1280, height: 844 });
+    await page.waitForFunction(() => !document.querySelector('.mobile-menu').open);
+    assert.equal(await page.locator('.sidebar').isVisible(), true);
+    assert.equal(await page.locator('.mobile-nav').isVisible(), false);
+
+    const tablet = await browser.newContext({
+        baseURL, hasTouch: true, isMobile: true, viewport: { width: 1376, height: 1024 },
+        storageState: await context.storageState(), serviceWorkers: 'block',
+    });
+    const tabletPage = await tablet.newPage();
+    try {
+        await tabletPage.goto('/');
+        assert.equal(await tabletPage.locator('.mobile-nav').isVisible(), true);
+        assert.equal(await tabletPage.locator('.sidebar').isVisible(), false);
+        for (const width of [1024, 390]) {
+            await tabletPage.setViewportSize({ width, height: 844 });
+            for (const [path, names] of [
+                ['/dispatches', ['.guided-form [name="flight"]', '.guided-form [name="flight_departure_at"]']],
+                ['/flight-records', ['.filters [name="from"]', '.filters [name="to"]']],
+                ['/reports', ['[name="date"]', '[name="payment_method_id"]']],
+            ]) {
+                await tabletPage.goto(path);
+                await tabletPage.locator(names[0]).waitFor();
+                const boxes = await tabletPage.evaluate((selectors) => selectors.map((selector) => {
+                    const field = document.querySelector(selector);
+                    const { left, right, top, bottom } = field.getBoundingClientRect();
+                    const label = field.closest('label').getBoundingClientRect();
+                    return { left, right, top, bottom, labelLeft: label.left, labelRight: label.right };
+                }), names);
+                const [first, second] = boxes;
+                assert.ok(boxes.every(({ left, right, labelLeft, labelRight }) => left >= labelLeft - 1 && right <= labelRight + 1), `${path} fields fit their labels at ${width}px`);
+                assert.ok(first.right <= second.left + 1 || first.bottom <= second.top + 1, `${path} fields do not overlap at ${width}px`);
+            }
+        }
+    } finally {
+        await tablet.close();
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await verify(1);
     // Unequal padding reproduces landscape safe-area geometry without a physical device.
     await page.addStyleTag({ content: '.mobile-nav { padding-left: 37px !important; padding-right: 19px !important; gap: 7px !important; }' });
     await verify(1);

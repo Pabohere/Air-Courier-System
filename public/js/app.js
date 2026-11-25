@@ -56,38 +56,87 @@ if (originBranch && destinationBranch) {
 }
 
 
+const parcelPhotoTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const parcelPhotoMaxBytes = 1024 * 1024;
+const parcelPhotoTargetBytes = 900 * 1024;
+
+const compressParcelPhoto = async (file) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    const canvas = document.createElement('canvas');
+    const encode = (type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+
+    try {
+        image.src = url;
+        await image.decode();
+        const type = file.type === 'image/jpeg' ? 'image/jpeg' : 'image/webp';
+        const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+        const context = canvas.getContext('2d');
+
+        for (const [maxSide, quality] of [[1600, 0.88], [1600, 0.72], [1200, 0.8], [800, 0.75]]) {
+            const scale = Math.min(1, maxSide / longestSide);
+            canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            let blob = await encode(type, quality);
+            if (type === 'image/webp' && blob?.type !== type) {
+                context.globalCompositeOperation = 'destination-over';
+                context.fillStyle = '#fff';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                blob = await encode('image/jpeg', quality);
+            }
+
+            if (blob?.size > 0 && blob.size <= parcelPhotoTargetBytes && ['image/jpeg', 'image/webp'].includes(blob.type)) {
+                const extension = blob.type === 'image/webp' ? 'webp' : 'jpg';
+                const name = file.name.replace(/\.[^.]+$/, '');
+                return new File([blob], `${name}.${extension}`, {type: blob.type, lastModified: file.lastModified});
+            }
+        }
+        return file;
+    } finally {
+        URL.revokeObjectURL(url);
+        canvas.width = canvas.height = 1;
+    }
+};
+
 document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
     const form = input.closest('form');
     const preview = form.querySelector('[data-photo-preview]');
     const feedback = form.querySelector('[data-photo-validation]');
     const clearWrap = form.querySelector('[data-photo-clear-wrap]');
-    let selectedFiles = Array.from(input.files);
+    let selectedPhotos = [];
     let urls = [];
+    let compressionQueue = Promise.resolve();
     const update = () => {
         const transfer = new DataTransfer();
-        selectedFiles.forEach((file) => transfer.items.add(file));
+        selectedPhotos.forEach(({file, pending}) => {
+            if (!pending) transfer.items.add(file);
+        });
         input.files = transfer.files;
         urls.forEach((url) => URL.revokeObjectURL(url));
         urls = [];
         preview.replaceChildren();
-        const files = selectedFiles;
+        const files = selectedPhotos.map(({file}) => file);
+        const compressing = selectedPhotos.some(({pending}) => pending);
         let message = '';
         if (files.length > Number(input.dataset.maxPhotos)) {
             message = input.dataset.photoCountError;
-        } else if (files.some((file) => file.size > 1024 * 1024)) {
-            message = input.dataset.photoSizeError;
-        } else if (files.some((file) => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type))) {
+        } else if (files.some((file) => !parcelPhotoTypes.includes(file.type))) {
             message = input.dataset.photoTypeError;
+        } else if (!compressing && files.some((file) => file.size > parcelPhotoMaxBytes)) {
+            message = input.dataset.photoSizeError;
         }
-        input.setCustomValidity(message);
+        input.setCustomValidity(message || (compressing ? input.dataset.photoCompressing : ''));
         feedback.textContent = message;
         feedback.classList.toggle('hide', !message);
+        form.querySelector('[data-photo-progress]').textContent = compressing ? input.dataset.photoCompressing : '';
         clearWrap.classList.toggle('hide', files.length === 0);
         form.querySelector('[data-photo-selected-count]').textContent = `${files.length} / ${input.dataset.maxPhotos}`;
-        files.forEach((file, index) => {
+        selectedPhotos.forEach(({file, pending}, index) => {
             const item = document.createElement('div');
             item.className = 'photo-preview-item';
-            if (file.type.startsWith('image/')) {
+            if (!pending && file.type.startsWith('image/')) {
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'photo-preview-open';
@@ -110,7 +159,7 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
             remove.textContent = '×';
             remove.setAttribute('aria-label', `${input.dataset.photoRemoveLabel}: ${file.name}`);
             remove.addEventListener('click', () => {
-                selectedFiles.splice(index, 1);
+                selectedPhotos.splice(index, 1);
                 update();
             });
             item.append(name, remove);
@@ -119,22 +168,38 @@ document.querySelectorAll('[data-parcel-photos]').forEach((input) => {
     };
     input.addEventListener('change', () => {
         const fileKey = (file) => `${file.name}:${file.size}:${file.lastModified}:${file.type}`;
-        const existing = new Set(selectedFiles.map(fileKey));
+        const existing = new Set(selectedPhotos.map(({key}) => key));
         Array.from(input.files).forEach((file) => {
             const key = fileKey(file);
             if (!existing.has(key)) {
-                selectedFiles.push(file);
+                const pending = file.size > parcelPhotoMaxBytes && parcelPhotoTypes.includes(file.type);
+                const photo = {key, file, pending};
+                selectedPhotos.push(photo);
                 existing.add(key);
+                if (pending) {
+                    compressionQueue = compressionQueue.then(async () => {
+                        if (!selectedPhotos.includes(photo)) return;
+                        photo.file = await compressParcelPhoto(file).catch(() => file);
+                        photo.pending = false;
+                        if (selectedPhotos.includes(photo)) update();
+                    });
+                }
             }
         });
         update();
     });
+    form.addEventListener('submit', (event) => {
+        if (!input.validity.valid) {
+            event.preventDefault();
+            input.reportValidity();
+        }
+    });
     form.querySelector('[data-photo-clear]').addEventListener('click', () => {
-        selectedFiles = [];
+        selectedPhotos = [];
         update();
     });
     form.addEventListener('reset', () => {
-        selectedFiles = [];
+        selectedPhotos = [];
         update();
     });
 });

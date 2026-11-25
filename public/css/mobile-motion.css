@@ -1,5 +1,5 @@
 /* Keep the shell steady while mobile content changes. */
-@media screen and (max-width: 780px) {
+@media screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse) {
     .mobile-nav { isolation: isolate; }
     .mobile-nav-indicator {
         position: absolute;
@@ -13,7 +13,7 @@
     .mobile-nav > :is(a, button) {
         transition: color 160ms ease, opacity 160ms ease;
     }
-    .mobile-nav[data-indicator-ready] > a[aria-current="page"],
+    .mobile-nav[data-indicator-ready] > [aria-current="page"],
     .mobile-nav[data-indicator-ready] > :is(a, button):active,
     .mobile-nav[data-indicator-ready] > button:focus-visible {
         background: transparent;
@@ -48,7 +48,8 @@
 @keyframes menu-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes menu-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
 
-@media screen and (max-width: 780px) and (prefers-reduced-motion: no-preference) {
+@media screen and (max-width: 1100px) and (prefers-reduced-motion: no-preference),
+    screen and (max-width: 1440px) and (any-pointer: coarse) and (prefers-reduced-motion: no-preference) {
     @view-transition { navigation: auto; }
     .workspace > main { view-transition-name: workspace-content; }
     .workspace > header { view-transition-name: workspace-header; }

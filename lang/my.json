@@ -643,6 +643,8 @@
   "Photos are optional. Select 0 to :count photos, up to 1 MB each (JPG, PNG or WebP).": "ဓာတ်ပုံ မတင်လည်း ရပါသည်။ ၀ ပုံမှ :count ပုံအထိ ရွေးနိုင်ပြီး တစ်ပုံလျှင် 1 MB အထိ (JPG၊ PNG၊ WebP)။",
   "Select at most :count photos.": "အများဆုံး ဓာတ်ပုံ :count ပုံသာ ရွေးနိုင်ပါသည်။",
   "Each photo must be 1 MB or smaller.": "ဓာတ်ပုံတစ်ပုံချင်းစီသည် 1 MB ထက် မကြီးရပါ။",
+  "Compressing photos…": "ဓာတ်ပုံများ ချုံ့နေပါသည်…",
+  "Larger photos are compressed automatically.": "အရွယ်အစားကျော်သည့် ဓာတ်ပုံများကို အလိုအလျောက် ချုံ့ပေးပါသည်။",
   "Choose JPG, PNG or WebP images only.": "JPG၊ PNG သို့မဟုတ် WebP ဓာတ်ပုံများသာ ရွေးပါ။",
   "Remove selected photos": "ရွေးထားသောပုံများ ဖယ်ရန်",
   "Carrier trips": "သယ်ယူသူ / ခရီးစဉ်",

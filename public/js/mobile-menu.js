@@ -82,8 +82,9 @@
     const reset = () => close(true, false);
     window.addEventListener('pagehide', reset);
     window.addEventListener('pageshow', reset);
-    window.matchMedia('(min-width: 781px)').addEventListener('change', (event) => {
-        if (event.matches) reset();
+    const tabBar = window.matchMedia('screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse)');
+    tabBar.addEventListener('change', (event) => {
+        if (!event.matches) reset();
     });
     reducedMotion.addEventListener('change', () => {
         if (reducedMotion.matches && closing) close(true);
