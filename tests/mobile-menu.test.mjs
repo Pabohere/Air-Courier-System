@@ -87,7 +87,7 @@ test('menu navigation closes before page capture without stealing focus; modifie
 test('back-forward cache and resizing discard an in-flight closing animation', async () => {
     for (const name of ['pagehide', 'pageshow', 'resize']) {
         const app = client(); app.open(); app.close();
-        if (name === 'resize') app.queries.get('screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse)')({ matches: false });
+        if (name === 'resize') app.queries.get('screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse), screen and (max-width: 1440px) and (display-mode: standalone)')({ matches: false });
         else app.events.get(name)();
         app.animations.at(-1).finish(); await flush();
         assert.equal(app.menu.open, false);

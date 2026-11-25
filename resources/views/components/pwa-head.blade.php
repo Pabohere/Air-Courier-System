@@ -1,5 +1,5 @@
 <link rel="manifest" href="{{ route('pwa.manifest') }}">
-<meta name="theme-color" content="#2d5cff">
+<meta name="theme-color" content="#02457a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Standard">

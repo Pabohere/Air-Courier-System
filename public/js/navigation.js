@@ -86,6 +86,7 @@
             const container = nav.getBoundingClientRect();
             const box = selected.getBoundingClientRect();
             if (!box.width || !box.height) return;
+            root.style.setProperty('--tab-bar-height', `${Math.ceil(container.height)}px`);
             const next = { x: box.left - container.left - nav.clientLeft, y: box.top - container.top - nav.clientTop, width: box.width, height: box.height };
             items.forEach((item) => item.toggleAttribute('data-mobile-selected', item === selected));
             if (geometry && Object.keys(next).every((key) => next[key] === geometry[key])) return;

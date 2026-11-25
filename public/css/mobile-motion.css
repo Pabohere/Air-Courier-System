@@ -1,5 +1,7 @@
 /* Keep the shell steady while mobile content changes. */
-@media screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse) {
+@media screen and (max-width: 1100px),
+    screen and (max-width: 1440px) and (any-pointer: coarse),
+    screen and (max-width: 1440px) and (display-mode: standalone) {
     .mobile-nav { isolation: isolate; }
     .mobile-nav-indicator {
         position: absolute;
@@ -49,16 +51,28 @@
 @keyframes menu-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
 
 @media screen and (max-width: 1100px) and (prefers-reduced-motion: no-preference),
-    screen and (max-width: 1440px) and (any-pointer: coarse) and (prefers-reduced-motion: no-preference) {
+    screen and (max-width: 1440px) and (any-pointer: coarse) and (prefers-reduced-motion: no-preference),
+    screen and (max-width: 1440px) and (display-mode: standalone) and (prefers-reduced-motion: no-preference) {
     @view-transition { navigation: auto; }
-    .workspace > main { view-transition-name: workspace-content; }
+    .workspace > main {
+        view-transition-name: workspace-content;
+        animation: workspace-enter 180ms ease-out;
+    }
+    :active-view-transition .workspace > main { animation: none; }
     .workspace > header { view-transition-name: workspace-header; }
     .mobile-nav { view-transition-name: workspace-navigation; }
+    ::view-transition { pointer-events: none; }
     ::view-transition-group(*) { animation-duration: 200ms; }
     ::view-transition-old(root), ::view-transition-new(root),
     ::view-transition-old(workspace-header), ::view-transition-new(workspace-header),
     ::view-transition-old(workspace-navigation), ::view-transition-new(workspace-navigation) {
         animation: none;
+        mix-blend-mode: normal;
+    }
+    ::view-transition-old(root),
+    ::view-transition-old(workspace-header),
+    ::view-transition-old(workspace-navigation) {
+        opacity: 0;
     }
     ::view-transition-old(workspace-content) {
         animation: workspace-leave 160ms ease both;
@@ -66,13 +80,10 @@
     ::view-transition-new(workspace-content) {
         animation: workspace-enter 220ms cubic-bezier(.22, 1, .36, 1) both;
     }
-    @supports not (view-transition-name: workspace-content) {
-        .workspace > main { animation: workspace-enter 180ms ease-out both; }
-    }
 }
 @keyframes workspace-enter {
     from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: none; }
 }
 @keyframes workspace-leave {
     from { opacity: 1; }

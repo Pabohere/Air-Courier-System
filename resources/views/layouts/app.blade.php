@@ -17,10 +17,10 @@
 </div>
 <nav aria-label="{{ __('Main menu') }}">
 <x-task-links />
-<details class="nav-more" @if(request()->routeIs('inventory.*','reports.*','customers.*','branches.*','settings.*','dispatches.records')) open @endif><summary>{{ __('More') }}</summary>
+<details class="nav-more" @if(request()->routeIs('inventory.*','reports.*','customers.*','branches.*','settings.*','dispatches.records')) open @endif><summary><x-workspace-icon name="more" /><span>{{ __('More') }}</span></summary>
 <x-task-links secondary />
 @can('admin')
-<a href="{{ route('settings.index') }}">{{ __('System settings') }}</a>
+<a href="{{ route('settings.index') }}" @if(request()->routeIs('settings.*')) class="active" aria-current="page" @endif><x-workspace-icon name="settings" /><span class="workspace-link-label">{{ __('System settings') }}</span></a>
 @endcan
 </details>
 </nav>
@@ -79,7 +79,7 @@
 @yield('content')
 </main>
 <footer>
-{{ $company?->name }} {{ __('· Courier operations') }} <span>{{ __('Accurate records. Every parcel.') }}</span>
+{{ $company?->name }} {{ __('· Courier operations') }}
 </footer>
 </div>
 <x-mobile-workspace />

@@ -82,7 +82,11 @@
     const reset = () => close(true, false);
     window.addEventListener('pagehide', reset);
     window.addEventListener('pageshow', reset);
-    const tabBar = window.matchMedia('screen and (max-width: 1100px), screen and (max-width: 1440px) and (any-pointer: coarse)');
+    const tabBar = window.matchMedia([
+        'screen and (max-width: 1100px)',
+        'screen and (max-width: 1440px) and (any-pointer: coarse)',
+        'screen and (max-width: 1440px) and (display-mode: standalone)',
+    ].join(', '));
     tabBar.addEventListener('change', (event) => {
         if (!event.matches) reset();
     });

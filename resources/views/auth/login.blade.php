@@ -8,29 +8,15 @@
 </head>
 <body class="login-body">
 <div class="login-shell" data-login-side="shared">
-<section class="login-story">
-<div>
-<div class="brand">
-<img class="brand-logo" src="{{ asset('images/pwa-192.png') }}" alt="{{ __('Standard · Yangon–Singapore courier service') }}" width="1305" height="1206">
-<span class="brand-copy">Standard<small>{{ __('YANGON ↔ SINGAPORE') }}</small></span>
-</div>
-<div class="eyebrow">
-{{ __('YOUR DAILY OPERATIONS, CONNECTED') }}
-</div>
-<h1>
-{{ __('Every parcel.') }}<br>{{ __('Every payment.') }}<br>{{ __('All in one place.') }}
-
-</h1>
-<p>{{ __('A focused workspace for your team, from the first booking to the final delivery.') }}</p>
-
-</div>
-<small>{{ __('YGN ↔ SG · Connected branch operations') }}</small>
-</section>
+<div class="login-photo" aria-hidden="true"></div>
 <section class="login-form">
-<x-theme-switch />
-<x-language-switch />
-<div class="eyebrow">
-{{ __('WELCOME BACK') }}
+<div class="login-preferences">
+    <x-theme-switch />
+    <x-language-switch />
+</div>
+<div class="login-brand">
+    <img src="{{ asset('images/pwa-192.png') }}" alt="" width="52" height="52">
+    <strong>Standard</strong>
 </div>
 <h1>
 {{ __('Sign in to your workspace') }}

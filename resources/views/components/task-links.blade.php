@@ -1,8 +1,8 @@
-@props(['secondary' => false, 'mobile' => false])
+@props(['secondary' => false])
 @php
     $items = $secondary
-        ? ['dispatches.records' => [__('Flight records'), '▣'], 'inventory.index' => [__('Parcel storage'), '▦'], 'reports.index' => [__('Bookkeeping'), '▤'], 'customers.index' => [__('Customers'), '♧'], 'branches.index' => [__('Daily work'), '⇆']]
-        : ['dashboard' => [__('Home'), '⌂'], 'shipments.create' => [__('Receive a Parcel'), '＋'], 'dispatches.index' => [__('Send Parcels'), '↗'], 'shipments.index' => [__('Find a Parcel'), '⌕']];
+        ? ['dispatches.records' => [__('Flight records'), 'flights'], 'inventory.index' => [__('Parcel storage'), 'storage'], 'reports.index' => [__('Bookkeeping'), 'books'], 'customers.index' => [__('Customers'), 'customers'], 'branches.index' => [__('Daily work'), 'daily']]
+        : ['dashboard' => [__('Home'), 'home'], 'shipments.create' => [__('Receive a Parcel'), 'receive'], 'dispatches.index' => [__('Send Parcels'), 'send'], 'shipments.index' => [__('Find a Parcel'), 'find']];
 @endphp
 @foreach($items as $route => [$label, $icon])
 @php($active = match ($route) {
@@ -13,5 +13,5 @@
     'shipments.index' => request()->routeIs('shipments.index', 'shipments.show'),
     default => request()->routeIs(explode('.', $route)[0].'.*'),
 })
-<a href="{{ route($route) }}" @class(['active' => $active]) @if($active) aria-current="page" @endif><span aria-hidden="true">{{ $icon }}</span><span>{{ $label }}</span></a>
+<a href="{{ route($route) }}" @class(['active' => $active]) @if($active) aria-current="page" @endif><x-workspace-icon :name="$icon" /><span class="workspace-link-label">{{ $label }}</span></a>
 @endforeach

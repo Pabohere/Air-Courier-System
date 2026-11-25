@@ -650,33 +650,6 @@ footer {
   overflow:hidden;
   box-shadow:0 25px 80px #15333f0d
 }
-.login-story {
-  background:#062467;
-  padding:56px 42px;
-  color:#dae9ff;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  min-height:560px
-}
-.login-story .brand {
-  margin:0 0 65px
-}
-.login-story h1 {
-  font-size:37px;
-  color:white;
-  line-height:1.15
-}
-.login-story p {
-  color:#b4ccef;
-  font-size:13px;
-  max-width:270px;
-  margin-top:20px
-}
-.login-story small {
-  font-size:10px;
-  color:#9dbce8
-}
 .login-form {
   padding:60px 42px
 }
@@ -851,19 +824,6 @@ h1 {
   grid-template-columns:1fr;
   max-width:450px
 }
-.login-story {
-  min-height:0;
-  padding:28px
-}
-.login-story .brand {
-  margin-bottom:20px
-}
-.login-story h1 {
-  font-size:25px
-}
-.login-story p,.login-story small {
-  display:none
-}
 .login-form {
   padding:30px
 }
@@ -911,12 +871,6 @@ footer span {
 
 /* Standard's supplied sky-blue and navy identity. */
 :root { --brand-sky:#1fa4ef; --brand-navy:#062467; }
-.login-story { background:linear-gradient(145deg, #062467 0%, #0a347d 100%); }
-.login-story .brand { align-items:center; gap:20px; margin-bottom:35px; }
-.login-story .brand-logo { width:124px; height:124px; border-radius:14px; }
-.login-story .brand-copy { font-size:28px; }
-.login-story .brand small { font-size:9px; letter-spacing:1.6px; color:#c9e4ff; }
-.login-story .eyebrow { color:#76cbff; }
 nav a.active { box-shadow:inset 3px 0 0 var(--brand-sky); }
 .button { box-shadow:0 3px 8px #0624670d; }
 .print-company { display:flex; gap:20px; align-items:center; }
@@ -928,9 +882,6 @@ nav a.active { box-shadow:inset 3px 0 0 var(--brand-sky); }
   .sidebar .brand { flex-direction:row; align-items:center; margin:0 0 14px; gap:14px; }
   .sidebar .brand-logo { width:72px; height:72px; }
   .sidebar .brand small { display:block; font-size:8px; letter-spacing:1.5px; }
-  .login-story .brand-logo { width:82px; height:82px; }
-  .login-story .brand small { display:block; }
-  .login-story .brand { margin-bottom:22px; }
   .print-company { gap:10px; }
   .print-logo { width:80px; height:80px; }
 }
@@ -950,11 +901,6 @@ nav a.active { box-shadow:inset 3px 0 0 var(--brand-sky); }
 .sidebar nav a.active { background:#0a469f; color:white; border-color:#0a469f; }
 .sidebar-bottom { color:#45628e; border-color:#ceddf2; }
 .sidebar-bottom small { color:#647da5; }
-.login-story { background:linear-gradient(145deg,#edf7ff,#d9ebff); color:#062467; }
-.login-story .brand, .login-story h1 { color:#062467; }
-.login-story .brand-logo { background:transparent; border-radius:0; }
-.login-story .brand small, .login-story p, .login-story small { color:#496b9a; }
-.login-story .eyebrow { color:#0a469f; }
 
 .language-switch { display:inline-flex; gap:3px; padding:3px; border:1px solid #d3e2f5; border-radius:8px; background:#f3f7fd; flex-shrink:0; }
 .language-switch button { width:auto; margin:0; padding:6px 10px; min-height:32px; border:0; border-radius:5px; background:transparent; color:#3e5b86; font-size:11px; line-height:1.6; }

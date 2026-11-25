@@ -2,7 +2,7 @@
 @section('title', __('Home'))
 @section('content')
 <div class="page-heading daily-heading" data-side="{{ strtolower($branch->code) }}">
-<div><p class="subtle">{{ __('Hello, :name', ['name' => auth()->user()->name]) }}</p><h1>{{ __('What would you like to do?') }}</h1><p><strong>{{ __($branch->name) }}</strong><span class="branch-timezone"> · {{ $branch->timezone }} · UTC{{ $branchNow->format('P') }}</span><br><time data-branch-clock data-timezone="{{ $branch->timezone }}" datetime="{{ $branchNow->toIso8601String() }}">{{ $branchNow->format('d M Y · H:i:s') }}</time></p></div>
+<div><h1>{{ __('What would you like to do?') }}</h1><p><strong>{{ __($branch->name) }}</strong><span class="branch-timezone"> · {{ $branch->timezone }} · UTC{{ $branchNow->format('P') }}</span><br><time data-branch-clock data-timezone="{{ $branch->timezone }}" datetime="{{ $branchNow->toIso8601String() }}">{{ $branchNow->format('d M Y · H:i:s') }}</time></p></div>
 @if(auth()->user()->isAdmin())
 <nav class="home-branch-picker" aria-label="{{ __('Choose branch on Home') }}">
 @foreach($branches as $choice)<a href="{{ route('dashboard', ['branch_id' => $choice->id]) }}" @if($choice->id === $branchId) aria-current="page" @endif><strong>{{ $choice->code }}</strong><span>{{ __($choice->name) }}</span></a>@endforeach
@@ -11,15 +11,18 @@
 </div>
 <div class="daily-tasks">
 @foreach([
-    [route('shipments.create', ['origin_branch_id' => $branchId]), '＋', __('Receive a Parcel'), __('Register a parcel brought in by a customer.')],
-    [route('dispatches.index'), '↗', __('Send Parcels'), __('Choose parcels and prepare them for sending.')],
-    [route('shipments.index', ['task' => 'collection']), '✓', __('Give Parcel to Customer'), __('Find the parcel and confirm who is collecting it.')],
-    [route('shipments.index', ['task' => 'payment']), '＋', __('Receive Money'), __('Find a parcel and record the customer payment.')],
-] as [$url, $icon, $title, $description])
-<a class="daily-task" href="{{ $url }}"><span class="task-icon" aria-hidden="true">{{ $icon }}</span><span><strong>{{ $title }}</strong><span>{{ $description }}</span></span><span aria-hidden="true">→</span></a>
+    [route('shipments.create', ['origin_branch_id' => $branchId]), __('Receive a Parcel'), __('Register a parcel brought in by a customer.')],
+    [route('dispatches.index'), __('Send Parcels'), __('Choose parcels and prepare them for sending.')],
+    [route('shipments.index', ['task' => 'collection']), __('Give Parcel to Customer'), __('Find the parcel and confirm who is collecting it.')],
+    [route('shipments.index', ['task' => 'payment']), __('Receive Money'), __('Find a parcel and record the customer payment.')],
+] as [$url, $title, $description])
+<a class="daily-task" href="{{ $url }}">
+    <span class="daily-task-copy"><strong>{{ $title }}</strong><span>{{ $description }}</span></span>
+    <span class="daily-task-arrow" aria-hidden="true">→</span>
+</a>
 @endforeach
 </div>
-<a class="button secondary daily-find" href="{{ route('shipments.index') }}">⌕ {{ __('Find a Parcel') }}</a>
+<a class="daily-find" href="{{ route('shipments.index') }}">{{ __('Find a Parcel') }}</a>
 <section class="daily-summary" aria-label="{{ __('Branch workload') }}">
 @foreach([['outgoing', __('To send'), $toSend], ['incoming', __('To receive'), $incoming], ['stored', __('To hand to customer'), $toCollect]] as [$tab, $label, $count])
 <a href="{{ route('branches.index', ['branch_id' => $branchId, 'tab' => $tab]) }}"><strong>{{ $count }}</strong><span>{{ $label }}</span></a>

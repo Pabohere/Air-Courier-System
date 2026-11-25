@@ -81,13 +81,32 @@ try {
 
     const tablet = await browser.newContext({
         baseURL, hasTouch: true, isMobile: true, viewport: { width: 1376, height: 1024 },
-        storageState: await context.storageState(), serviceWorkers: 'block',
+        storageState: await context.storageState(),
     });
     const tabletPage = await tablet.newPage();
     try {
         await tabletPage.goto('/');
+        await tabletPage.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
         assert.equal(await tabletPage.locator('.mobile-nav').isVisible(), true);
         assert.equal(await tabletPage.locator('.sidebar').isVisible(), false);
+        await Promise.all([
+            tabletPage.waitForURL('**/dispatches'),
+            tabletPage.locator('.mobile-nav > a').nth(2).tap(),
+        ]);
+        assert.equal(await tabletPage.locator('.mobile-nav > a').nth(2).getAttribute('aria-current'), 'page');
+        const tabClearance = await tabletPage.evaluate(() => {
+            const nav = document.querySelector('.mobile-nav');
+            const workspace = document.querySelector('.workspace');
+            window.scrollTo(0, document.documentElement.scrollHeight);
+            return {
+                barBottom: nav.getBoundingClientRect().bottom,
+                height: window.innerHeight,
+                clearance: parseFloat(getComputedStyle(workspace).paddingBottom),
+                barHeight: nav.getBoundingClientRect().height,
+            };
+        });
+        assert.ok(Math.abs(tabClearance.barBottom - tabClearance.height) < 1);
+        assert.ok(tabClearance.clearance >= tabClearance.barHeight);
         for (const width of [1024, 390]) {
             await tabletPage.setViewportSize({ width, height: 844 });
             for (const [path, names] of [
@@ -121,6 +140,7 @@ try {
     assert.equal(await page.locator('.mobile-nav-indicator').evaluate((el) => el.getAnimations().length), 0);
     await page.keyboard.press('Escape');
     await verify(1);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     // Hold native document requests so a newer click can replace a slow first navigation.
     await page.goto('/');
     console.log('Checking rapid native navigation');
@@ -128,10 +148,13 @@ try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         await route.abort().catch(() => {});
     });
-    await page.evaluate(() => {
+    const animated = await page.evaluate(async () => {
         document.querySelectorAll('.mobile-nav > a')[1].click();
+        await Promise.resolve();
         setTimeout(() => document.querySelectorAll('.mobile-nav > a')[2].click(), 80);
+        return document.querySelector('.mobile-nav-indicator').getAnimations().length;
     });
+    assert.equal(animated, 1, 'Tab selection starts moving before the server responds');
     await page.waitForURL('**/dispatches', { timeout: 10000 });
     await verify(2);
     await page.unroute('**/shipments/create');

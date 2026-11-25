@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'standard-public-';
-const CACHE_NAME = `${CACHE_PREFIX}v8`;
+const CACHE_NAME = `${CACHE_PREFIX}v9`;
 const PUBLIC_ASSETS = [
     '/offline.html',
     '/css/app.css',
