@@ -80,15 +80,55 @@ try {
     assert.equal(await page.locator('.mobile-nav').isVisible(), false);
 
     const tablet = await browser.newContext({
-        baseURL, hasTouch: true, isMobile: true, viewport: { width: 1376, height: 1024 },
+        baseURL, hasTouch: true, isMobile: true, viewport: { width: 1366, height: 1024 },
         storageState: await context.storageState(),
     });
     const tabletPage = await tablet.newPage();
     try {
         await tabletPage.goto('/');
         await tabletPage.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
-        assert.equal(await tabletPage.locator('.mobile-nav').isVisible(), true);
-        assert.equal(await tabletPage.locator('.sidebar').isVisible(), false);
+        for (const [width, height, columns] of [[1366, 1024, 4], [1024, 1366, 4], [820, 1180, 2]]) {
+            await tabletPage.setViewportSize({ width, height });
+            await tabletPage.evaluate(() => document.fonts.ready);
+            assert.equal(await tabletPage.locator('.sidebar').isVisible(), false);
+            const layout = await tabletPage.evaluate(() => {
+                const bounds = (selector) => document.querySelector(selector).getBoundingClientRect();
+                const { height: barHeight, top: barTop } = bounds('.mobile-nav');
+                const header = bounds('.workspace > header');
+                const heading = bounds('.daily-heading');
+                const picker = bounds('.home-branch-picker');
+                const cards = [...document.querySelectorAll('.daily-task')];
+                const labels = [...document.querySelectorAll('.mobile-nav .workspace-link-label')];
+                return {
+                    barHeight,
+                    labelLines: labels.map((label) => {
+                        const range = document.createRange();
+                        range.selectNodeContents(label);
+                        return new Set([...range.getClientRects()].map((rect) => rect.top)).size;
+                    }),
+                    headingVisible: heading.top >= header.bottom && picker.bottom <= barTop,
+                    balanced: Math.abs(heading.left - (innerWidth - heading.right)) < 2,
+                    columns: cards.filter((card) => card.offsetTop === cards[0].offsetTop).length,
+                    cardsFit: cards.every((card) => {
+                        const text = card.querySelector('.daily-task-copy').getBoundingClientRect();
+                        return text.bottom <= card.getBoundingClientRect().bottom - 8;
+                    }),
+                    scrollWidth: document.documentElement.scrollWidth,
+                };
+            });
+            assert.ok(layout.barHeight > 0 && layout.barHeight <= 100, `Compact tab bar at ${width}px`);
+            assert.deepEqual(layout.labelLines, [1, 1, 1, 1, 1], `Single-line tab labels at ${width}px`);
+            assert.ok(layout.headingVisible && layout.balanced, `Home heading and branch switcher fit at ${width}px`);
+            assert.equal(layout.columns, columns);
+            assert.ok(layout.cardsFit, `Task copy fits at ${width}px`);
+            assert.ok(layout.scrollWidth <= width, `No horizontal page overflow at ${width}px`);
+        }
+        await tabletPage.setViewportSize({ width: 1366, height: 1024 });
+        await tabletPage.locator('[data-mobile-search]').tap();
+        const tabletSearch = tabletPage.locator('#workspace-search');
+        assert.equal(await tabletSearch.evaluate((input) => getComputedStyle(input).fontSize), '16px');
+        await tabletSearch.press('Escape');
+        assert.equal(await tabletSearch.isVisible(), false);
         await Promise.all([
             tabletPage.waitForURL('**/dispatches'),
             tabletPage.locator('.mobile-nav > a').nth(2).tap(),
